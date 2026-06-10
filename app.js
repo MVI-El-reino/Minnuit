@@ -1,5 +1,5 @@
 let carrito = [];
-const numeroDueno = "522227125366"; 
+const numeroDueno = "5215551234567"; // CAMBIA ESTO POR EL NÚMERO DEL DUEÑO
 
 // 1. Tablas de precios
 const basesBasicPrecios = {
@@ -19,32 +19,25 @@ const coloresLogotipo = {
     "Premium": ["blanco", "dorado", "negro"]
 };
 
-// ==========================================
-// NUEVO: Función de Alertas Elegantes
-// ==========================================
+// Alertas Toasts
 function mostrarAlerta(mensaje) {
     const contenedor = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = 'toast';
     toast.innerHTML = mensaje;
     contenedor.appendChild(toast);
-    
-    // Se elimina del HTML después de 3 segundos (cuando termina la animación)
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
+    setTimeout(() => { toast.remove(); }, 3000);
 }
 
-// 2. Navegación por pestañas
+// Navegación de pestañas
 function cambiarTab(idSeccion) {
     document.querySelectorAll('.categoria-seccion').forEach(sec => sec.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    
     document.getElementById(idSeccion).classList.add('active');
     event.currentTarget.classList.add('active');
 }
 
-// 3. Control de Cantidades
+// Control de Cantidades individuales
 function cambiarCantidad(inputId, cambio, minimo) {
     let input = document.getElementById(inputId);
     let valorActual = parseInt(input.value);
@@ -53,16 +46,13 @@ function cambiarCantidad(inputId, cambio, minimo) {
     if (nuevoValor >= minimo) {
         input.value = nuevoValor;
     } else {
-        mostrarAlerta(`⚠️ El mínimo es de ${minimo} piezas.`);
+        mostrarAlerta(`⚠️ La cantidad mínima para este artículo es ${minimo}.`);
     }
 }
 
-// 4. Lógica Dinámica del Configurador de Bases
+// Configuración dinámica de bases
 let precioBaseActual = 25; 
-
-function inicializarBases() {
-    actualizarConfiguradorBases();
-}
+function inicializarBases() { actualizarConfiguradorBases(); }
 
 function actualizarConfiguradorBases() {
     const linea = document.getElementById("sel_linea_base").value;
@@ -93,49 +83,78 @@ function agregarBaseConfigAlCarrito() {
     const cantidad = parseInt(document.getElementById("cant_base_config").value);
 
     const nombreCompuesto = `Base ${linea} ${forma} ${grosor} ${tamano}`;
-    const detalleCompuesto = `Color Logo: ${colorLogo}`;
+    const detalleCompuesto = `Logo: ${colorLogo}`;
     const subtotal = precioBaseActual * cantidad;
 
-    carrito.push({
-        nombre: nombreCompuesto,
-        cantidad: cantidad,
-        detalle: detalleCompuesto,
-        precio: precioBaseActual,
-        subtotal: subtotal
-    });
-
+    carrito.push({ nombre: nombreCompuesto, cantidad, detalle: detalleCompuesto, precio: precioBaseActual, subtotal });
     mostrarAlerta(`🛒 ¡Agregado al carrito!`);
     actualizarVistaCarrito();
 }
 
-// 5. Manejo General del Carrito
 function agregarAlCarrito(nombre, precio, idCantidad, idDetalle) {
     let cantidad = parseInt(document.getElementById(idCantidad).value);
     let detalleTxt = document.getElementById(idDetalle).value || "Sin detalle";
-    
     let subtotal = precio * cantidad;
     
     carrito.push({ nombre, cantidad, detalle: detalleTxt, precio, subtotal });
-    
     mostrarAlerta(`🛒 ¡Agregado al carrito!`);
     actualizarVistaCarrito();
 }
 
+// NUEVO: Eliminar un artículo específico del carrito
+function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
+    mostrarAlerta("❌ Artículo eliminado");
+    actualizarVistaCarrito();
+    
+    // Si vacían el carrito por completo, cerramos el modal automáticamente
+    if(carrito.length === 0) {
+        cerrarModal();
+    }
+}
+
+// MODIFICADO: Lógica de validación acumulada de 35 piezas
 function actualizarVistaCarrito() {
-    let total = 0;
+    let totalDinero = 0;
+    let totalPiezasBases = 0; // Contamos solo piezas del catálogo que apliquen a la regla
     let listaHTML = "";
     
     carrito.forEach((item, index) => {
-        total += item.subtotal;
-        listaHTML += `<li><strong>${item.cantidad}x ${item.nombre}</strong><br><small>Ref: ${item.detalle}</small><br><small>Sub: $${item.subtotal.toFixed(2)}</small></li>`;
+        totalDinero += item.subtotal;
+        
+        // Si el nombre contiene la palabra "Base", lo sumamos al contador de la regla
+        if(item.nombre.includes("Base")) {
+            totalPiezasBases += item.cantidad;
+        }
+        
+        listaHTML += `
+            <li>
+                <button class="btn-eliminar-item" onclick="eliminarDelCarrito(${index})">&times;</button>
+                <strong>${item.cantidad}x ${item.nombre}</strong><br>
+                <small>Ref: ${item.detalle}</small><br>
+                <small>Sub: $${item.subtotal.toFixed(2)}</small>
+            </li>`;
     });
     
-    document.getElementById("fab-total").innerText = "$" + total.toFixed(2);
-    document.getElementById("modal-total").innerText = "$" + total.toFixed(2);
+    document.getElementById("fab-total").innerText = "$" + totalDinero.toFixed(2);
+    document.getElementById("modal-total").innerText = "$" + totalDinero.toFixed(2);
     document.getElementById("lista-carrito").innerHTML = listaHTML;
+
+    // Control de la regla de negocio de las 35 piezas de bases
+    const btnPedido = document.querySelector(".btn-pedido");
+    const alertaPiezas = document.getElementById("contador-piezas-alerta");
+
+    if (totalPiezasBases < 35) {
+        alertaPiezas.className = "texto-alerta-rojo";
+        alertaPiezas.innerText = `⚠️ Llevas ${totalPiezasBases} bases de MDF. El mínimo acumulado para procesar fabricación es de 35 piezas.`;
+        btnPedido.disabled = true; // Bloquea el botón
+    } else {
+        alertaPiezas.className = "texto-valido-verde";
+        alertaPiezas.innerText = `✅ ¡Súper! Llevas ${totalPiezasBases} bases acumuladas. Pedido autorizado.`;
+        btnPedido.disabled = false; // Desbloquea el botón
+    }
 }
 
-// 6. Modal
 function abrirModal() {
     if(carrito.length === 0) return mostrarAlerta("🛍️ Tu carrito está vacío.");
     document.getElementById("modal-carrito").style.display = "block";
@@ -144,7 +163,7 @@ function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
 
-// 7. Procesar Pedido (PDF + WhatsApp)
+// Generar PDF y Redirigir a WhatsApp
 async function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value;
     if (!nombreCliente) return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
@@ -152,7 +171,6 @@ async function procesarPedido() {
     mostrarAlerta("⏳ Preparando tu pedido...");
     
     let totalTxt = document.getElementById("modal-total").innerText;
-    
     document.getElementById("pdf-cliente").innerText = nombreCliente;
     document.getElementById("pdf-total").innerText = totalTxt;
     
