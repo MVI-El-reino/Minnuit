@@ -1,19 +1,19 @@
 :root {
-    /* Paleta refinada */
+    /* Paleta refinada con MÁS ROSA MINUIT */
     --rosa-principal: #e87b9e;
     --rosa-gradiente: linear-gradient(135deg, #f48fb1 0%, #e16b90 100%);
-    --rosa-claro: #fcf0f4;
+    --rosa-claro: #fdf0f4;     /* <--- Fondo general de la página (Rosa Minuit pastel) */
+    --rosa-medio: #fadbe4;     /* <--- Para detalles y bordes */
     --rosa-hover: #d66488;
     --blanco: #ffffff;
-    --fondo-app: #f8f9fa;
-    --texto-oscuro: #2d3436;
-    --texto-secundario: #636e72;
-    --borde-suave: #edf2f7;
+    --texto-oscuro: #4a3b40;     /* <--- Un gris muy oscuro casi café/rosado */
+    --texto-secundario: #9e7f8a; /* <--- Gris con tinte rosado para textos menores */
+    --borde-suave: #f8dce5;      /* <--- Bordes rosados en lugar de grises */
     
-    /* Sombras modernas (estilo Apple/Stripe) */
-    --sombra-tarjeta: 0 10px 30px -5px rgba(232, 123, 158, 0.08);
+    /* Sombras teñidas de rosa */
+    --sombra-tarjeta: 0 10px 30px -5px rgba(232, 123, 158, 0.2); 
     --sombra-boton: 0 8px 20px -6px rgba(225, 107, 144, 0.5);
-    --sombra-header: 0 4px 20px rgba(0,0,0,0.03);
+    --sombra-header: 0 4px 20px rgba(232, 123, 158, 0.12);
 }
 
 /* =========================================
@@ -23,10 +23,10 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: var(--fondo-app);
+    background-color: var(--rosa-claro); /* Aplicamos el fondo rosa pastel */
     color: var(--texto-oscuro);
     padding-bottom: 90px;
-    -webkit-font-smoothing: antialiased; /* Texto más nítido */
+    -webkit-font-smoothing: antialiased;
 }
 
 /* =========================================
@@ -40,6 +40,7 @@ header {
     position: sticky;
     top: 0;
     z-index: 50;
+    border-bottom: 1px solid var(--rosa-medio); /* Línea divisoria sutil */
 }
 
 header h1 {
@@ -64,21 +65,19 @@ header p {
    ========================================= */
 .tabs {
     display: flex;
-    background: var(--blanco);
+    background: transparent; /* Dejamos ver el fondo rosa */
     padding: 15px;
     gap: 10px;
     overflow-x: auto;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-    /* Ocultar barra de scroll pero mantener funcionalidad */
     scrollbar-width: none; 
 }
 .tabs::-webkit-scrollbar { display: none; }
 
 .tab-btn {
     flex: 0 0 auto;
-    background: var(--fondo-app);
+    background: var(--blanco);
     border: 1px solid var(--borde-suave);
-    border-radius: 25px; /* Botones tipo píldora */
+    border-radius: 25px;
     padding: 10px 20px;
     font-family: 'Poppins', sans-serif;
     font-size: 0.9rem;
@@ -86,6 +85,7 @@ header p {
     color: var(--texto-secundario);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(232, 123, 158, 0.05);
 }
 
 .tab-btn.active {
@@ -101,9 +101,9 @@ header p {
    ========================================= */
 .categoria-seccion { 
     display: none; 
-    padding: 25px 15px; 
+    padding: 15px 15px 25px; 
     max-width: 600px;
-    margin: 0 auto; /* Centrar en pantallas grandes */
+    margin: 0 auto; 
 }
 .categoria-seccion.active { 
     display: block; 
@@ -121,11 +121,11 @@ header p {
     padding: 25px;
     margin-bottom: 25px;
     box-shadow: var(--sombra-tarjeta);
-    border: 1px solid rgba(232, 123, 158, 0.05);
+    border: 1px solid var(--blanco);
     transition: transform 0.2s ease;
 }
 
-.card-producto:active { transform: scale(0.99); } /* Efecto al tocar en celular */
+.card-producto:active { transform: scale(0.99); }
 
 .card-producto h3 { 
     color: var(--texto-oscuro); 
@@ -161,11 +161,10 @@ header p {
     font-family: 'Poppins', sans-serif;
     font-size: 0.95rem;
     color: var(--texto-oscuro);
-    background-color: var(--fondo-app);
+    background-color: #fffafb; /* Blanco con una gotita de rosa */
     transition: all 0.3s ease;
 }
 
-/* Personalizar la flecha del select para que se vea moderna */
 .controles-config select {
     appearance: none;
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23e87b9e%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
@@ -177,7 +176,7 @@ header p {
 .controles input:focus, .controles-config select:focus {
     outline: none;
     border-color: var(--rosa-principal);
-    box-shadow: 0 0 0 4px rgba(232, 123, 158, 0.15); /* Anillo de enfoque (Focus ring) */
+    box-shadow: 0 0 0 4px rgba(232, 123, 158, 0.15); 
     background-color: var(--blanco);
 }
 
@@ -205,7 +204,7 @@ header p {
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    background: var(--fondo-app); 
+    background: #fffafb; 
     border-radius: 12px; 
     padding: 8px;
     margin: 25px 0 20px;
@@ -214,7 +213,7 @@ header p {
 
 .controles-cantidad button {
     background: var(--blanco); 
-    color: var(--texto-oscuro); 
+    color: var(--rosa-principal); 
     border: 1px solid var(--borde-suave);
     width: 40px; 
     height: 40px; 
@@ -222,12 +221,11 @@ header p {
     font-size: 1.3rem; 
     cursor: pointer;
     transition: 0.2s;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    box-shadow: 0 2px 5px rgba(232, 123, 158, 0.08);
 }
 
 .controles-cantidad button:active {
     background: var(--rosa-claro);
-    color: var(--rosa-principal);
     border-color: var(--rosa-principal);
 }
 
@@ -239,6 +237,7 @@ header p {
     font-family: 'Poppins', sans-serif; 
     font-weight: 700; 
     font-size: 1.1rem; 
+    color: var(--texto-oscuro);
     pointer-events: none;
 }
 
@@ -294,7 +293,7 @@ header p {
 #fab-carrito:hover { transform: scale(1.05); }
 
 /* =========================================
-   Modal (Look Vidrio/Limpo)
+   Modal (Look Vidrio)
    ========================================= */
 .modal {
     display: none; 
@@ -304,8 +303,8 @@ header p {
     top: 0;
     width: 100%; 
     height: 100%; 
-    background-color: rgba(45, 52, 54, 0.6); /* Fondo más oscuro y elegante */
-    backdrop-filter: blur(4px); /* Efecto cristal */
+    background-color: rgba(74, 59, 64, 0.5); /* Tinte cálido rosado oscuro */
+    backdrop-filter: blur(4px); 
 }
 
 .modal-contenido {
@@ -316,7 +315,7 @@ header p {
     max-width: 450px; 
     border-radius: 20px; 
     position: relative;
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    box-shadow: 0 25px 50px -12px rgba(232, 123, 158, 0.3);
     animation: modalPop 0.3s ease-out;
 }
 
@@ -332,7 +331,7 @@ header p {
     font-size: 32px; 
     font-weight: 400; 
     cursor: pointer; 
-    color: #b2bec3; 
+    color: var(--texto-secundario); 
     transition: 0.2s;
 }
 .cerrar:hover { color: var(--rosa-principal); }
@@ -366,18 +365,6 @@ header p {
 .total-modal span { color: var(--rosa-principal); font-weight: 700; }
 
 /* =========================================
-   Plantilla Oculta para el PDF
-   ========================================= */
-#contenedor-pdf {
-    position: absolute;
-    left: -9999px;
-    width: 600px;
-    background: white;
-    padding: 40px;
-    font-family: 'Poppins', sans-serif;
-    color: #000;
-}
-/* =========================================
    Alertas Elegantes (Toasts Flotantes)
    ========================================= */
 #toast-container {
@@ -389,7 +376,7 @@ header p {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    pointer-events: none; /* Para que no interfiera con los clics */
+    pointer-events: none; 
     width: 90%;
     max-width: 350px;
 }
@@ -404,7 +391,6 @@ header p {
     font-weight: 600;
     text-align: center;
     border: 2px solid var(--rosa-claro);
-    /* Animación de entrada y salida automática */
     animation: slideInDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, fadeOut 0.4s ease 2.5s forwards;
 }
 
@@ -416,4 +402,17 @@ header p {
 @keyframes fadeOut {
     from { opacity: 1; transform: translateY(0) scale(1); }
     to { opacity: 0; transform: translateY(-30px) scale(0.9); }
+}
+
+/* =========================================
+   Plantilla Oculta para el PDF
+   ========================================= */
+#contenedor-pdf {
+    position: absolute;
+    left: -9999px;
+    width: 600px;
+    background: white;
+    padding: 40px;
+    font-family: 'Poppins', sans-serif;
+    color: #000;
 }
