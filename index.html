@@ -116,10 +116,10 @@
                     <input type="text" id="detalle_pastel1" placeholder="Ej. Sin logo">
                 </div>
                 <div class="controles-cantidad">
-                    <button onclick="cambiarCantidad('cant_caja_pas1', -1, 30)">-</button>
-                    <input type="number" id="cant_caja_pas1" value="30" readonly>
-                    <button onclick="cambiarCantidad('cant_caja_pas1', 1, 30)">+</button>
-                </div>
+    <button onclick="cambiarCantidad('cant_base_config', -1, 1)">-</button>
+    <input type="number" id="cant_base_config" value="10" readonly>
+    <button onclick="cambiarCantidad('cant_base_config', 1, 1)">+</button>
+</div>
                 <button class="btn-agregar" onclick="agregarAlCarrito('Caja Pastel 15.5x10', 20, 'cant_caja_pas1', 'detalle_pastel1')">Agregar al Carrito</button>
             </div>
         </section>
@@ -129,11 +129,6 @@
         🛒 Total: <span id="fab-total">$0.00</span>
     </div>
 
-    <div class="controles-cantidad">
-    <button onclick="cambiarCantidad('cant_base_config', -1, 1)">-</button>
-    <input type="number" id="cant_base_config" value="10" readonly>
-    <button onclick="cambiarCantidad('cant_base_config', 1, 1)">+</button>
-</div>
 
 <div id="modal-carrito" class="modal">
     <div class="modal-contenido">
