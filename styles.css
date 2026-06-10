@@ -69,16 +69,21 @@ header h1 {
     border-top: 5px solid var(--rosa-claro);
 }
 
-.card-producto h3 { color: var(--rosa-fuerte); margin-bottom: 5px; }
-.card-producto p { font-size: 0.85rem; color: #777; margin-bottom: 10px;}
-.precio { font-weight: 600; font-size: 1.1rem !important; color: var(--texto) !important; }
+.card-configurador h3 { color: var(--rosa-fuerte); margin-bottom: 10px; }
+.card-configurador p { font-size: 0.85rem; color: #777; margin-bottom: 15px;}
 
-.controles label { font-size: 0.8rem; display: block; margin-top: 10px; }
-.controles input {
-    width: 100%; padding: 8px; margin-top: 5px;
+.controles label, .controles-config label { font-size: 0.8rem; display: block; margin-top: 10px; }
+.controles input, .controles-config select {
+    width: 100%; padding: 12px; margin-top: 5px;
     border: 1px solid #ddd; border-radius: 6px;
     font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: var(--texto);
+    background-color: white;
 }
+
+.precio { font-weight: 600; font-size: 1.1rem; color: var(--texto); }
+.precio-grande { font-size: 1.5rem; text-align: center; margin-top: 20px; color: var(--rosa-fuerte) !important; }
 
 /* Controles de Cantidad */
 .controles-cantidad {
@@ -95,9 +100,10 @@ header h1 {
 }
 
 .btn-agregar {
-    width: 100%; padding: 12px; border: none; border-radius: 8px;
+    width: 100%; padding: 15px; border: none; border-radius: 8px;
     background-color: var(--rosa-claro); color: var(--rosa-fuerte);
     font-family: 'Poppins', sans-serif; font-weight: 600; cursor: pointer; transition: 0.2s;
+    font-size: 1rem;
 }
 .btn-agregar:hover { background-color: var(--rosa-fuerte); color: white; }
 
@@ -108,6 +114,7 @@ header h1 {
     padding: 15px 25px; border-radius: 30px; font-weight: 600;
     box-shadow: 0 5px 20px rgba(244, 143, 177, 0.5); cursor: pointer;
     z-index: 100;
+    font-size: 1rem;
 }
 
 /* Modal */
@@ -120,14 +127,15 @@ header h1 {
     width: 90%; max-width: 400px; border-radius: 15px; position: relative;
 }
 .cerrar { position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
-.input-cliente input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
+.input-cliente input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
 #lista-carrito { list-style: none; margin: 15px 0; max-height: 200px; overflow-y: auto; }
-#lista-carrito li { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+#lista-carrito li { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; line-height: 1.4; }
 .total-modal { color: var(--rosa-fuerte); text-align: right; margin-bottom: 15px; }
 
 .btn-pedido {
     width: 100%; background: var(--rosa-fuerte); color: white; border: none;
     padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
 }
 
 /* Ocultar el PDF de la pantalla normal */
