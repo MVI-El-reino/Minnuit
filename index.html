@@ -5,48 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Pedido Exclusivo - Minuit</title>
-    <!-- Tipografías de Google -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Librería para generar el PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body onload="inicializarBases()">
 
     <header>
         <h1>Minuit</h1>
         <p>Catálogo de Productos Chulis</p>
     </header>
 
-    <!-- Navegación de Categorías -->
     <nav class="tabs">
         <button class="tab-btn active" onclick="cambiarTab('bases')">Bases MDF</button>
         <button class="tab-btn" onclick="cambiarTab('cajas_cupcakes')">Cajas Cupcakes</button>
         <button class="tab-btn" onclick="cambiarTab('cajas_pastel')">Cajas Pastel</button>
     </nav>
 
-    <!-- Contenedor de Productos -->
     <main>
-        <!-- Categoría: Bases MDF -->
         <section id="bases" class="categoria-seccion active">
-            <div class="card-producto">
-                <h3>Base Basic - 3MM (15cm)</h3>
-                <p>Color blanco o negro mate. Incluye logotipo.</p>
-                <p class="precio">$25.00 MXN</p>
-                <div class="controles">
-                    <label>Color Logo:</label>
-                    <input type="text" id="logo_base1" placeholder="Ej. Dorado">
+            <div class="card-producto card-configurador">
+                <h3>Bases Personalizadas - Configura la Tuya</h3>
+                <p>Mínimo 35 piezas. Combina tamaños, grosores y figuras.</p>
+                
+                <div class="controles-config">
+                    <label>Línea:</label>
+                    <select id="sel_linea_base" onchange="actualizarConfiguradorBases()">
+                        <option value="Basic">Basic (Blanco ó Negro mate)</option>
+                        <option value="Premium">Premium (+100 colores/texturas)</option>
+                    </select>
                 </div>
+                
+                <div class="controles-config">
+                    <label>Grosor:</label>
+                    <select id="sel_grosor_base" onchange="actualizarConfiguradorBases()">
+                        <option value="3MM">3 MM</option>
+                        <option value="6MM">6 MM</option>
+                        <option value="9MM">9 MM</option>
+                    </select>
+                </div>
+                
+                <div class="controles-config">
+                    <label>Tamaño:</label>
+                    <select id="sel_tamano_base" onchange="actualizarConfiguradorBases()">
+                        <option value="15cm">#15cm (6")</option>
+                        <option value="20cm">#20cm (8")</option>
+                        <option value="23cm">#23cm (9")</option>
+                        <option value="25cm">#25cm (10")</option>
+                        <option value="28cm">#28cm (11")</option>
+                        <option value="30cm">#30cm (12")</option>
+                        <option value="35cm">#35cm (14")</option>
+                        <option value="40cm">#40cm (16")</option>
+                        <option value="45cm">#45cm (18")</option>
+                        <option value="50cm">#50cm (20")</option>
+                    </select>
+                </div>
+                
+                <div class="controles-config">
+                    <label>Forma:</label>
+                    <select id="sel_forma_base">
+                        <option value="Círculo">Círculo</option>
+                        <option value="Cuadrado">Cuadrado</option>
+                        <option value="Octágono">Octágono</option>
+                        <option value="Hexágono">Hexágono</option>
+                    </select>
+                </div>
+                
+                <div class="controles-config">
+                    <label>Color Logotipo:</label>
+                    <select id="sel_color_logo_base">
+                        </select>
+                </div>
+
+                <p id="precio_config_base" class="precio precio-grande">$25.00 MXN / u</p>
+
                 <div class="controles-cantidad">
-                    <button onclick="cambiarCantidad('cant_base1', -1, 35)">-</button>
-                    <input type="number" id="cant_base1" value="35" readonly>
-                    <button onclick="cambiarCantidad('cant_base1', 1, 35)">+</button>
+                    <button onclick="cambiarCantidad('cant_base_config', -1, 35)">-</button>
+                    <input type="number" id="cant_base_config" value="35" readonly>
+                    <button onclick="cambiarCantidad('cant_base_config', 1, 35)">+</button>
                 </div>
-                <button class="btn-agregar" onclick="agregarAlCarrito('Base Basic 3MM 15cm', 25, 'cant_base1', 'logo_base1')">Agregar al Carrito</button>
+                <button class="btn-agregar" onclick="agregarBaseConfigAlCarrito()">Agregar al Carrito</button>
             </div>
         </section>
 
-        <!-- Categoría: Cajas Cupcakes -->
         <section id="cajas_cupcakes" class="categoria-seccion">
             <div class="card-producto">
                 <h3>Caja 2 Cupcakes</h3>
@@ -65,7 +106,6 @@
             </div>
         </section>
 
-        <!-- Categoría: Cajas Pastel -->
         <section id="cajas_pastel" class="categoria-seccion">
             <div class="card-producto">
                 <h3>Caja Pastel 15.5x15.5x10</h3>
@@ -85,12 +125,10 @@
         </section>
     </main>
 
-    <!-- Botón Flotante del Carrito -->
     <div id="fab-carrito" onclick="abrirModal()">
         🛒 Total: <span id="fab-total">$0.00</span>
     </div>
 
-    <!-- Modal del Carrito -->
     <div id="modal-carrito" class="modal">
         <div class="modal-contenido">
             <span class="cerrar" onclick="cerrarModal()">&times;</span>
@@ -105,7 +143,6 @@
         </div>
     </div>
 
-    <!-- Plantilla Oculta para el PDF -->
     <div id="contenedor-pdf">
         <h1 style="font-family: 'Dancing Script', cursive; color: #f48fb1; text-align: center;">Minuit</h1>
         <h3 style="text-align: center;">Resumen de Pedido</h3>
