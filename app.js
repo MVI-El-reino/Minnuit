@@ -1,7 +1,7 @@
 let carrito = [];
 const numeroDueno = "5215551234567"; // CAMBIA ESTO POR EL NÚMERO DEL DUEÑO
 
-// 1. Tablas de precios de las imágenes adjuntas
+// 1. Tablas de precios
 const basesBasicPrecios = {
     "3MM": { "15cm": 25, "20cm": 35, "23cm": 38, "25cm": 40, "28cm": 45, "30cm": 50, "35cm": 65, "40cm": 80, "45cm": 110, "50cm": 125 },
     "6MM": { "15cm": 35, "20cm": 45, "23cm": 50, "25cm": 65, "28cm": 75, "30cm": 90, "35cm": 110, "40cm": 130, "45cm": 150, "50cm": 180 },
@@ -19,6 +19,22 @@ const coloresLogotipo = {
     "Premium": ["blanco", "dorado", "negro"]
 };
 
+// ==========================================
+// NUEVO: Función de Alertas Elegantes
+// ==========================================
+function mostrarAlerta(mensaje) {
+    const contenedor = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = mensaje;
+    contenedor.appendChild(toast);
+    
+    // Se elimina del HTML después de 3 segundos (cuando termina la animación)
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
 // 2. Navegación por pestañas
 function cambiarTab(idSeccion) {
     document.querySelectorAll('.categoria-seccion').forEach(sec => sec.classList.remove('active'));
@@ -28,7 +44,7 @@ function cambiarTab(idSeccion) {
     event.currentTarget.classList.add('active');
 }
 
-// 3. Control de Cantidades (Asegura el mínimo de piezas)
+// 3. Control de Cantidades
 function cambiarCantidad(inputId, cambio, minimo) {
     let input = document.getElementById(inputId);
     let valorActual = parseInt(input.value);
@@ -37,12 +53,12 @@ function cambiarCantidad(inputId, cambio, minimo) {
     if (nuevoValor >= minimo) {
         input.value = nuevoValor;
     } else {
-        alert("La cantidad mínima para este producto es de " + minimo + " piezas.");
+        mostrarAlerta(`⚠️ El mínimo es de ${minimo} piezas.`);
     }
 }
 
 // 4. Lógica Dinámica del Configurador de Bases
-let precioBaseActual = 25; // Precio inicial por defecto
+let precioBaseActual = 25; 
 
 function inicializarBases() {
     actualizarConfiguradorBases();
@@ -53,14 +69,11 @@ function actualizarConfiguradorBases() {
     const grosor = document.getElementById("sel_grosor_base").value;
     const tamano = document.getElementById("sel_tamano_base").value;
 
-    // Buscar precio unitario
     const precios = (linea === "Basic") ? basesBasicPrecios : basesPremiumPrecios;
     precioBaseActual = precios[grosor][tamano];
 
-    // Actualizar precio en pantalla
     document.getElementById("precio_config_base").innerText = `$${precioBaseActual.toFixed(2)} MXN / u`;
 
-    // Actualizar opciones de color de logotipo
     const selectColor = document.getElementById("sel_color_logo_base");
     selectColor.innerHTML = "";
     coloresLogotipo[linea].forEach(color => {
@@ -79,7 +92,6 @@ function agregarBaseConfigAlCarrito() {
     const colorLogo = document.getElementById("sel_color_logo_base").value;
     const cantidad = parseInt(document.getElementById("cant_base_config").value);
 
-    // Crear nombre compuesto para el carrito y WhatsApp
     const nombreCompuesto = `Base ${linea} ${forma} ${grosor} ${tamano}`;
     const detalleCompuesto = `Color Logo: ${colorLogo}`;
     const subtotal = precioBaseActual * cantidad;
@@ -92,7 +104,7 @@ function agregarBaseConfigAlCarrito() {
         subtotal: subtotal
     });
 
-    alert(`¡${cantidad}x ${nombreCompuesto} agregado al carrito!`);
+    mostrarAlerta(`🛒 ¡Agregado al carrito!`);
     actualizarVistaCarrito();
 }
 
@@ -105,7 +117,7 @@ function agregarAlCarrito(nombre, precio, idCantidad, idDetalle) {
     
     carrito.push({ nombre, cantidad, detalle: detalleTxt, precio, subtotal });
     
-    alert(`¡${cantidad}x ${nombre} agregado al carrito!`);
+    mostrarAlerta(`🛒 ¡Agregado al carrito!`);
     actualizarVistaCarrito();
 }
 
@@ -125,21 +137,22 @@ function actualizarVistaCarrito() {
 
 // 6. Modal
 function abrirModal() {
-    if(carrito.length === 0) return alert("Tu carrito está vacío.");
+    if(carrito.length === 0) return mostrarAlerta("🛍️ Tu carrito está vacío.");
     document.getElementById("modal-carrito").style.display = "block";
 }
 function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
 
-// 7. Procesar Pedido (PDF + WhatsApp con detalles completos)
+// 7. Procesar Pedido (PDF + WhatsApp)
 async function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value;
-    if (!nombreCliente) return alert("Por favor, escribe tu nombre para el pedido.");
+    if (!nombreCliente) return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
+    
+    mostrarAlerta("⏳ Preparando tu pedido...");
     
     let totalTxt = document.getElementById("modal-total").innerText;
     
-    // Preparar el HTML oculto para el PDF
     document.getElementById("pdf-cliente").innerText = nombreCliente;
     document.getElementById("pdf-total").innerText = totalTxt;
     
@@ -147,16 +160,13 @@ async function procesarPedido() {
     let textoWhatsApp = `✨ *¡Hola Minuit! Nuevo pedido* ✨\n\n*Cliente:* ${nombreCliente}\n\n*Detalles:*\n`;
     
     carrito.forEach(item => {
-        // Llenado para PDF
         pdfLista += `<li style="margin-bottom: 10px;"><strong>${item.cantidad}x ${item.nombre}</strong> - ${item.detalle} <span style="float:right;">$${item.subtotal.toFixed(2)}</span></li>`;
-        // Llenado para WhatsApp (con detalles completos de configuración)
         textoWhatsApp += `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
     });
     
     document.getElementById("pdf-lista").innerHTML = pdfLista;
     textoWhatsApp += `\n💰 *Total: ${totalTxt}*\n\nQuedo a la espera de los datos de transferencia.`;
 
-    // Generar y descargar PDF
     const elementoPDF = document.getElementById("contenedor-pdf");
     const opcionesPDF = {
         margin: 10,
@@ -166,7 +176,6 @@ async function procesarPedido() {
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
-    // Mostramos temporalmente, tomamos foto, y volvemos a ocultar (necesario para html2pdf)
     elementoPDF.style.left = "0";
     elementoPDF.style.position = "relative";
     
@@ -174,13 +183,12 @@ async function procesarPedido() {
         elementoPDF.style.position = "absolute";
         elementoPDF.style.left = "-9999px";
         
-        // Redirigir a WhatsApp después de guardar el PDF
         let textoCodificado = encodeURIComponent(textoWhatsApp);
         window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
         
-        // Limpiar carrito
         carrito = [];
         actualizarVistaCarrito();
         cerrarModal();
+        document.getElementById("nombre_cliente").value = "";
     });
 }
