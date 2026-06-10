@@ -163,12 +163,12 @@ function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
 
-// Generar PDF y Redirigir a WhatsApp
+// 8. Generar PDF y Redirigir a WhatsApp (VERSIÓN CORREGIDA)
 async function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value;
     if (!nombreCliente) return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
     
-    mostrarAlerta("⏳ Preparando tu pedido...");
+    mostrarAlerta("⏳ Generando tu nota de pedido...");
     
     let totalTxt = document.getElementById("modal-total").innerText;
     document.getElementById("pdf-cliente").innerText = nombreCliente;
@@ -178,7 +178,7 @@ async function procesarPedido() {
     let textoWhatsApp = `✨ *¡Hola Minuit! Nuevo pedido* ✨\n\n*Cliente:* ${nombreCliente}\n\n*Detalles:*\n`;
     
     carrito.forEach(item => {
-        pdfLista += `<li style="margin-bottom: 10px;"><strong>${item.cantidad}x ${item.nombre}</strong> - ${item.detalle} <span style="float:right;">$${item.subtotal.toFixed(2)}</span></li>`;
+        pdfLista += `<li style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;"><strong>${item.cantidad}x ${item.nombre}</strong><br><small style="color: #666;">${item.detalle}</small> <span style="float:right; font-weight: bold;">$${item.subtotal.toFixed(2)}</span></li>`;
         textoWhatsApp += `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
     });
     
@@ -186,27 +186,39 @@ async function procesarPedido() {
     textoWhatsApp += `\n💰 *Total: ${totalTxt}*\n\nQuedo a la espera de los datos de transferencia.`;
 
     const elementoPDF = document.getElementById("contenedor-pdf");
+    
+    // OPCIONES CORREGIDAS PARA EL PDF
     const opcionesPDF = {
-        margin: 10,
+        margin: [15, 15, 15, 15], // Márgenes superior, izquierdo, inferior, derecho
         filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, '_')}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true, 
+            windowWidth: 800 // EL TRUCO ESTÁ AQUÍ: Fuerza el ancho de la "cámara"
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
+    // Lo traemos al frente pero escondido detrás de todo el contenido visual
     elementoPDF.style.left = "0";
-    elementoPDF.style.position = "relative";
+    elementoPDF.style.zIndex = "-9999"; 
     
-    html2pdf().set(opcionesPDF).from(elementoPDF).save().then(() => {
-        elementoPDF.style.position = "absolute";
-        elementoPDF.style.left = "-9999px";
-        
-        let textoCodificado = encodeURIComponent(textoWhatsApp);
-        window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
-        
-        carrito = [];
-        actualizarVistaCarrito();
-        cerrarModal();
-        document.getElementById("nombre_cliente").value = "";
-    });
+    // Pequeño retraso de medio segundo para asegurar que las fuentes y estilos carguen bien
+    setTimeout(() => {
+        html2pdf().set(opcionesPDF).from(elementoPDF).save().then(() => {
+            // Lo regresamos a su escondite
+            elementoPDF.style.left = "-9999px";
+            
+            // Redirigimos a WhatsApp
+            let textoCodificado = encodeURIComponent(textoWhatsApp);
+            window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
+            
+            // Limpiamos el sistema para la siguiente compra
+            carrito = [];
+            actualizarVistaCarrito();
+            cerrarModal();
+            document.getElementById("nombre_cliente").value = "";
+        });
+    }, 500); // 500 milisegundos de espera
 }
