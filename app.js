@@ -1,7 +1,25 @@
 let carrito = [];
 const numeroDueno = "5215551234567"; // CAMBIA ESTO POR EL NÚMERO DEL DUEÑO
 
-// 1. Navegación por pestañas
+// 1. Tablas de precios de las imágenes adjuntas
+const basesBasicPrecios = {
+    "3MM": { "15cm": 25, "20cm": 35, "23cm": 38, "25cm": 40, "28cm": 45, "30cm": 50, "35cm": 65, "40cm": 80, "45cm": 110, "50cm": 125 },
+    "6MM": { "15cm": 35, "20cm": 45, "23cm": 50, "25cm": 65, "28cm": 75, "30cm": 90, "35cm": 110, "40cm": 130, "45cm": 150, "50cm": 180 },
+    "9MM": { "15cm": 50, "20cm": 60, "23cm": 75, "25cm": 85, "28cm": 110, "30cm": 140, "35cm": 160, "40cm": 190, "45cm": 220, "50cm": 250 }
+};
+
+const basesPremiumPrecios = {
+    "3MM": { "15cm": 33, "20cm": 45, "23cm": 48, "25cm": 55, "28cm": 60, "30cm": 65, "35cm": 80, "40cm": 100, "45cm": 125, "50cm": 145 },
+    "6MM": { "15cm": 53, "20cm": 60, "23cm": 70, "25cm": 78, "28cm": 90, "30cm": 105, "35cm": 125, "40cm": 145, "45cm": 170, "50cm": 200 },
+    "9MM": { "15cm": 60, "20cm": 75, "23cm": 85, "25cm": 95, "28cm": 120, "30cm": 150, "35cm": 170, "40cm": 200, "45cm": 230, "50cm": 260 }
+};
+
+const coloresLogotipo = {
+    "Basic": ["dorado", "rosa pastel", "rosa mexicano", "azul cielo", "negro", "jade", "tornasol"],
+    "Premium": ["blanco", "dorado", "negro"]
+};
+
+// 2. Navegación por pestañas
 function cambiarTab(idSeccion) {
     document.querySelectorAll('.categoria-seccion').forEach(sec => sec.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -10,7 +28,7 @@ function cambiarTab(idSeccion) {
     event.currentTarget.classList.add('active');
 }
 
-// 2. Control de Cantidades (Asegura el mínimo de piezas)
+// 3. Control de Cantidades (Asegura el mínimo de piezas)
 function cambiarCantidad(inputId, cambio, minimo) {
     let input = document.getElementById(inputId);
     let valorActual = parseInt(input.value);
@@ -23,14 +41,69 @@ function cambiarCantidad(inputId, cambio, minimo) {
     }
 }
 
-// 3. Manejo del Carrito
+// 4. Lógica Dinámica del Configurador de Bases
+let precioBaseActual = 25; // Precio inicial por defecto
+
+function inicializarBases() {
+    actualizarConfiguradorBases();
+}
+
+function actualizarConfiguradorBases() {
+    const linea = document.getElementById("sel_linea_base").value;
+    const grosor = document.getElementById("sel_grosor_base").value;
+    const tamano = document.getElementById("sel_tamano_base").value;
+
+    // Buscar precio unitario
+    const precios = (linea === "Basic") ? basesBasicPrecios : basesPremiumPrecios;
+    precioBaseActual = precios[grosor][tamano];
+
+    // Actualizar precio en pantalla
+    document.getElementById("precio_config_base").innerText = `$${precioBaseActual.toFixed(2)} MXN / u`;
+
+    // Actualizar opciones de color de logotipo
+    const selectColor = document.getElementById("sel_color_logo_base");
+    selectColor.innerHTML = "";
+    coloresLogotipo[linea].forEach(color => {
+        let option = document.createElement("option");
+        option.value = color;
+        option.text = color.charAt(0).toUpperCase() + color.slice(1);
+        selectColor.add(option);
+    });
+}
+
+function agregarBaseConfigAlCarrito() {
+    const linea = document.getElementById("sel_linea_base").value;
+    const grosor = document.getElementById("sel_grosor_base").value;
+    const tamano = document.getElementById("sel_tamano_base").value;
+    const forma = document.getElementById("sel_forma_base").value;
+    const colorLogo = document.getElementById("sel_color_logo_base").value;
+    const cantidad = parseInt(document.getElementById("cant_base_config").value);
+
+    // Crear nombre compuesto para el carrito y WhatsApp
+    const nombreCompuesto = `Base ${linea} ${forma} ${grosor} ${tamano}`;
+    const detalleCompuesto = `Color Logo: ${colorLogo}`;
+    const subtotal = precioBaseActual * cantidad;
+
+    carrito.push({
+        nombre: nombreCompuesto,
+        cantidad: cantidad,
+        detalle: detalleCompuesto,
+        precio: precioBaseActual,
+        subtotal: subtotal
+    });
+
+    alert(`¡${cantidad}x ${nombreCompuesto} agregado al carrito!`);
+    actualizarVistaCarrito();
+}
+
+// 5. Manejo General del Carrito
 function agregarAlCarrito(nombre, precio, idCantidad, idDetalle) {
     let cantidad = parseInt(document.getElementById(idCantidad).value);
-    let detalle = document.getElementById(idDetalle).value || "Sin detalle";
+    let detalleTxt = document.getElementById(idDetalle).value || "Sin detalle";
     
     let subtotal = precio * cantidad;
     
-    carrito.push({ nombre, cantidad, detalle, precio, subtotal });
+    carrito.push({ nombre, cantidad, detalle: detalleTxt, precio, subtotal });
     
     alert(`¡${cantidad}x ${nombre} agregado al carrito!`);
     actualizarVistaCarrito();
@@ -50,7 +123,7 @@ function actualizarVistaCarrito() {
     document.getElementById("lista-carrito").innerHTML = listaHTML;
 }
 
-// 4. Modal
+// 6. Modal
 function abrirModal() {
     if(carrito.length === 0) return alert("Tu carrito está vacío.");
     document.getElementById("modal-carrito").style.display = "block";
@@ -59,7 +132,7 @@ function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
 
-// 5. Procesar Pedido (PDF + WhatsApp)
+// 7. Procesar Pedido (PDF + WhatsApp con detalles completos)
 async function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value;
     if (!nombreCliente) return alert("Por favor, escribe tu nombre para el pedido.");
@@ -76,7 +149,7 @@ async function procesarPedido() {
     carrito.forEach(item => {
         // Llenado para PDF
         pdfLista += `<li style="margin-bottom: 10px;"><strong>${item.cantidad}x ${item.nombre}</strong> - ${item.detalle} <span style="float:right;">$${item.subtotal.toFixed(2)}</span></li>`;
-        // Llenado para WhatsApp
+        // Llenado para WhatsApp (con detalles completos de configuración)
         textoWhatsApp += `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
     });
     
