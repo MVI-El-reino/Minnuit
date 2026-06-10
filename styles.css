@@ -416,3 +416,52 @@ header p {
     font-family: 'Poppins', sans-serif;
     color: #000;
 }
+/* Estados del contador de piezas acumuladas */
+.texto-alerta-rojo {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    background: #fdf2f2;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border: 1px solid #fecdca;
+}
+
+.texto-valido-verde {
+    color: #2ecc71;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    background: #f4fbf7;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border: 1px solid #c3e6cb;
+}
+
+/* Estado bloqueado del botón de pedido */
+.btn-pedido:disabled {
+    background: #dcdde1 !important;
+    color: #a6b1b7 !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Botón elegante para eliminar un artículo del carrito */
+.btn-eliminar-item {
+    background: none;
+    border: none;
+    color: #ff7675;
+    font-size: 1.2rem;
+    cursor: pointer;
+    float: right;
+    padding: 0 5px;
+    transition: 0.2s;
+}
+.btn-eliminar-item:hover {
+    color: #d63031;
+    transform: scale(1.1);
+}
