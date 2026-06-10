@@ -129,19 +129,29 @@
         🛒 Total: <span id="fab-total">$0.00</span>
     </div>
 
-    <div id="modal-carrito" class="modal">
-        <div class="modal-contenido">
-            <span class="cerrar" onclick="cerrarModal()">&times;</span>
-            <h2>Tu Pedido Minuit</h2>
-            <div class="input-cliente">
-                <label>Tu Nombre:</label>
-                <input type="text" id="nombre_cliente" placeholder="Escribe tu nombre">
-            </div>
-            <ul id="lista-carrito"></ul>
-            <h3 class="total-modal">Total: <span id="modal-total">$0.00</span></h3>
-            <button class="btn-pedido" onclick="procesarPedido()">Hacer Pedido y Enviar a WhatsApp</button>
+    <div class="controles-cantidad">
+    <button onclick="cambiarCantidad('cant_base_config', -1, 1)">-</button>
+    <input type="number" id="cant_base_config" value="10" readonly>
+    <button onclick="cambiarCantidad('cant_base_config', 1, 1)">+</button>
+</div>
+
+<div id="modal-carrito" class="modal">
+    <div class="modal-contenido">
+        <span class="cerrar" onclick="cerrarModal()">&times;</span>
+        <h2>Tu Pedido Minuit</h2>
+        <div class="input-cliente">
+            <label>Tu Nombre:</label>
+            <input type="text" id="nombre_cliente" placeholder="Escribe tu nombre">
         </div>
+        
+        <ul id="lista-carrito"></ul>
+        
+        <p id="contador-piezas-alerta"></p>
+
+        <h3 class="total-modal">Total: <span id="modal-total">$0.00</span></h3>
+        <button class="btn-pedido" onclick="procesarPedido()">Hacer Pedido y Enviar a WhatsApp</button>
     </div>
+</div>
 
     <div id="contenedor-pdf">
         <h1 style="font-family: 'Dancing Script', cursive; color: #f48fb1; text-align: center;">Minuit</h1>
