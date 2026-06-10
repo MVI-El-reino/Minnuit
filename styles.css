@@ -377,3 +377,43 @@ header p {
     font-family: 'Poppins', sans-serif;
     color: #000;
 }
+/* =========================================
+   Alertas Elegantes (Toasts Flotantes)
+   ========================================= */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none; /* Para que no interfiera con los clics */
+    width: 90%;
+    max-width: 350px;
+}
+
+.toast {
+    background: var(--blanco);
+    color: var(--texto-oscuro);
+    padding: 14px 24px;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(232, 123, 158, 0.25);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+    border: 2px solid var(--rosa-claro);
+    /* Animación de entrada y salida automática */
+    animation: slideInDown 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, fadeOut 0.4s ease 2.5s forwards;
+}
+
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-30px) scale(0.9); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(-30px) scale(0.9); }
+}
