@@ -409,12 +409,13 @@ header p {
    ========================================= */
 #contenedor-pdf {
     position: absolute;
-    left: -9999px;
-    width: 600px;
-    background: white;
+    top: 0;
+    left: -9999px; /* Sigue oculto para el cliente */
+    width: 800px;  /* ANCHO FIJO OBLIGATORIO para el renderizado del PDF */
+    background: #ffffff;
     padding: 40px;
     font-family: 'Poppins', sans-serif;
-    color: #000;
+    color: #2d3436;
 }
 /* Estados del contador de piezas acumuladas */
 .texto-alerta-rojo {
