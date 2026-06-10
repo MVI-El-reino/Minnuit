@@ -1,144 +1,373 @@
 :root {
-    --rosa-fuerte: #f48fb1;
-    --rosa-claro: #fce4ec;
+    /* Paleta refinada */
+    --rosa-principal: #e87b9e;
+    --rosa-gradiente: linear-gradient(135deg, #f48fb1 0%, #e16b90 100%);
+    --rosa-claro: #fcf0f4;
+    --rosa-hover: #d66488;
     --blanco: #ffffff;
-    --texto: #4a4a4a;
-    --sombra: 0 4px 15px rgba(0,0,0,0.05);
+    --fondo-app: #f8f9fa;
+    --texto-oscuro: #2d3436;
+    --texto-secundario: #636e72;
+    --borde-suave: #edf2f7;
+    
+    /* Sombras modernas (estilo Apple/Stripe) */
+    --sombra-tarjeta: 0 10px 30px -5px rgba(232, 123, 158, 0.08);
+    --sombra-boton: 0 8px 20px -6px rgba(225, 107, 144, 0.5);
+    --sombra-header: 0 4px 20px rgba(0,0,0,0.03);
 }
 
+/* =========================================
+   Reset y Tipografía General
+   ========================================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #fafafa;
-    color: var(--texto);
-    padding-bottom: 80px; /* Espacio para el FAB */
+    background-color: var(--fondo-app);
+    color: var(--texto-oscuro);
+    padding-bottom: 90px;
+    -webkit-font-smoothing: antialiased; /* Texto más nítido */
 }
 
+/* =========================================
+   Header (Cabecera)
+   ========================================= */
 header {
-    background-color: var(--rosa-claro);
+    background: var(--blanco);
     text-align: center;
-    padding: 20px 10px;
+    padding: 25px 15px 20px;
+    box-shadow: var(--sombra-header);
+    position: sticky;
+    top: 0;
+    z-index: 50;
 }
 
 header h1 {
     font-family: 'Dancing Script', cursive;
-    font-size: 3rem;
-    color: var(--rosa-fuerte);
+    font-size: 3.2rem;
+    background: var(--rosa-gradiente);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 2px;
 }
 
-/* Pestañas */
-.tabs {
-    display: flex;
-    overflow-x: auto;
-    background: var(--blanco);
-    padding: 10px;
-    box-shadow: var(--sombra);
-    white-space: nowrap;
-}
-
-.tab-btn {
-    flex: 1;
-    border: none;
-    background: none;
-    padding: 10px 15px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    color: #999;
-    border-bottom: 3px solid transparent;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.tab-btn.active {
-    color: var(--rosa-fuerte);
-    border-bottom: 3px solid var(--rosa-fuerte);
+header p {
+    font-size: 0.85rem;
+    color: var(--texto-secundario);
+    letter-spacing: 1px;
+    text-transform: uppercase;
     font-weight: 600;
 }
 
-/* Categorías y Tarjetas */
-.categoria-seccion { display: none; padding: 20px 15px; }
-.categoria-seccion.active { display: block; }
+/* =========================================
+   Navegación (Pestañas estilo App iOS)
+   ========================================= */
+.tabs {
+    display: flex;
+    background: var(--blanco);
+    padding: 15px;
+    gap: 10px;
+    overflow-x: auto;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    /* Ocultar barra de scroll pero mantener funcionalidad */
+    scrollbar-width: none; 
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+    flex: 0 0 auto;
+    background: var(--fondo-app);
+    border: 1px solid var(--borde-suave);
+    border-radius: 25px; /* Botones tipo píldora */
+    padding: 10px 20px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--texto-secundario);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn.active {
+    background: var(--rosa-gradiente);
+    color: var(--blanco);
+    border: none;
+    box-shadow: var(--sombra-boton);
+    font-weight: 600;
+}
+
+/* =========================================
+   Tarjetas de Productos
+   ========================================= */
+.categoria-seccion { 
+    display: none; 
+    padding: 25px 15px; 
+    max-width: 600px;
+    margin: 0 auto; /* Centrar en pantallas grandes */
+}
+.categoria-seccion.active { 
+    display: block; 
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
 .card-producto {
     background: var(--blanco);
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: var(--sombra-tarjeta);
+    border: 1px solid rgba(232, 123, 158, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.card-producto:active { transform: scale(0.99); } /* Efecto al tocar en celular */
+
+.card-producto h3 { 
+    color: var(--texto-oscuro); 
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 5px; 
+}
+
+.card-producto p { 
+    font-size: 0.9rem; 
+    color: var(--texto-secundario); 
     margin-bottom: 20px;
-    box-shadow: var(--sombra);
-    border-top: 5px solid var(--rosa-claro);
+    line-height: 1.5;
 }
 
-.card-configurador h3 { color: var(--rosa-fuerte); margin-bottom: 10px; }
-.card-configurador p { font-size: 0.85rem; color: #777; margin-bottom: 15px;}
+/* =========================================
+   Formularios y Controles (Look profesional)
+   ========================================= */
+.controles label, .controles-config label { 
+    font-size: 0.85rem; 
+    font-weight: 600;
+    color: var(--texto-oscuro);
+    display: block; 
+    margin-top: 15px; 
+    margin-bottom: 5px;
+}
 
-.controles label, .controles-config label { font-size: 0.8rem; display: block; margin-top: 10px; }
 .controles input, .controles-config select {
-    width: 100%; padding: 12px; margin-top: 5px;
-    border: 1px solid #ddd; border-radius: 6px;
+    width: 100%; 
+    padding: 14px; 
+    border: 1.5px solid var(--borde-suave); 
+    border-radius: 10px;
     font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    color: var(--texto);
-    background-color: white;
+    font-size: 0.95rem;
+    color: var(--texto-oscuro);
+    background-color: var(--fondo-app);
+    transition: all 0.3s ease;
 }
 
-.precio { font-weight: 600; font-size: 1.1rem; color: var(--texto); }
-.precio-grande { font-size: 1.5rem; text-align: center; margin-top: 20px; color: var(--rosa-fuerte) !important; }
+/* Personalizar la flecha del select para que se vea moderna */
+.controles-config select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23e87b9e%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px top 50%;
+    background-size: 12px auto;
+}
 
-/* Controles de Cantidad */
+.controles input:focus, .controles-config select:focus {
+    outline: none;
+    border-color: var(--rosa-principal);
+    box-shadow: 0 0 0 4px rgba(232, 123, 158, 0.15); /* Anillo de enfoque (Focus ring) */
+    background-color: var(--blanco);
+}
+
+/* =========================================
+   Precios y Cantidades
+   ========================================= */
+.precio { 
+    font-weight: 700; 
+    font-size: 1.2rem; 
+    color: var(--rosa-principal); 
+    display: inline-block;
+    background: var(--rosa-claro);
+    padding: 5px 12px;
+    border-radius: 8px;
+}
+.precio-grande { 
+    font-size: 1.6rem; 
+    text-align: center; 
+    margin-top: 25px; 
+    display: block; 
+    background: transparent;
+}
+
 .controles-cantidad {
-    display: flex; align-items: center; margin: 15px 0;
-    justify-content: center; background: #f9f9f9; border-radius: 8px; padding: 5px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    background: var(--fondo-app); 
+    border-radius: 12px; 
+    padding: 8px;
+    margin: 25px 0 20px;
+    border: 1px solid var(--borde-suave);
 }
+
 .controles-cantidad button {
-    background: var(--rosa-fuerte); color: white; border: none;
-    width: 35px; height: 35px; border-radius: 5px; font-size: 1.2rem; cursor: pointer;
+    background: var(--blanco); 
+    color: var(--texto-oscuro); 
+    border: 1px solid var(--borde-suave);
+    width: 40px; 
+    height: 40px; 
+    border-radius: 8px; 
+    font-size: 1.3rem; 
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
 }
+
+.controles-cantidad button:active {
+    background: var(--rosa-claro);
+    color: var(--rosa-principal);
+    border-color: var(--rosa-principal);
+}
+
 .controles-cantidad input {
-    width: 60px; text-align: center; border: none; background: transparent;
-    font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1rem; pointer-events: none;
+    width: 70px; 
+    text-align: center; 
+    border: none; 
+    background: transparent;
+    font-family: 'Poppins', sans-serif; 
+    font-weight: 700; 
+    font-size: 1.1rem; 
+    pointer-events: none;
 }
 
-.btn-agregar {
-    width: 100%; padding: 15px; border: none; border-radius: 8px;
-    background-color: var(--rosa-claro); color: var(--rosa-fuerte);
-    font-family: 'Poppins', sans-serif; font-weight: 600; cursor: pointer; transition: 0.2s;
-    font-size: 1rem;
+/* =========================================
+   Botones Principales
+   ========================================= */
+.btn-agregar, .btn-pedido {
+    width: 100%; 
+    padding: 16px; 
+    border: none; 
+    border-radius: 12px;
+    background: var(--rosa-gradiente); 
+    color: var(--blanco);
+    font-family: 'Poppins', sans-serif; 
+    font-weight: 600; 
+    font-size: 1.05rem;
+    cursor: pointer; 
+    transition: all 0.3s ease;
+    box-shadow: var(--sombra-boton);
 }
-.btn-agregar:hover { background-color: var(--rosa-fuerte); color: white; }
 
-/* Botón Flotante FAB */
+.btn-agregar:hover, .btn-pedido:hover { 
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px -5px rgba(225, 107, 144, 0.6);
+}
+
+.btn-agregar:active, .btn-pedido:active {
+    transform: translateY(1px);
+}
+
+/* =========================================
+   Botón Flotante (FAB Carrito)
+   ========================================= */
 #fab-carrito {
-    position: fixed; bottom: 20px; right: 20px;
-    background-color: var(--rosa-fuerte); color: white;
-    padding: 15px 25px; border-radius: 30px; font-weight: 600;
-    box-shadow: 0 5px 20px rgba(244, 143, 177, 0.5); cursor: pointer;
+    position: fixed; 
+    bottom: 25px; 
+    right: 25px;
+    background: var(--rosa-gradiente); 
+    color: var(--blanco);
+    padding: 16px 28px; 
+    border-radius: 30px; 
+    font-weight: 600;
+    font-size: 1.05rem;
+    box-shadow: 0 10px 25px rgba(232, 123, 158, 0.5); 
+    cursor: pointer;
     z-index: 100;
-    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Modal */
+#fab-carrito:hover { transform: scale(1.05); }
+
+/* =========================================
+   Modal (Look Vidrio/Limpo)
+   ========================================= */
 .modal {
-    display: none; position: fixed; z-index: 1000; left: 0; top: 0;
-    width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; 
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(45, 52, 54, 0.6); /* Fondo más oscuro y elegante */
+    backdrop-filter: blur(4px); /* Efecto cristal */
 }
+
 .modal-contenido {
-    background-color: white; margin: 20% auto; padding: 25px;
-    width: 90%; max-width: 400px; border-radius: 15px; position: relative;
-}
-.cerrar { position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
-.input-cliente input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
-#lista-carrito { list-style: none; margin: 15px 0; max-height: 200px; overflow-y: auto; }
-#lista-carrito li { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; line-height: 1.4; }
-.total-modal { color: var(--rosa-fuerte); text-align: right; margin-bottom: 15px; }
-
-.btn-pedido {
-    width: 100%; background: var(--rosa-fuerte); color: white; border: none;
-    padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
+    background-color: var(--blanco); 
+    margin: 15% auto; 
+    padding: 30px;
+    width: 90%; 
+    max-width: 450px; 
+    border-radius: 20px; 
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    animation: modalPop 0.3s ease-out;
 }
 
-/* Ocultar el PDF de la pantalla normal */
+@keyframes modalPop {
+    from { opacity: 0; transform: scale(0.95) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.cerrar { 
+    position: absolute; 
+    right: 25px; 
+    top: 20px; 
+    font-size: 32px; 
+    font-weight: 400; 
+    cursor: pointer; 
+    color: #b2bec3; 
+    transition: 0.2s;
+}
+.cerrar:hover { color: var(--rosa-principal); }
+
+.modal-contenido h2 { color: var(--texto-oscuro); margin-bottom: 20px; }
+
+#lista-carrito { 
+    list-style: none; 
+    margin: 20px 0; 
+    max-height: 250px; 
+    overflow-y: auto; 
+    padding-right: 10px;
+}
+#lista-carrito::-webkit-scrollbar { width: 6px; }
+#lista-carrito::-webkit-scrollbar-thumb { background: var(--borde-suave); border-radius: 10px; }
+
+#lista-carrito li { 
+    padding: 15px 0; 
+    border-bottom: 1px solid var(--borde-suave); 
+    font-size: 0.95rem; 
+    line-height: 1.5; 
+}
+#lista-carrito li:last-child { border-bottom: none; }
+
+.total-modal { 
+    color: var(--texto-oscuro); 
+    text-align: right; 
+    margin: 20px 0; 
+    font-size: 1.4rem;
+}
+.total-modal span { color: var(--rosa-principal); font-weight: 700; }
+
+/* =========================================
+   Plantilla Oculta para el PDF
+   ========================================= */
 #contenedor-pdf {
     position: absolute;
     left: -9999px;
@@ -146,4 +375,5 @@ header h1 {
     background: white;
     padding: 40px;
     font-family: 'Poppins', sans-serif;
+    color: #000;
 }
