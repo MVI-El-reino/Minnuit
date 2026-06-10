@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Pedido Exclusivo - Minuit</title>
+    <!-- Tipografías de Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Librería para generar el PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>Minuit</h1>
+        <p>Catálogo de Productos Chulis</p>
+    </header>
+
+    <!-- Navegación de Categorías -->
+    <nav class="tabs">
+        <button class="tab-btn active" onclick="cambiarTab('bases')">Bases MDF</button>
+        <button class="tab-btn" onclick="cambiarTab('cajas_cupcakes')">Cajas Cupcakes</button>
+        <button class="tab-btn" onclick="cambiarTab('cajas_pastel')">Cajas Pastel</button>
+    </nav>
+
+    <!-- Contenedor de Productos -->
+    <main>
+        <!-- Categoría: Bases MDF -->
+        <section id="bases" class="categoria-seccion active">
+            <div class="card-producto">
+                <h3>Base Basic - 3MM (15cm)</h3>
+                <p>Color blanco o negro mate. Incluye logotipo.</p>
+                <p class="precio">$25.00 MXN</p>
+                <div class="controles">
+                    <label>Color Logo:</label>
+                    <input type="text" id="logo_base1" placeholder="Ej. Dorado">
+                </div>
+                <div class="controles-cantidad">
+                    <button onclick="cambiarCantidad('cant_base1', -1, 35)">-</button>
+                    <input type="number" id="cant_base1" value="35" readonly>
+                    <button onclick="cambiarCantidad('cant_base1', 1, 35)">+</button>
+                </div>
+                <button class="btn-agregar" onclick="agregarAlCarrito('Base Basic 3MM 15cm', 25, 'cant_base1', 'logo_base1')">Agregar al Carrito</button>
+            </div>
+        </section>
+
+        <!-- Categoría: Cajas Cupcakes -->
+        <section id="cajas_cupcakes" class="categoria-seccion">
+            <div class="card-producto">
+                <h3>Caja 2 Cupcakes</h3>
+                <p>Medida 22x12x7.5. Soporte blanco incluido.</p>
+                <p class="precio">$18.00 MXN</p>
+                <div class="controles">
+                    <label>Color de soporte (Blanco es gratis):</label>
+                    <input type="text" id="color_soporte1" placeholder="Ej. Blanco">
+                </div>
+                <div class="controles-cantidad">
+                    <button onclick="cambiarCantidad('cant_caja_cup1', -1, 30)">-</button>
+                    <input type="number" id="cant_caja_cup1" value="30" readonly>
+                    <button onclick="cambiarCantidad('cant_caja_cup1', 1, 30)">+</button>
+                </div>
+                <button class="btn-agregar" onclick="agregarAlCarrito('Caja 2 Cupcakes', 18, 'cant_caja_cup1', 'color_soporte1')">Agregar al Carrito</button>
+            </div>
+        </section>
+
+        <!-- Categoría: Cajas Pastel -->
+        <section id="cajas_pastel" class="categoria-seccion">
+            <div class="card-producto">
+                <h3>Caja Pastel 15.5x15.5x10</h3>
+                <p>Personalizada con logotipo.</p>
+                <p class="precio">$20.00 MXN</p>
+                <div class="controles">
+                    <label>Detalle extra:</label>
+                    <input type="text" id="detalle_pastel1" placeholder="Ej. Sin logo">
+                </div>
+                <div class="controles-cantidad">
+                    <button onclick="cambiarCantidad('cant_caja_pas1', -1, 30)">-</button>
+                    <input type="number" id="cant_caja_pas1" value="30" readonly>
+                    <button onclick="cambiarCantidad('cant_caja_pas1', 1, 30)">+</button>
+                </div>
+                <button class="btn-agregar" onclick="agregarAlCarrito('Caja Pastel 15.5x10', 20, 'cant_caja_pas1', 'detalle_pastel1')">Agregar al Carrito</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Botón Flotante del Carrito -->
+    <div id="fab-carrito" onclick="abrirModal()">
+        🛒 Total: <span id="fab-total">$0.00</span>
+    </div>
+
+    <!-- Modal del Carrito -->
+    <div id="modal-carrito" class="modal">
+        <div class="modal-contenido">
+            <span class="cerrar" onclick="cerrarModal()">&times;</span>
+            <h2>Tu Pedido Minuit</h2>
+            <div class="input-cliente">
+                <label>Tu Nombre:</label>
+                <input type="text" id="nombre_cliente" placeholder="Escribe tu nombre">
+            </div>
+            <ul id="lista-carrito"></ul>
+            <h3 class="total-modal">Total: <span id="modal-total">$0.00</span></h3>
+            <button class="btn-pedido" onclick="procesarPedido()">Hacer Pedido y Enviar a WhatsApp</button>
+        </div>
+    </div>
+
+    <!-- Plantilla Oculta para el PDF -->
+    <div id="contenedor-pdf">
+        <h1 style="font-family: 'Dancing Script', cursive; color: #f48fb1; text-align: center;">Minuit</h1>
+        <h3 style="text-align: center;">Resumen de Pedido</h3>
+        <p><strong>Cliente:</strong> <span id="pdf-cliente"></span></p>
+        <hr>
+        <ul id="pdf-lista" style="list-style: none; padding: 0;"></ul>
+        <hr>
+        <h2 style="text-align: right; color: #f48fb1;">Total: <span id="pdf-total"></span></h2>
+        <p style="text-align: center; font-size: 12px; margin-top: 30px;">¡Gracias por tu compra! Conserva este comprobante.</p>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
