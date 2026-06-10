@@ -1,0 +1,141 @@
+:root {
+    --rosa-fuerte: #f48fb1;
+    --rosa-claro: #fce4ec;
+    --blanco: #ffffff;
+    --texto: #4a4a4a;
+    --sombra: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fafafa;
+    color: var(--texto);
+    padding-bottom: 80px; /* Espacio para el FAB */
+}
+
+header {
+    background-color: var(--rosa-claro);
+    text-align: center;
+    padding: 20px 10px;
+}
+
+header h1 {
+    font-family: 'Dancing Script', cursive;
+    font-size: 3rem;
+    color: var(--rosa-fuerte);
+}
+
+/* Pestañas */
+.tabs {
+    display: flex;
+    overflow-x: auto;
+    background: var(--blanco);
+    padding: 10px;
+    box-shadow: var(--sombra);
+    white-space: nowrap;
+}
+
+.tab-btn {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 10px 15px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #999;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.tab-btn.active {
+    color: var(--rosa-fuerte);
+    border-bottom: 3px solid var(--rosa-fuerte);
+    font-weight: 600;
+}
+
+/* Categorías y Tarjetas */
+.categoria-seccion { display: none; padding: 20px 15px; }
+.categoria-seccion.active { display: block; }
+
+.card-producto {
+    background: var(--blanco);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--sombra);
+    border-top: 5px solid var(--rosa-claro);
+}
+
+.card-producto h3 { color: var(--rosa-fuerte); margin-bottom: 5px; }
+.card-producto p { font-size: 0.85rem; color: #777; margin-bottom: 10px;}
+.precio { font-weight: 600; font-size: 1.1rem !important; color: var(--texto) !important; }
+
+.controles label { font-size: 0.8rem; display: block; margin-top: 10px; }
+.controles input {
+    width: 100%; padding: 8px; margin-top: 5px;
+    border: 1px solid #ddd; border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Controles de Cantidad */
+.controles-cantidad {
+    display: flex; align-items: center; margin: 15px 0;
+    justify-content: center; background: #f9f9f9; border-radius: 8px; padding: 5px;
+}
+.controles-cantidad button {
+    background: var(--rosa-fuerte); color: white; border: none;
+    width: 35px; height: 35px; border-radius: 5px; font-size: 1.2rem; cursor: pointer;
+}
+.controles-cantidad input {
+    width: 60px; text-align: center; border: none; background: transparent;
+    font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1rem; pointer-events: none;
+}
+
+.btn-agregar {
+    width: 100%; padding: 12px; border: none; border-radius: 8px;
+    background-color: var(--rosa-claro); color: var(--rosa-fuerte);
+    font-family: 'Poppins', sans-serif; font-weight: 600; cursor: pointer; transition: 0.2s;
+}
+.btn-agregar:hover { background-color: var(--rosa-fuerte); color: white; }
+
+/* Botón Flotante FAB */
+#fab-carrito {
+    position: fixed; bottom: 20px; right: 20px;
+    background-color: var(--rosa-fuerte); color: white;
+    padding: 15px 25px; border-radius: 30px; font-weight: 600;
+    box-shadow: 0 5px 20px rgba(244, 143, 177, 0.5); cursor: pointer;
+    z-index: 100;
+}
+
+/* Modal */
+.modal {
+    display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+    width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);
+}
+.modal-contenido {
+    background-color: white; margin: 20% auto; padding: 25px;
+    width: 90%; max-width: 400px; border-radius: 15px; position: relative;
+}
+.cerrar { position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer; color: #aaa; }
+.input-cliente input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; }
+#lista-carrito { list-style: none; margin: 15px 0; max-height: 200px; overflow-y: auto; }
+#lista-carrito li { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+.total-modal { color: var(--rosa-fuerte); text-align: right; margin-bottom: 15px; }
+
+.btn-pedido {
+    width: 100%; background: var(--rosa-fuerte); color: white; border: none;
+    padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-family: 'Poppins', sans-serif;
+}
+
+/* Ocultar el PDF de la pantalla normal */
+#contenedor-pdf {
+    position: absolute;
+    left: -9999px;
+    width: 600px;
+    background: white;
+    padding: 40px;
+    font-family: 'Poppins', sans-serif;
+}
