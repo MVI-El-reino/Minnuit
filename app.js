@@ -1,5 +1,5 @@
 let carrito = [];
-const numeroDueno = "5215551234567"; // CAMBIA ESTO POR EL NÚMERO DEL DUEÑO
+const numeroDueno = "522227125366"; 
 
 // 1. Tablas de precios
 const basesBasicPrecios = {
