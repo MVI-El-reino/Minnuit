@@ -89,7 +89,6 @@ function agregarBaseConfigAlCarrito() {
     carrito.push({ nombre: nombreCompuesto, cantidad, detalle: detalleCompuesto, precio: precioBaseActual, subtotal });
     mostrarAlerta(`🛒 ¡Agregado al carrito!`);
     actualizarVistaCarrito();
-    // Animar botón carrito cuando se agrega algo
     animarBotónCarrito();
 }
 
@@ -101,7 +100,6 @@ function agregarAlCarrito(nombre, precio, idCantidad, idDetalle) {
     carrito.push({ nombre, cantidad, detalle: detalleTxt, precio, subtotal });
     mostrarAlerta(`🛒 ¡Agregado al carrito!`);
     actualizarVistaCarrito();
-    // Animar botón carrito cuando se agrega algo
     animarBotónCarrito();
 }
 
@@ -109,7 +107,6 @@ function agregarAlCarrito(nombre, precio, idCantidad, idDetalle) {
 function animarBotónCarrito() {
     const fabCarrito = document.getElementById("fab-carrito");
     fabCarrito.classList.remove('con-items');
-    // Forzar reflow para que la animación se reinicie
     void fabCarrito.offsetWidth;
     fabCarrito.classList.add('con-items');
 }
@@ -120,7 +117,6 @@ function eliminarDelCarrito(index) {
     mostrarAlerta("❌ Artículo eliminado");
     actualizarVistaCarrito();
     
-    // Si vacían el carrito por completo, cerramos el modal automáticamente
     if(carrito.length === 0) {
         cerrarModal();
     }
@@ -129,13 +125,12 @@ function eliminarDelCarrito(index) {
 // MODIFICADO: Lógica de validación acumulada de 35 piezas
 function actualizarVistaCarrito() {
     let totalDinero = 0;
-    let totalPiezasBases = 0; // Contamos solo piezas del catálogo que apliquen a la regla
+    let totalPiezasBases = 0;
     let listaHTML = "";
     
     carrito.forEach((item, index) => {
         totalDinero += item.subtotal;
         
-        // Si el nombre contiene la palabra "Base", lo sumamos al contador de la regla
         if(item.nombre.includes("Base")) {
             totalPiezasBases += item.cantidad;
         }
@@ -153,18 +148,17 @@ function actualizarVistaCarrito() {
     document.getElementById("modal-total").innerText = "$" + totalDinero.toFixed(2);
     document.getElementById("lista-carrito").innerHTML = listaHTML;
 
-    // Control de la regla de negocio de las 35 piezas de bases
     const btnPedido = document.querySelector(".btn-pedido");
     const alertaPiezas = document.getElementById("contador-piezas-alerta");
 
     if (totalPiezasBases < 35) {
         alertaPiezas.className = "texto-alerta-rojo";
         alertaPiezas.innerText = `⚠️ Llevas ${totalPiezasBases} bases de MDF. El mínimo acumulado para procesar fabricación es de 35 piezas.`;
-        btnPedido.disabled = true; // Bloquea el botón
+        btnPedido.disabled = true;
     } else {
         alertaPiezas.className = "texto-valido-verde";
         alertaPiezas.innerText = `✅ ¡Súper! Llevas ${totalPiezasBases} bases acumuladas. Pedido autorizado.`;
-        btnPedido.disabled = false; // Desbloquea el botón
+        btnPedido.disabled = false;
     }
 }
 
@@ -176,7 +170,7 @@ function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
 
-// 8. Generar PDF y Redirigir a WhatsApp (VERSIÓN CORREGIDA)
+// ===== GENERAR PDF - VERSIÓN CORREGIDA (SIN PDF BLANCO) =====
 async function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value;
     if (!nombreCliente) return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
@@ -184,63 +178,108 @@ async function procesarPedido() {
     mostrarAlerta("⏳ Generando tu nota de pedido...");
     
     let totalTxt = document.getElementById("modal-total").innerText;
-    document.getElementById("pdf-cliente").innerText = nombreCliente;
-    document.getElementById("pdf-total").innerText = totalTxt;
     
-    let pdfLista = "";
-    let textoWhatsApp = `✨ *¡Hola Minuit! Nuevo pedido* ✨\n\n*Cliente:* ${nombreCliente}\n\n*Detalles:*\n`;
+    // Construir HTML del PDF dinamicamente
+    let pdfHTML = `
+        <div style="font-family: Arial, sans-serif; color: #2d3436; max-width: 800px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #e87b9e; padding-bottom: 15px;">
+                <h1 style="color: #e87b9e; font-size: 28px; margin: 0; font-family: 'Dancing Script', cursive;">✨ Minuit ✨</h1>
+                <h3 style="color: #666; margin: 10px 0 0 0; font-size: 14px;">Resumen de Pedido</h3>
+            </div>
+            
+            <div style="margin-bottom: 20px; padding: 10px; background: #fdf0f4; border-radius: 8px;">
+                <p style="margin: 0; font-weight: bold;"><strong>Cliente:</strong> ${nombreCliente}</p>
+                <p style="margin: 5px 0 0 0; font-weight: bold;"><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-MX')}</p>
+            </div>
+            
+            <h3 style="color: #4a3b40; font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid #fadbe4; padding-bottom: 8px;">Detalles de Productos</h3>
+            
+            <ul style="list-style: none; padding: 0; margin: 0;">
+    `;
     
     carrito.forEach(item => {
-        pdfLista += `<li style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;"><strong>${item.cantidad}x ${item.nombre}</strong><br><small style="color: #666;">${item.detalle}</small><br><small style="color: #e87b9e;"><strong>$${item.subtotal.toFixed(2)}</strong></small></li>`;
-        textoWhatsApp += `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
+        pdfHTML += `
+            <li style="margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid #eee;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <strong style="font-size: 14px; color: #2d3436;">${item.cantidad}x ${item.nombre}</strong>
+                        <p style="margin: 5px 0 0 0; color: #666; font-size: 12px;">${item.detalle}</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color: #e87b9e; font-weight: bold; font-size: 14px;">$${item.subtotal.toFixed(2)}</div>
+                    </div>
+                </div>
+            </li>
+        `;
     });
     
-    document.getElementById("pdf-lista").innerHTML = pdfLista;
-    textoWhatsApp += `\n💰 *Total: ${totalTxt}*\n\nQuedo a la espera de los datos de transferencia.`;
-
-    const elementoPDF = document.getElementById("contenedor-pdf");
+    pdfHTML += `
+            </ul>
+            
+            <div style="margin-top: 25px; padding-top: 15px; border-top: 2px solid #e87b9e; text-align: right;">
+                <p style="font-size: 12px; color: #666; margin: 0 0 10px 0;">TOTAL:</p>
+                <h2 style="color: #e87b9e; margin: 0; font-size: 24px;">${totalTxt}</h2>
+            </div>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #fadbe4; text-align: center; font-size: 11px; color: #999;">
+                <p style="margin: 0;">✅ ¡Gracias por tu compra, Minuit! 🌸</p>
+                <p style="margin: 5px 0 0 0;">Conserva este comprobante para tu referencia.</p>
+            </div>
+        </div>
+    `;
     
-    // OPCIONES CORREGIDAS PARA PDF - Soluciona el PDF blanco
-    const opcionesPDF = {
-        margin: [15, 15, 15, 15],
+    // Crear elemento temporal para renderizar
+    const tempContainer = document.createElement('div');
+    tempContainer.innerHTML = pdfHTML;
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.top = '-9999px';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.width = '800px';
+    tempContainer.style.backgroundColor = '#ffffff';
+    tempContainer.style.padding = '40px';
+    document.body.appendChild(tempContainer);
+    
+    // Esperar a que se renderice
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    const opt = {
+        margin: [10, 10, 10, 10],
         filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, '_')}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, // Aumentado para mejor calidad
+        html2canvas: {
+            scale: 2,
             useCORS: true,
             allowTaint: true,
             backgroundColor: '#ffffff',
             windowWidth: 800,
-            windowHeight: 1200,
-            logging: false,
-            async: true
+            windowHeight: 'auto',
+            logging: false
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
-    // Mostrar el contenedor para el renderizado
-    elementoPDF.style.visibility = "visible";
-    elementoPDF.style.position = "absolute";
-    elementoPDF.style.top = "-10000px";
-    elementoPDF.style.left = "0";
-    
-    // Generar PDF con mejor manejo de promesas
     html2pdf()
-        .set(opcionesPDF)
-        .from(elementoPDF)
+        .set(opt)
+        .from(tempContainer)
         .save()
         .then(() => {
-            // Ocultar nuevamente el contenedor
-            elementoPDF.style.visibility = "hidden";
-            elementoPDF.style.top = "0";
+            // Eliminar contenedor temporal
+            document.body.removeChild(tempContainer);
             
-            // Redirigir a WhatsApp
+            // Preparar mensaje WhatsApp
+            let textoWhatsApp = `✨ *¡Hola Minuit! Nuevo pedido* ✨\n\n*Cliente:* ${nombreCliente}\n\n*Detalles:*\n`;
+            carrito.forEach(item => {
+                textoWhatsApp += `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
+            });
+            textoWhatsApp += `\n💰 *Total: ${totalTxt}*\n\nQuedo a la espera de los datos de transferencia.`;
+            
+            // Abrir WhatsApp
             let textoCodificado = encodeURIComponent(textoWhatsApp);
             window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
             
-            mostrarAlerta("✅ PDF generado y WhatsApp abierto");
+            mostrarAlerta("✅ PDF descargado - WhatsApp abierto");
             
-            // Limpiamos el sistema para la siguiente compra
+            // Limpiar carrito
             carrito = [];
             actualizarVistaCarrito();
             cerrarModal();
@@ -248,7 +287,7 @@ async function procesarPedido() {
         })
         .catch((error) => {
             console.error("Error al generar PDF:", error);
+            document.body.removeChild(tempContainer);
             mostrarAlerta("❌ Error al generar PDF. Intenta nuevamente.");
-            elementoPDF.style.visibility = "hidden";
         });
 }
