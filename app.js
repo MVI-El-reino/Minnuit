@@ -163,7 +163,7 @@ function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
 
-// 8. Generar PDF y Redirigir a WhatsApp (VERSIÓN CORREGIDA PARA MOBILE)
+// 8. Generar PDF y Redirigir a WhatsApp (VERSIÓN CORREGIDA)
 async function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value;
     if (!nombreCliente) return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
@@ -178,7 +178,7 @@ async function procesarPedido() {
     let textoWhatsApp = `✨ *¡Hola Minuit! Nuevo pedido* ✨\n\n*Cliente:* ${nombreCliente}\n\n*Detalles:*\n`;
     
     carrito.forEach(item => {
-        pdfLista += `<li style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;"><strong>${item.cantidad}x ${item.nombre}</strong><br><small style="color: #666;">${item.detalle}</small><br><strong>$${item.subtotal.toFixed(2)}</strong></li>`;
+        pdfLista += `<li style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;"><strong>${item.cantidad}x ${item.nombre}</strong><br><small style="color: #666;">${item.detalle}</small><br><small style="color: #e87b9e;"><strong>$${item.subtotal.toFixed(2)}</strong></small></li>`;
         textoWhatsApp += `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
     });
     
@@ -187,41 +187,55 @@ async function procesarPedido() {
 
     const elementoPDF = document.getElementById("contenedor-pdf");
     
-    // OPCIONES CORREGIDAS PARA PDF EN MOBILE Y DESKTOP
+    // OPCIONES CORREGIDAS PARA PDF - Soluciona el PDF blanco
     const opcionesPDF = {
-        margin: [10, 10, 10, 10],
+        margin: [15, 15, 15, 15],
         filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.95 },
+        image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { 
-            scale: 1.5,
+            scale: 2, // Aumentado para mejor calidad
             useCORS: true,
             allowTaint: true,
             backgroundColor: '#ffffff',
-            windowWidth: window.innerWidth > 800 ? 800 : window.innerWidth - 20,
-            logging: false
+            windowWidth: 800,
+            windowHeight: 1200,
+            logging: false,
+            async: true
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
-    // Lo traemos al frente pero escondido detrás de todo el contenido visual
+    // Mostrar el contenedor para el renderizado
+    elementoPDF.style.visibility = "visible";
+    elementoPDF.style.position = "absolute";
+    elementoPDF.style.top = "-10000px";
     elementoPDF.style.left = "0";
-    elementoPDF.style.zIndex = "-9999"; 
     
-    // Pequeño retraso para asegurar que las fuentes y estilos carguen bien
-    setTimeout(() => {
-        html2pdf().set(opcionesPDF).from(elementoPDF).save().then(() => {
-            // Lo regresamos a su escondite
-            elementoPDF.style.left = "-9999px";
+    // Generar PDF con mejor manejo de promesas
+    html2pdf()
+        .set(opcionesPDF)
+        .from(elementoPDF)
+        .save()
+        .then(() => {
+            // Ocultar nuevamente el contenedor
+            elementoPDF.style.visibility = "hidden";
+            elementoPDF.style.top = "0";
             
-            // Redirigimos a WhatsApp
+            // Redirigir a WhatsApp
             let textoCodificado = encodeURIComponent(textoWhatsApp);
             window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
+            
+            mostrarAlerta("✅ PDF generado y WhatsApp abierto");
             
             // Limpiamos el sistema para la siguiente compra
             carrito = [];
             actualizarVistaCarrito();
             cerrarModal();
             document.getElementById("nombre_cliente").value = "";
+        })
+        .catch((error) => {
+            console.error("Error al generar PDF:", error);
+            mostrarAlerta("❌ Error al generar PDF. Intenta nuevamente.");
+            elementoPDF.style.visibility = "hidden";
         });
-    }, 500);
 }
