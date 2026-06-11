@@ -89,6 +89,8 @@ function agregarBaseConfigAlCarrito() {
     carrito.push({ nombre: nombreCompuesto, cantidad, detalle: detalleCompuesto, precio: precioBaseActual, subtotal });
     mostrarAlerta(`🛒 ¡Agregado al carrito!`);
     actualizarVistaCarrito();
+    // Animar botón carrito cuando se agrega algo
+    animarBotónCarrito();
 }
 
 function agregarAlCarrito(nombre, precio, idCantidad, idDetalle) {
@@ -99,6 +101,17 @@ function agregarAlCarrito(nombre, precio, idCantidad, idDetalle) {
     carrito.push({ nombre, cantidad, detalle: detalleTxt, precio, subtotal });
     mostrarAlerta(`🛒 ¡Agregado al carrito!`);
     actualizarVistaCarrito();
+    // Animar botón carrito cuando se agrega algo
+    animarBotónCarrito();
+}
+
+// Función para animar el botón del carrito - BOUNCE EFFECT
+function animarBotónCarrito() {
+    const fabCarrito = document.getElementById("fab-carrito");
+    fabCarrito.classList.remove('con-items');
+    // Forzar reflow para que la animación se reinicie
+    void fabCarrito.offsetWidth;
+    fabCarrito.classList.add('con-items');
 }
 
 // NUEVO: Eliminar un artículo específico del carrito
