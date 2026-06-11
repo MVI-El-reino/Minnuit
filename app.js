@@ -170,159 +170,98 @@ function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
 
-// ===== GENERAR PDF CON jsPDF NATIVO (SIN html2canvas) =====
+// ===== GENERAR PDF DEFINITIVO Y ABRIR WHATSAPP =====
 function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value;
     if (!nombreCliente) return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
     
     mostrarAlerta("⏳ Generando tu nota de pedido...");
     
-    // Importar jsPDF desde el CDN (ya está en index.html)
-    const { jsPDF } = window.jspdf;
+    let totalTxt = document.getElementById("modal-total").innerText;
+    let pdfLista = "";
     
-    // Crear documento PDF
-    const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-    });
-    
-    // Colores Minuit
-    const colorRosa = [232, 123, 158];
-    const colorTexto = [74, 59, 64];
-    const colorGris = [158, 127, 138];
-    const colorFondo = [253, 240, 244];
-    
-    let yPos = 20;
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const margen = 20;
-    
-    // ===== ENCABEZADO =====
-    doc.setFillColor(...colorFondo);
-    doc.rect(margen, yPos, 170, 30, 'F');
-    
-    doc.setTextColor(...colorRosa);
-    doc.setFontSize(28);
-    doc.setFont("helvetica", "bold");
-    doc.text("✨ MINUIT ✨", 105, yPos + 15, { align: 'center' });
-    
-    doc.setTextColor(...colorGris);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("Resumen de Pedido", 105, yPos + 25, { align: 'center' });
-    
-    yPos += 40;
-    
-    // ===== DATOS DEL CLIENTE =====
-    doc.setFillColor(...colorFondo);
-    doc.rect(margen, yPos, 170, 18, 'F');
-    
-    doc.setTextColor(...colorTexto);
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "bold");
-    doc.text(`Cliente: ${nombreCliente}`, margen + 5, yPos + 7);
-    
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    const fecha = new Date().toLocaleDateString('es-MX');
-    doc.text(`Fecha: ${fecha}`, margen + 5, yPos + 13);
-    
-    yPos += 25;
-    
-    // ===== ENCABEZADO DE TABLA =====
-    doc.setTextColor(...colorRosa);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("PRODUCTO", margen + 5, yPos);
-    doc.text("CANTIDAD", 120, yPos);
-    doc.text("PRECIO", 160, yPos);
-    
-    // Línea divisoria
-    doc.setDrawColor(...colorRosa);
-    doc.setLineWidth(0.5);
-    doc.line(margen, yPos + 2, 190, yPos + 2);
-    
-    yPos += 10;
-    
-    // ===== ITEMS DEL CARRITO =====
-    doc.setTextColor(...colorTexto);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    
-    let totalPedido = 0;
-    
-    carrito.forEach((item, index) => {
-        // Verificar si necesita nueva página
-        if (yPos > pageHeight - 40) {
-            doc.addPage();
-            yPos = 20;
-        }
-        
-        // Nombre del producto
-        doc.setFont("helvetica", "bold");
-        doc.text(`${item.cantidad}x ${item.nombre}`, margen + 5, yPos);
-        
-        // Detalle
-        doc.setFont("helvetica", "normal");
-        doc.setTextColor(...colorGris);
-        doc.setFontSize(8);
-        doc.text(`Ref: ${item.detalle}`, margen + 5, yPos + 4);
-        
-        doc.setTextColor(...colorTexto);
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "normal");
-        doc.text(item.cantidad.toString(), 120, yPos);
-        doc.text(`$${item.subtotal.toFixed(2)}`, 160, yPos, { align: 'right' });
-        
-        totalPedido += item.subtotal;
-        yPos += 12;
-    });
-    
-    // Línea final
-    doc.setDrawColor(...colorRosa);
-    doc.setLineWidth(1);
-    doc.line(margen, yPos, 190, yPos);
-    
-    yPos += 10;
-    
-    // ===== TOTAL =====
-    doc.setFillColor(...colorFondo);
-    doc.rect(margen, yPos, 170, 15, 'F');
-    
-    doc.setTextColor(...colorRosa);
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text(`TOTAL: $${totalPedido.toFixed(2)}`, 190, yPos + 9, { align: 'right' });
-    
-    yPos += 25;
-    
-    // ===== PIE DE PÁGINA =====
-    doc.setTextColor(...colorGris);
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.text("✅ ¡Gracias por tu compra, Minuit! 🌸", 105, yPos, { align: 'center' });
-    doc.text("Conserva este comprobante para tu referencia.", 105, yPos + 5, { align: 'center' });
-    
-    // Guardar PDF
-    doc.save(`Pedido_Minuit_${nombreCliente.replace(/\s+/g, '_')}.pdf`);
-    
-    // ===== ENVIAR A WHATSAPP =====
+    // Texto para el mensaje de WhatsApp (Este sí soporta emojis)
     let textoWhatsApp = `✨ *¡Hola Minuit! Nuevo pedido* ✨\n\n*Cliente:* ${nombreCliente}\n\n*Detalles:*\n`;
     
     carrito.forEach(item => {
+        // Filas para la tabla del PDF (Usando HTML y estilos inline)
+        pdfLista += `
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f8dce5; padding: 15px 0;">
+                <div style="width: 75%;">
+                    <strong style="color: #4a3b40; font-size: 16px; display: block; margin-bottom: 4px;">${item.cantidad}x ${item.nombre}</strong>
+                    <span style="color: #9e7f8a; font-size: 13px;">Ref: ${item.detalle}</span>
+                </div>
+                <div style="width: 25%; text-align: right;">
+                    <strong style="color: #e87b9e; font-size: 16px;">$${item.subtotal.toFixed(2)}</strong>
+                </div>
+            </div>
+        `;
+        // Filas para WhatsApp
         textoWhatsApp += `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
     });
     
-    textoWhatsApp += `\n💰 *Total: $${totalPedido.toFixed(2)}*\n\nQuedo a la espera de los datos de transferencia.`;
-    
-    let textoCodificado = encodeURIComponent(textoWhatsApp);
-    window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
-    
-    mostrarAlerta("✅ PDF descargado - WhatsApp abierto");
-    
-    // Limpiar carrito
-    carrito = [];
-    actualizarVistaCarrito();
-    cerrarModal();
-    document.getElementById("nombre_cliente").value = "";
+    textoWhatsApp += `\n💰 *Total: ${totalTxt}*\n\nQuedo a la espera de los datos de transferencia.`;
+
+    // ==========================================
+    // CREACIÓN DEL DISEÑO DEL PDF EN MEMORIA
+    // ==========================================
+    const element = document.createElement('div');
+    // Forzamos un ancho de 800px para que NUNCA se aplaste en celulares
+    element.style.width = '800px'; 
+    element.style.padding = '40px';
+    element.style.backgroundColor = '#ffffff';
+    element.style.fontFamily = 'Arial, sans-serif'; // Fuente segura
+    element.style.boxSizing = 'border-box';
+
+    // Inyectamos el diseño directamente
+    element.innerHTML = `
+        <div style="text-align: center; border-bottom: 2px solid #f8dce5; padding-bottom: 20px; margin-bottom: 25px;">
+            <h1 style="color: #e87b9e; font-size: 42px; margin: 0; font-family: 'Georgia', serif; font-style: italic;">Minuit</h1>
+            <p style="color: #9e7f8a; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; font-weight: bold;">Nota de Pedido</p>
+        </div>
+
+        <div style="background-color: #fdf0f4; padding: 20px; border-radius: 12px; margin-bottom: 30px; display: flex; justify-content: space-between;">
+            <div>
+                <p style="margin: 0 0 5px 0; font-size: 16px; color: #4a3b40;"><strong>Cliente:</strong> ${nombreCliente}</p>
+                <p style="margin: 0; font-size: 14px; color: #9e7f8a;"><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-MX')}</p>
+            </div>
+            <div style="text-align: right;">
+                <p style="margin: 0; font-size: 14px; color: #9e7f8a;"><strong>Estado:</strong> Por transferir</p>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            ${pdfLista}
+        </div>
+
+        <div style="text-align: right; background-color: #fdf0f4; padding: 20px; border-radius: 12px; margin-bottom: 40px;">
+            <h2 style="margin: 0; color: #e87b9e; font-size: 28px;">Total a Pagar: ${totalTxt}</h2>
+        </div>
+
+        <div style="text-align: center;">
+            <p style="color: #9e7f8a; font-size: 14px;">¡Gracias por tu compra, Minuit!</p>
+            <p style="color: #9e7f8a; font-size: 12px; margin-top: 5px;">Conserva este comprobante para tu referencia.</p>
+        </div>
+    `;
+
+    // Opciones del conversor (Usando html2pdf.js)
+    const opcionesPDF = {
+        margin: [10, 0, 10, 0],
+        filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, '_')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, width: 800, windowWidth: 800 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Generar el PDF y luego enviar a WhatsApp
+    html2pdf().set(opcionesPDF).from(element).save().then(() => {
+        let textoCodificado = encodeURIComponent(textoWhatsApp);
+        window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
+        
+        // Limpiamos todo
+        carrito = [];
+        actualizarVistaCarrito();
+        cerrarModal();
+        document.getElementById("nombre_cliente").value = "";
+    });
 }
