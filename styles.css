@@ -289,7 +289,7 @@ header p {
 }
 
 /* =========================================
-   Botón Flotante (FAB Carrito)
+   Botón Flotante (FAB Carrito) - CON ANIMACIÓN PULSANTE
    ========================================= */
 #fab-carrito {
     position: fixed; 
@@ -308,9 +308,57 @@ header p {
     align-items: center;
     gap: 8px;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: pulse-fab 2s ease-in-out infinite;
 }
 
-#fab-carrito:hover { transform: scale(1.05); }
+#fab-carrito:hover { 
+    transform: scale(1.08);
+    animation: none;
+}
+
+/* Animación pulsante para atraer atención */
+@keyframes pulse-fab {
+    0%, 100% {
+        box-shadow: 0 10px 25px rgba(232, 123, 158, 0.5), 0 0 0 0px rgba(232, 123, 158, 0.7);
+    }
+    50% {
+        box-shadow: 0 10px 25px rgba(232, 123, 158, 0.5), 0 0 0 10px rgba(232, 123, 158, 0);
+    }
+}
+
+/* Indicador de producto agregado */
+#fab-carrito.con-items {
+    animation: bounce-fab 0.6s ease-out;
+}
+
+@keyframes bounce-fab {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+/* Tooltip informativo para el carrito */
+#fab-carrito::before {
+    content: "👆 Toca aquí";
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    margin-bottom: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    font-weight: 500;
+}
+
+#fab-carrito:hover::before {
+    opacity: 1;
+}
 
 /* =========================================
    Modal (Look Vidrio)
@@ -497,5 +545,10 @@ header p {
     
     .controles input {
         font-size: 16px; /* Previene zoom en iOS */
+    }
+
+    /* En mobile, mostrar siempre el tooltip */
+    #fab-carrito::before {
+        opacity: 1;
     }
 }
