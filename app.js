@@ -180,13 +180,12 @@ function procesarPedido() {
     let totalTxt = document.getElementById("modal-total").innerText;
     let pdfLista = "";
     
-    // Texto para el mensaje de WhatsApp (Este sí soporta emojis)
     let textoWhatsApp = `✨ *¡Hola Minuit! Nuevo pedido* ✨\n\n*Cliente:* ${nombreCliente}\n\n*Detalles:*\n`;
     
     carrito.forEach(item => {
-        // Filas para la tabla del PDF (Usando HTML y estilos inline)
+        // Agregamos page-break-inside: avoid para que no parta los productos a la mitad
         pdfLista += `
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f8dce5; padding: 15px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f8dce5; padding: 15px 0; page-break-inside: avoid;">
                 <div style="width: 75%;">
                     <strong style="color: #4a3b40; font-size: 16px; display: block; margin-bottom: 4px;">${item.cantidad}x ${item.nombre}</strong>
                     <span style="color: #9e7f8a; font-size: 13px;">Ref: ${item.detalle}</span>
@@ -196,24 +195,27 @@ function procesarPedido() {
                 </div>
             </div>
         `;
-        // Filas para WhatsApp
         textoWhatsApp += `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
     });
     
     textoWhatsApp += `\n💰 *Total: ${totalTxt}*\n\nQuedo a la espera de los datos de transferencia.`;
 
     // ==========================================
-    // CREACIÓN DEL DISEÑO DEL PDF EN MEMORIA
+    // CREACIÓN DEL DISEÑO DEL PDF EN EL DOM
     // ==========================================
     const element = document.createElement('div');
-    // Forzamos un ancho de 800px para que NUNCA se aplaste en celulares
-    element.style.width = '800px'; 
-    element.style.padding = '40px';
-    element.style.backgroundColor = '#ffffff';
-    element.style.fontFamily = 'Arial, sans-serif'; // Fuente segura
-    element.style.boxSizing = 'border-box';
+    element.id = "pdf-temporal-minuit";
+    
+    // Estilos para que sea perfecto en PDF pero invisible para el usuario
+    element.style.position = "absolute";
+    element.style.top = "0";
+    element.style.left = "-10000px"; // Escondido a la izquierda
+    element.style.width = "800px";   // Ancho estricto
+    element.style.padding = "40px";
+    element.style.backgroundColor = "#ffffff";
+    element.style.fontFamily = "Arial, sans-serif";
+    element.style.boxSizing = "border-box";
 
-    // Inyectamos el diseño directamente
     element.innerHTML = `
         <div style="text-align: center; border-bottom: 2px solid #f8dce5; padding-bottom: 20px; margin-bottom: 25px;">
             <h1 style="color: #e87b9e; font-size: 42px; margin: 0; font-family: 'Georgia', serif; font-style: italic;">Minuit</h1>
@@ -234,31 +236,42 @@ function procesarPedido() {
             ${pdfLista}
         </div>
 
-        <div style="text-align: right; background-color: #fdf0f4; padding: 20px; border-radius: 12px; margin-bottom: 40px;">
+        <div style="text-align: right; background-color: #fdf0f4; padding: 20px; border-radius: 12px; margin-bottom: 40px; page-break-inside: avoid;">
             <h2 style="margin: 0; color: #e87b9e; font-size: 28px;">Total a Pagar: ${totalTxt}</h2>
         </div>
 
-        <div style="text-align: center;">
+        <div style="text-align: center; page-break-inside: avoid;">
             <p style="color: #9e7f8a; font-size: 14px;">¡Gracias por tu compra, Minuit!</p>
             <p style="color: #9e7f8a; font-size: 12px; margin-top: 5px;">Conserva este comprobante para tu referencia.</p>
         </div>
     `;
 
-    // Opciones del conversor (Usando html2pdf.js)
+    // ¡CLAVE! Insertamos el elemento físicamente en la página para que la PC lo pueda ver
+    document.body.appendChild(element);
+
     const opcionesPDF = {
-        margin: [10, 0, 10, 0],
+        margin: [15, 10, 15, 10], // Márgenes superior, derecho, inferior, izquierdo
         filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, '_')}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, width: 800, windowWidth: 800 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true, 
+            width: 800, 
+            windowWidth: 800,
+            scrollY: 0, // ¡CLAVE! Ignora el scroll del cliente y toma la foto desde arriba
+            scrollX: 0
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Evita cortes a la mitad
     };
 
-    // Generar el PDF y luego enviar a WhatsApp
     html2pdf().set(opcionesPDF).from(element).save().then(() => {
+        // Limpieza: Borramos la plantilla de la página para no dejar basura
+        document.body.removeChild(element);
+        
         let textoCodificado = encodeURIComponent(textoWhatsApp);
         window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
         
-        // Limpiamos todo
         carrito = [];
         actualizarVistaCarrito();
         cerrarModal();
