@@ -163,7 +163,7 @@ function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
 
-// 8. Generar PDF y Redirigir a WhatsApp (VERSIÓN CORREGIDA)
+// 8. Generar PDF y Redirigir a WhatsApp (VERSIÓN CORREGIDA PARA MOBILE)
 async function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value;
     if (!nombreCliente) return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
@@ -178,7 +178,7 @@ async function procesarPedido() {
     let textoWhatsApp = `✨ *¡Hola Minuit! Nuevo pedido* ✨\n\n*Cliente:* ${nombreCliente}\n\n*Detalles:*\n`;
     
     carrito.forEach(item => {
-        pdfLista += `<li style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;"><strong>${item.cantidad}x ${item.nombre}</strong><br><small style="color: #666;">${item.detalle}</small> <span style="float:right; font-weight: bold;">$${item.subtotal.toFixed(2)}</span></li>`;
+        pdfLista += `<li style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;"><strong>${item.cantidad}x ${item.nombre}</strong><br><small style="color: #666;">${item.detalle}</small><br><strong>$${item.subtotal.toFixed(2)}</strong></li>`;
         textoWhatsApp += `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
     });
     
@@ -187,15 +187,18 @@ async function procesarPedido() {
 
     const elementoPDF = document.getElementById("contenedor-pdf");
     
-    // OPCIONES CORREGIDAS PARA EL PDF
+    // OPCIONES CORREGIDAS PARA PDF EN MOBILE Y DESKTOP
     const opcionesPDF = {
-        margin: [15, 15, 15, 15], // Márgenes superior, izquierdo, inferior, derecho
+        margin: [10, 10, 10, 10],
         filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
+        image: { type: 'jpeg', quality: 0.95 },
         html2canvas: { 
-            scale: 2, 
-            useCORS: true, 
-            windowWidth: 800 // EL TRUCO ESTÁ AQUÍ: Fuerza el ancho de la "cámara"
+            scale: 1.5,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            windowWidth: window.innerWidth > 800 ? 800 : window.innerWidth - 20,
+            logging: false
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
@@ -204,7 +207,7 @@ async function procesarPedido() {
     elementoPDF.style.left = "0";
     elementoPDF.style.zIndex = "-9999"; 
     
-    // Pequeño retraso de medio segundo para asegurar que las fuentes y estilos carguen bien
+    // Pequeño retraso para asegurar que las fuentes y estilos carguen bien
     setTimeout(() => {
         html2pdf().set(opcionesPDF).from(elementoPDF).save().then(() => {
             // Lo regresamos a su escondite
@@ -220,5 +223,5 @@ async function procesarPedido() {
             cerrarModal();
             document.getElementById("nombre_cliente").value = "";
         });
-    }, 500); // 500 milisegundos de espera
+    }, 500);
 }
