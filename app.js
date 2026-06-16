@@ -252,130 +252,14 @@ async function procesarPedido() {
     // Crear contenedor temporal
     const element = document.createElement("div");
 
-    element.style.width = "800px";
-    element.style.background = "#ffffff";
-    element.style.padding = "30px";
-    element.style.fontFamily = "Arial, sans-serif";
-    element.style.color = "#333";
+element.innerHTML = `
+<h1>MINUIT</h1>
+<p>Hola Mundo</p>
+`;
 
-    element.innerHTML = `
-        <div style="text-align:center;margin-bottom:25px;">
-            <h1 style="
-                color:#e87b9e;
-                margin:0;
-                font-size:42px;
-            ">
-                Minuit
-            </h1>
+document.body.appendChild(element);
 
-            <p style="
-                color:#9e7f8a;
-                margin-top:10px;
-            ">
-                Nota de Pedido
-            </p>
-        </div>
-
-        <hr>
-
-        <p>
-            <strong>Cliente:</strong>
-            ${nombreCliente}
-        </p>
-
-        <p>
-            <strong>Fecha:</strong>
-            ${new Date().toLocaleDateString('es-MX')}
-        </p>
-
-        <p>
-            <strong>Estado:</strong>
-            Por transferir
-        </p>
-
-        <br>
-
-        ${pdfLista}
-
-        <br>
-
-        <div style="
-            background:#fdf0f4;
-            padding:15px;
-            border-radius:8px;
-        ">
-            <h2 style="
-                color:#e87b9e;
-                margin:0;
-            ">
-                Total a Pagar: ${totalTxt}
-            </h2>
-        </div>
-
-        <br>
-
-        <div style="text-align:center;">
-            <p>¡Gracias por tu compra!</p>
-            <p>Conserva este comprobante para tu referencia.</p>
-        </div>
-    `;
-
-    // Visible para html2canvas pero fuera de pantalla
-    element.style.position = "absolute";
-    element.style.left = "-9999px";
-    element.style.top = "0";
-
-    document.body.appendChild(element);
-
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    try {
-
-        await html2pdf()
-            .set({
-                margin: 10,
-                filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`,
-                image: {
-                    type: "jpeg",
-                    quality: 1
-                },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    backgroundColor: "#ffffff"
-                },
-                jsPDF: {
-                    unit: "mm",
-                    format: "a4",
-                    orientation: "portrait"
-                }
-            })
-            .from(element)
-            .save();
-
-        let textoCodificado = encodeURIComponent(textoWhatsApp);
-
-        window.open(
-            `https://wa.me/${numeroDueno}?text=${textoCodificado}`,
-            "_blank"
-        );
-
-        carrito = [];
-        actualizarVistaCarrito();
-        cerrarModal();
-        document.getElementById("nombre_cliente").value = "";
-
-    } catch (error) {
-
-        console.error(error);
-        alert("Error al generar el PDF.");
-
-    } finally {
-
-        if (document.body.contains(element)) {
-            document.body.removeChild(element);
-        }
-
-    }
-}
+html2canvas(element).then(canvas => {
+    document.body.appendChild(canvas);
+});
 
