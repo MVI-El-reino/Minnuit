@@ -236,80 +236,141 @@ function procesarPedido() {
     textoWhatsApp += `\n💰 *Total: ${totalTxt}*\n\nQuedo a la espera de los datos de transferencia.`;
 
     // ==========================================
-    // CREACIÓN DEL DISEÑO DEL PDF EN EL DOM
-    // ==========================================
-    const element = document.createElement('div');
-    element.id = "pdf-temporal-minuit";
-    
-    // Estilos para que sea perfecto en PDF pero invisible para el usuario
-    element.style.position = "absolute";
-    element.style.top = "0";
-    element.style.left = "-10000px"; // Escondido a la izquierda
-    element.style.width = "800px";   // Ancho estricto
-    element.style.padding = "40px";
-    element.style.backgroundColor = "#ffffff";
-    element.style.fontFamily = "Arial, sans-serif";
-    element.style.boxSizing = "border-box";
+// CREACIÓN DEL DISEÑO DEL PDF EN EL DOM
+// ==========================================
 
-    element.innerHTML = `
-        <div style="text-align: center; border-bottom: 2px solid #f8dce5; padding-bottom: 20px; margin-bottom: 25px;">
-            <h1 style="color: #e87b9e; font-size: 42px; margin: 0; font-family: 'Georgia', serif; font-style: italic;">Minuit</h1>
-            <p style="color: #9e7f8a; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; font-weight: bold;">Nota de Pedido</p>
-        </div>
+const element = document.createElement('div');
+element.id = "pdf-temporal-minuit";
 
-        <div style="background-color: #fdf0f4; padding: 20px; border-radius: 12px; margin-bottom: 30px; display: flex; justify-content: space-between;">
-            <div>
-                <p style="margin: 0 0 5px 0; font-size: 16px; color: #4a3b40;"><strong>Cliente:</strong> ${nombreCliente}</p>
-                <p style="margin: 0; font-size: 14px; color: #9e7f8a;"><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-MX')}</p>
-            </div>
-            <div style="text-align: right;">
-                <p style="margin: 0; font-size: 14px; color: #9e7f8a;"><strong>Estado:</strong> Por transferir</p>
-            </div>
-        </div>
+// Mantenerlo oculto pero renderizable
+element.style.position = "fixed";
+element.style.top = "0";
+element.style.left = "0";
+element.style.width = "800px";
+element.style.padding = "40px";
+element.style.backgroundColor = "#ffffff";
+element.style.fontFamily = "Arial, sans-serif";
+element.style.boxSizing = "border-box";
+element.style.opacity = "0";
+element.style.pointerEvents = "none";
+element.style.zIndex = "-1";
 
-        <div style="margin-bottom: 30px;">
-            ${pdfLista}
-        </div>
+element.innerHTML = `
+    <div style="text-align:center; border-bottom:2px solid #f8dce5; padding-bottom:20px; margin-bottom:25px;">
+        <h1 style="color:#e87b9e; font-size:42px; margin:0; font-family:Georgia, serif; font-style:italic;">
+            Minuit
+        </h1>
+        <p style="color:#9e7f8a; font-size:14px; text-transform:uppercase; letter-spacing:2px; margin-top:8px; font-weight:bold;">
+            Nota de Pedido
+        </p>
+    </div>
 
-        <div style="text-align: right; background-color: #fdf0f4; padding: 20px; border-radius: 12px; margin-bottom: 40px; page-break-inside: avoid;">
-            <h2 style="margin: 0; color: #e87b9e; font-size: 28px;">Total a Pagar: ${totalTxt}</h2>
-        </div>
+    <div style="background:#fdf0f4; padding:20px; border-radius:12px; margin-bottom:30px;">
+        <table width="100%">
+            <tr>
+                <td>
+                    <p style="margin:0 0 5px 0; font-size:16px; color:#4a3b40;">
+                        <strong>Cliente:</strong> ${nombreCliente}
+                    </p>
+                    <p style="margin:0; font-size:14px; color:#9e7f8a;">
+                        <strong>Fecha:</strong> ${new Date().toLocaleDateString('es-MX')}
+                    </p>
+                </td>
+                <td align="right">
+                    <p style="margin:0; font-size:14px; color:#9e7f8a;">
+                        <strong>Estado:</strong> Por transferir
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </div>
 
-        <div style="text-align: center; page-break-inside: avoid;">
-            <p style="color: #9e7f8a; font-size: 14px;">¡Gracias por tu compra, Minuit!</p>
-            <p style="color: #9e7f8a; font-size: 12px; margin-top: 5px;">Conserva este comprobante para tu referencia.</p>
-        </div>
-    `;
+    <div style="margin-bottom:30px;">
+        ${pdfLista}
+    </div>
 
-    // ¡CLAVE! Insertamos el elemento físicamente en la página para que la PC lo pueda ver
-    document.body.appendChild(element);
+    <div style="text-align:right; background:#fdf0f4; padding:20px; border-radius:12px; margin-bottom:40px;">
+        <h2 style="margin:0; color:#e87b9e; font-size:28px;">
+            Total a Pagar: ${totalTxt}
+        </h2>
+    </div>
 
-    const opcionesPDF = {
-        margin: [15, 10, 15, 10], // Márgenes superior, derecho, inferior, izquierdo
-        filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, 
-            useCORS: true, 
-            width: 800, 
-            windowWidth: 800,
-            scrollY: 0, // ¡CLAVE! Ignora el scroll del cliente y toma la foto desde arriba
-            scrollX: 0
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] } // Evita cortes a la mitad
-    };
+    <div style="text-align:center;">
+        <p style="color:#9e7f8a; font-size:14px;">
+            ¡Gracias por tu compra, Minuit!
+        </p>
+        <p style="color:#9e7f8a; font-size:12px; margin-top:5px;">
+            Conserva este comprobante para tu referencia.
+        </p>
+    </div>
+`;
 
-    html2pdf().set(opcionesPDF).from(element).save().then(() => {
-        // Limpieza: Borramos la plantilla de la página para no dejar basura
-        document.body.removeChild(element);
-        
-        let textoCodificado = encodeURIComponent(textoWhatsApp);
-        window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
-        
-        carrito = [];
-        actualizarVistaCarrito();
-        cerrarModal();
-        document.getElementById("nombre_cliente").value = "";
+// Agregar al DOM
+document.body.appendChild(element);
+
+// Esperar a que el navegador renderice
+await new Promise(resolve => setTimeout(resolve, 500));
+
+console.log("Altura PDF:", element.offsetHeight);
+console.log("Contenido:", element.innerHTML);
+
+const opcionesPDF = {
+    margin: 10,
+    filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, '_')}.pdf`,
+    image: {
+        type: 'jpeg',
+        quality: 1
+    },
+    html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: true,
+        backgroundColor: "#ffffff"
+    },
+    jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait'
+    }
+};
+
+try {
+
+    // Prueba visual (opcional para depuración)
+    /*
+    const canvas = await html2canvas(element, {
+        scale: 2,
+        backgroundColor: "#ffffff"
     });
+    document.body.appendChild(canvas);
+    */
+
+    await html2pdf()
+        .set(opcionesPDF)
+        .from(element)
+        .save();
+
+    let textoCodificado = encodeURIComponent(textoWhatsApp);
+
+    window.open(
+        `https://wa.me/${numeroDueno}?text=${textoCodificado}`,
+        '_blank'
+    );
+
+    carrito = [];
+    actualizarVistaCarrito();
+    cerrarModal();
+    document.getElementById("nombre_cliente").value = "";
+
+} catch (error) {
+
+    console.error("Error al generar PDF:", error);
+    alert("Error al generar el PDF. Revisa la consola.");
+
+} finally {
+
+    if (document.body.contains(element)) {
+        document.body.removeChild(element);
+    }
+
 }
