@@ -17,6 +17,35 @@
 }
 
 /* =========================================
+   Contenedor del precio superior
+   ========================================= */
+
+.contenedor-precio-destacado {
+    text-align: center;
+    background-color: var(--rosa-claro);
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px 0 20px 0;
+    border: 1px solid var(--borde-suave);
+}
+
+.etiqueta-precio {
+    display: block;
+    color: var(--texto-secundario);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.precio-grande {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--rosa-principal);
+    margin: 0;
+}
+
+/* =========================================
    Reset y Tipografía General
    ========================================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
