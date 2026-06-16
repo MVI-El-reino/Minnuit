@@ -206,7 +206,7 @@ function cerrarModal() {
 }
 
 // ===== GENERAR PDF DEFINITIVO Y ABRIR WHATSAPP =====
-function procesarPedido() {
+async function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value;
     if (!nombreCliente) return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
     
