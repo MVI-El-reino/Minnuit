@@ -207,59 +207,19 @@ function cerrarModal() {
 // ===== GENERAR PDF DEFINITIVO Y ABRIR WHATSAPP =====
 async function procesarPedido() {
 
-    let nombreCliente = document.getElementById("nombre_cliente").value;
-
-    if (!nombreCliente) {
-        return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
-    }
-
-    mostrarAlerta("⏳ Generando tu nota de pedido...");
-
-    let totalTxt = document.getElementById("modal-total").innerText;
-
-    let pdfLista = "";
-    let textoWhatsApp = `✨ *¡Hola Minuit! Nuevo pedido* ✨\n\n*Cliente:* ${nombreCliente}\n\n*Detalles:*\n`;
-
-    carrito.forEach(item => {
-
-        // HTML simplificado para máxima compatibilidad con html2pdf
-        pdfLista += `
-            <div style="
-                border-bottom:1px solid #f8dce5;
-                padding:10px 0;
-                margin-bottom:8px;
-            ">
-                <strong>
-                    ${item.cantidad}x ${item.nombre}
-                </strong>
-                <br>
-                <span>
-                    Ref: ${item.detalle}
-                </span>
-                <br>
-                <span>
-                    Total: $${item.subtotal.toFixed(2)}
-                </span>
-            </div>
-        `;
-
-        textoWhatsApp +=
-            `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
-    });
-
-    textoWhatsApp += `\n💰 *Total: ${totalTxt}*\n\nQuedo a la espera de los datos de transferencia.`;
-
-    // Crear contenedor temporal
     const element = document.createElement("div");
 
-element.innerHTML = `
-<h1>MINUIT</h1>
-<p>Hola Mundo</p>
-`;
+    element.innerHTML = `
+        <h1 style="color:red">MINUIT</h1>
+        <p>Hola Mundo</p>
+    `;
 
-document.body.appendChild(element);
+    element.style.background = "white";
+    element.style.padding = "20px";
 
-html2canvas(element).then(canvas => {
-    document.body.appendChild(canvas);
-});
+    // IMPORTANTE: visible en pantalla
+    document.body.appendChild(element);
 
+    alert("¿Ves el texto MINUIT en la página?");
+
+}
