@@ -94,21 +94,32 @@ function actualizarConfiguradorBases() {
 }
 
 function agregarBaseConfigAlCarrito() {
-    const linea = document.getElementById("sel_linea_base").value;
-    const grosor = document.getElementById("sel_grosor_base").value;
-    const tamano = document.getElementById("sel_tamano_base").value;
-    const forma = document.getElementById("sel_forma_base").value;
-    const colorLogo = document.getElementById("sel_color_logo_base").value;
-    const cantidad = parseInt(document.getElementById("cant_base_config").value);
+    // ... (todo tu código actual de agregarBaseConfigAlCarrito) ...
 
-    const nombreCompuesto = `Base ${linea} ${forma} ${grosor} ${tamano}`;
-    const detalleCompuesto = `Logo: ${colorLogo}`;
-    const subtotal = precioBaseActual * cantidad;
+    carrito.push({
+        nombre: nombreCompuesto,
+        cantidad: cantidad,
+        detalle: detalleCompuesto,
+        precio: precioBaseActual,
+        subtotal: subtotal
+    });
 
-    carrito.push({ nombre: nombreCompuesto, cantidad, detalle: detalleCompuesto, precio: precioBaseActual, subtotal });
     mostrarAlerta(`🛒 ¡Agregado al carrito!`);
     actualizarVistaCarrito();
     animarBotónCarrito();
+
+    // ==========================================
+    // NUEVO: LIMPIEZA AUTOMÁTICA
+    // ==========================================
+    // Reseteamos los selectores a su valor por defecto
+    document.getElementById("sel_linea_base").value = "Basic";
+    document.getElementById("sel_grosor_base").value = "3MM";
+    document.getElementById("sel_tamano_base").value = "15cm";
+    document.getElementById("sel_forma_base").value = "Círculo";
+    document.getElementById("cant_base_config").value = "10"; // Regresamos al mínimo inicial
+    
+    // Actualizamos el precio y colores visualmente
+    actualizarConfiguradorBases();
 }
 
 function agregarAlCarrito(nombre, precio, idCantidad, idDetalle) {
