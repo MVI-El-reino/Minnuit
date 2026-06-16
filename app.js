@@ -56,23 +56,41 @@ function inicializarBases() { actualizarConfiguradorBases(); }
 
 function actualizarConfiguradorBases() {
     const linea = document.getElementById("sel_linea_base").value;
-    const grosor = document.getElementById("sel_grosor_base").value;
-    const tamano = document.getElementById("sel_tamano_base").value;
+    const grosorSelect = document.getElementById("sel_grosor_base");
+    const tamanoSelect = document.getElementById("sel_tamano_base");
+    
+    // Obtenemos los valores actuales
+    const grosor = grosorSelect.value;
+    const tamano = tamanoSelect.value;
 
     const precios = (linea === "Basic") ? basesBasicPrecios : basesPremiumPrecios;
-    precioBaseActual = precios[grosor][tamano];
-
-    // Actualizamos el precio en el nuevo contenedor que pusimos
-    const displayPrecio = document.getElementById("precio_config_base");
-    displayPrecio.innerText = `$${precioBaseActual.toFixed(2)} MXN`;
     
-    // Un toque extra: un efecto de "flash" cuando cambia el precio
-    displayPrecio.style.opacity = 0;
-    setTimeout(() => {
-        displayPrecio.style.opacity = 1;
-    }, 100);
+    // 1. Actualizar textos de opciones en Tamaño
+    Array.from(tamanoSelect.options).forEach(opt => {
+        let precio = precios[grosor][opt.value];
+        let nombreOriginal = opt.text.split(' - ')[0]; // Limpiamos nombre si ya tenía precio
+        opt.text = `${nombreOriginal} - $${precio}`;
+    });
 
-    // Actualizar selectores de logo... (resto de tu lógica igual)
+    // 2. Actualizar textos de opciones en Grosor
+    Array.from(grosorSelect.options).forEach(opt => {
+        let precio = precios[opt.value][tamano];
+        let nombreOriginal = opt.text.split(' - ')[0];
+        opt.text = `${nombreOriginal} - $${precio}`;
+    });
+
+    // Actualizar precio grande y colores
+    precioBaseActual = precios[grosor][tamano];
+    document.getElementById("precio_config_base").innerText = `$${precioBaseActual.toFixed(2)} MXN`;
+
+    const selectColor = document.getElementById("sel_color_logo_base");
+    selectColor.innerHTML = "";
+    coloresLogotipo[linea].forEach(color => {
+        let option = document.createElement("option");
+        option.value = color;
+        option.text = color.charAt(0).toUpperCase() + color.slice(1);
+        selectColor.add(option);
+    });
 }
 
 function agregarBaseConfigAlCarrito() {
