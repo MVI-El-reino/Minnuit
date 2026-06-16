@@ -204,29 +204,178 @@ function abrirModal() {
 function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
+// ===== GENERAR PDF DEFINITIVO Y ABRIR WHATSAPP =====
 async function procesarPedido() {
-
-    alert("1. Entró a la función");
 
     let nombreCliente = document.getElementById("nombre_cliente").value;
 
-    alert("2. Nombre: " + nombreCliente);
+    if (!nombreCliente) {
+        return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
+    }
 
-    const div = document.createElement("div");
+    mostrarAlerta("⏳ Generando tu nota de pedido...");
 
-    div.innerHTML = `
-        <h1>PRUEBA PDF</h1>
-        <p>Hola Mundo</p>
+    let totalTxt = document.getElementById("modal-total").innerText;
+
+    let pdfLista = "";
+    let textoWhatsApp = `✨ *¡Hola Minuit! Nuevo pedido* ✨\n\n*Cliente:* ${nombreCliente}\n\n*Detalles:*\n`;
+
+    carrito.forEach(item => {
+
+        // HTML simplificado para máxima compatibilidad con html2pdf
+        pdfLista += `
+            <div style="
+                border-bottom:1px solid #f8dce5;
+                padding:10px 0;
+                margin-bottom:8px;
+            ">
+                <strong>
+                    ${item.cantidad}x ${item.nombre}
+                </strong>
+                <br>
+                <span>
+                    Ref: ${item.detalle}
+                </span>
+                <br>
+                <span>
+                    Total: $${item.subtotal.toFixed(2)}
+                </span>
+            </div>
+        `;
+
+        textoWhatsApp +=
+            `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
+    });
+
+    textoWhatsApp += `\n💰 *Total: ${totalTxt}*\n\nQuedo a la espera de los datos de transferencia.`;
+
+    // Crear contenedor temporal
+    const element = document.createElement("div");
+
+    element.style.width = "800px";
+    element.style.background = "#ffffff";
+    element.style.padding = "30px";
+    element.style.fontFamily = "Arial, sans-serif";
+    element.style.color = "#333";
+
+    element.innerHTML = `
+        <div style="text-align:center;margin-bottom:25px;">
+            <h1 style="
+                color:#e87b9e;
+                margin:0;
+                font-size:42px;
+            ">
+                Minuit
+            </h1>
+
+            <p style="
+                color:#9e7f8a;
+                margin-top:10px;
+            ">
+                Nota de Pedido
+            </p>
+        </div>
+
+        <hr>
+
+        <p>
+            <strong>Cliente:</strong>
+            ${nombreCliente}
+        </p>
+
+        <p>
+            <strong>Fecha:</strong>
+            ${new Date().toLocaleDateString('es-MX')}
+        </p>
+
+        <p>
+            <strong>Estado:</strong>
+            Por transferir
+        </p>
+
+        <br>
+
+        ${pdfLista}
+
+        <br>
+
+        <div style="
+            background:#fdf0f4;
+            padding:15px;
+            border-radius:8px;
+        ">
+            <h2 style="
+                color:#e87b9e;
+                margin:0;
+            ">
+                Total a Pagar: ${totalTxt}
+            </h2>
+        </div>
+
+        <br>
+
+        <div style="text-align:center;">
+            <p>¡Gracias por tu compra!</p>
+            <p>Conserva este comprobante para tu referencia.</p>
+        </div>
     `;
 
-    document.body.appendChild(div);
+    // Visible para html2canvas pero fuera de pantalla
+    element.style.position = "absolute";
+    element.style.left = "-9999px";
+    element.style.top = "0";
 
-    alert("3. Antes de html2pdf");
+    document.body.appendChild(element);
 
-    html2pdf()
-        .from(div)
-        .save("prueba.pdf");
+    await new Promise(resolve => setTimeout(resolve, 300));
 
-    alert("4. Después de html2pdf");
+    try {
+
+        await html2pdf()
+            .set({
+                margin: 10,
+                filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`,
+                image: {
+                    type: "jpeg",
+                    quality: 1
+                },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: "#ffffff"
+                },
+                jsPDF: {
+                    unit: "mm",
+                    format: "a4",
+                    orientation: "portrait"
+                }
+            })
+            .from(element)
+            .save();
+
+        let textoCodificado = encodeURIComponent(textoWhatsApp);
+
+        window.open(
+            `https://wa.me/${numeroDueno}?text=${textoCodificado}`,
+            "_blank"
+        );
+
+        carrito = [];
+        actualizarVistaCarrito();
+        cerrarModal();
+        document.getElementById("nombre_cliente").value = "";
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Error al generar el PDF.");
+
+    } finally {
+
+        if (document.body.contains(element)) {
+            document.body.removeChild(element);
+        }
+
+    }
 }
 
