@@ -207,6 +207,8 @@ function cerrarModal() {
 // ===== GENERAR PDF DEFINITIVO Y ABRIR WHATSAPP =====
 async function procesarPedido() {
 
+    alert("Inicio");
+
     const element = document.createElement("div");
 
     element.innerHTML = `
@@ -214,12 +216,18 @@ async function procesarPedido() {
         <p>Hola Mundo</p>
     `;
 
+    element.style.position = "fixed";
+    element.style.top = "100px";
+    element.style.left = "100px";
     element.style.background = "white";
     element.style.padding = "20px";
+    element.style.border = "5px solid red";
+    element.style.zIndex = "999999";
 
-    // IMPORTANTE: visible en pantalla
     document.body.appendChild(element);
 
-    alert("¿Ves el texto MINUIT en la página?");
+    console.log(element);
+    console.log(document.body.contains(element));
 
+    alert("¿Ahora ves un cuadro blanco con borde rojo?");
 }
