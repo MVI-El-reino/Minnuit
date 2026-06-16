@@ -25,7 +25,19 @@
     <main>
         <section id="bases" class="categoria-seccion active">
             <div class="card-producto card-configurador">
-                <h3>Bases Personalizadas - Configura la Tuya</h3>
+    <h3>Bases Personalizadas - Configura la Tuya</h3>
+    
+    <div class="contenedor-precio-destacado">
+        <span class="etiqueta-precio">Precio por unidad:</span>
+        <p id="precio_config_base" class="precio-grande">$25.00 MXN</p>
+    </div>
+
+    <div class="controles-cantidad">
+        <button onclick="cambiarCantidad('cant_base_config', -1, 1)">-</button>
+        <input type="number" id="cant_base_config" value="10" readonly>
+        <button onclick="cambiarCantidad('cant_base_config', 1, 1)">+</button>
+    </div>
+</div>
                 <p>Mínimo 35 piezas. Combina tamaños, grosores y figuras.</p>
                 
                 <div class="controles-config">
@@ -35,24 +47,11 @@
                         <option value="Premium">Premium (+100 colores/texturas)</option>
                     </select>
                 </div>
-                
-                <div class="controles-config">
-                    <label>Grosor:</label>
-                    <select id="sel_grosor_base" onchange="actualizarConfiguradorBases()">
-                        <option value="3MM">3 MM</option>
-                        <option value="6MM">6 MM</option>
-                        <option value="9MM">9 MM</option>
-                    </select>
-                </div>
-                
+
                 <div class="controles-config">
                     <label>Tamaño:</label>
                     <select id="sel_tamano_base" onchange="actualizarConfiguradorBases()">
                         <option value="15cm">#15cm (6")</option>
-                        <div class="precio-unitario-display">
-    <span>Precio unitario:</span>
-    <h2 id="precio_config_base" class="precio-grande">$25.00 MXN</h2>
-</div>
                         <option value="20cm">#20cm (8")</option>
                         <option value="23cm">#23cm (9")</option>
                         <option value="25cm">#25cm (10")</option>
@@ -62,6 +61,15 @@
                         <option value="40cm">#40cm (16")</option>
                         <option value="45cm">#45cm (18")</option>
                         <option value="50cm">#50cm (20")</option>
+                    </select>
+                </div>
+                
+                <div class="controles-config">
+                    <label>Grosor:</label>
+                    <select id="sel_grosor_base" onchange="actualizarConfiguradorBases()">
+                        <option value="3MM">3 MM</option>
+                        <option value="6MM">6 MM</option>
+                        <option value="9MM">9 MM</option>
                     </select>
                 </div>
                 
@@ -80,14 +88,6 @@
                     <select id="sel_color_logo_base">
                         </select>
                 </div>
-
-                <p id="precio_config_base" class="precio precio-grande">$25.00 MXN / u</p>
-
-                <div class="controles-cantidad">
-    <button onclick="cambiarCantidad('cant_base_config', -1, 1)">-</button>
-    <input type="number" id="cant_base_config" value="10" readonly>
-    <button onclick="cambiarCantidad('cant_base_config', 1, 1)">+</button>
-</div>
                 <button class="btn-agregar" onclick="agregarBaseConfigAlCarrito()">Agregar al Carrito</button>
             </div>
         </section>
