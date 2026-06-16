@@ -372,5 +372,5 @@ try {
     if (document.body.contains(element)) {
         document.body.removeChild(element);
     }
-
+  }
 }
