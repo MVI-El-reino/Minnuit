@@ -356,6 +356,22 @@ header p {
     transition: all 0.3s ease;
     box-shadow: var(--sombra-boton);
 }
+/* ===== LA MAGIA PARA QUE EL BOTÓN NO SE PIERDA ===== */
+.btn-agregar {
+    position: sticky;
+    bottom: 85px; /* Lo mantiene flotando justo por encima de la barra del total */
+    z-index: 90;
+    
+    /* Le ponemos un "halo" blanco difuminado hacia arriba para que 
+       el texto de las opciones no choque con el botón al hacer scroll */
+    box-shadow: 0 -15px 20px rgba(255, 255, 255, 0.95), 0 8px 20px -6px rgba(225, 107, 144, 0.5);
+}
+
+/* Evitamos que el botón del modal del carrito también se quede pegado de forma rara */
+.btn-pedido {
+    position: relative;
+    z-index: 1;
+}
 
 .btn-agregar:hover, .btn-pedido:hover { 
     transform: translateY(-2px);
