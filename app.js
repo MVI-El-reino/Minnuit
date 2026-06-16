@@ -204,9 +204,33 @@ function abrirModal() {
 function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
-
-// ===== GENERAR PDF DEFINITIVO Y ABRIR WHATSAPP =====
 async function procesarPedido() {
+
+    alert("1. Entró a la función");
+
+    let nombreCliente = document.getElementById("nombre_cliente").value;
+
+    alert("2. Nombre: " + nombreCliente);
+
+    const div = document.createElement("div");
+
+    div.innerHTML = `
+        <h1>PRUEBA PDF</h1>
+        <p>Hola Mundo</p>
+    `;
+
+    document.body.appendChild(div);
+
+    alert("3. Antes de html2pdf");
+
+    html2pdf()
+        .from(div)
+        .save("prueba.pdf");
+
+    alert("4. Después de html2pdf");
+}
+// ===== GENERAR PDF DEFINITIVO Y ABRIR WHATSAPP =====
+/*async function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value;
     if (!nombreCliente) return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
     
@@ -345,7 +369,7 @@ try {
     document.body.appendChild(canvas);
     */
 
-    await html2pdf()
+  /*  await html2pdf()
         .set(opcionesPDF)
         .from(element)
         .save();
@@ -373,4 +397,4 @@ try {
         document.body.removeChild(element);
     }
   }
-}
+}*/
