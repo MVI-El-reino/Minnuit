@@ -205,29 +205,238 @@ function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
 // ===== GENERAR PDF DEFINITIVO Y ABRIR WHATSAPP =====
+// ===== GENERAR PDF DEFINITIVO Y ABRIR WHATSAPP =====
 async function procesarPedido() {
 
-    alert("Inicio");
+    let nombreCliente = document.getElementById("nombre_cliente").value.trim();
+
+    if (!nombreCliente) {
+        return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
+    }
+
+    if (carrito.length === 0) {
+        return mostrarAlerta("🛒 Tu carrito está vacío.");
+    }
+
+    mostrarAlerta("⏳ Generando nota de pedido...");
+
+    let totalTxt = document.getElementById("modal-total").innerText;
+
+    let pdfLista = "";
+
+    let textoWhatsApp =
+`✨ *¡Hola Minuit! Nuevo pedido* ✨
+
+*Cliente:* ${nombreCliente}
+
+*Detalles:*
+`;
+
+    carrito.forEach(item => {
+
+        pdfLista += `
+            <div style="
+                border-bottom:1px solid #f8dce5;
+                padding:12px 0;
+            ">
+                <div>
+                    <strong>
+                        ${item.cantidad}x ${item.nombre}
+                    </strong>
+                </div>
+
+                <div style="
+                    color:#9e7f8a;
+                    font-size:13px;
+                    margin-top:4px;
+                ">
+                    Ref: ${item.detalle}
+                </div>
+
+                <div style="
+                    color:#e87b9e;
+                    font-weight:bold;
+                    margin-top:6px;
+                ">
+                    $${item.subtotal.toFixed(2)}
+                </div>
+            </div>
+        `;
+
+        textoWhatsApp +=
+`▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}
+`;
+    });
+
+    textoWhatsApp += `
+
+💰 *Total:* ${totalTxt}
+
+Quedo a la espera de los datos de transferencia.
+`;
+
+    // ==========================================
+    // CREAR CONTENEDOR PDF
+    // ==========================================
 
     const element = document.createElement("div");
 
-    element.innerHTML = `
-        <h1 style="color:red">MINUIT</h1>
-        <p>Hola Mundo</p>
-    `;
+    element.id = "pdf-temporal-minuit";
 
     element.style.position = "fixed";
-    element.style.top = "100px";
-    element.style.left = "100px";
-    element.style.background = "white";
-    element.style.padding = "20px";
-    element.style.border = "5px solid red";
+    element.style.top = "50px";
+    element.style.left = "50px";
+    element.style.width = "800px";
+    element.style.padding = "40px";
+    element.style.backgroundColor = "#ffffff";
+    element.style.fontFamily = "Arial, sans-serif";
+    element.style.boxSizing = "border-box";
     element.style.zIndex = "999999";
+
+    element.innerHTML = `
+        <div style="
+            text-align:center;
+            border-bottom:2px solid #f8dce5;
+            padding-bottom:20px;
+            margin-bottom:25px;
+        ">
+            <h1 style="
+                color:#e87b9e;
+                font-size:42px;
+                margin:0;
+                font-family:Georgia, serif;
+                font-style:italic;
+            ">
+                Minuit
+            </h1>
+
+            <p style="
+                color:#9e7f8a;
+                font-size:14px;
+                text-transform:uppercase;
+                letter-spacing:2px;
+                margin-top:8px;
+                font-weight:bold;
+            ">
+                Nota de Pedido
+            </p>
+        </div>
+
+        <div style="
+            background:#fdf0f4;
+            padding:15px;
+            border-radius:10px;
+            margin-bottom:25px;
+        ">
+            <p style="margin:0 0 8px 0;">
+                <strong>Cliente:</strong>
+                ${nombreCliente}
+            </p>
+
+            <p style="margin:0 0 8px 0;">
+                <strong>Fecha:</strong>
+                ${new Date().toLocaleDateString("es-MX")}
+            </p>
+
+            <p style="margin:0;">
+                <strong>Estado:</strong>
+                Por transferir
+            </p>
+        </div>
+
+        <div>
+            ${pdfLista}
+        </div>
+
+        <div style="
+            background:#fdf0f4;
+            padding:20px;
+            border-radius:10px;
+            margin-top:25px;
+            text-align:right;
+        ">
+            <h2 style="
+                margin:0;
+                color:#e87b9e;
+            ">
+                Total a Pagar: ${totalTxt}
+            </h2>
+        </div>
+
+        <div style="
+            text-align:center;
+            margin-top:35px;
+            color:#9e7f8a;
+        ">
+            <p>
+                ¡Gracias por tu compra en Minuit!
+            </p>
+
+            <p style="font-size:12px;">
+                Conserva este comprobante para futuras referencias.
+            </p>
+        </div>
+    `;
 
     document.body.appendChild(element);
 
-    console.log(element);
-    console.log(document.body.contains(element));
+    // Dar tiempo a renderizar
+    await new Promise(resolve => setTimeout(resolve, 500));
 
-    alert("¿Ahora ves un cuadro blanco con borde rojo?");
+    try {
+
+        const opcionesPDF = {
+            margin: 10,
+            filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`,
+            image: {
+                type: "jpeg",
+                quality: 1
+            },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: "#FFFFFF"
+            },
+            jsPDF: {
+                unit: "mm",
+                format: "a4",
+                orientation: "portrait"
+            }
+        };
+
+        await html2pdf()
+            .set(opcionesPDF)
+            .from(element)
+            .save();
+
+        let textoCodificado = encodeURIComponent(textoWhatsApp);
+
+        window.open(
+            `https://wa.me/${numeroDueno}?text=${textoCodificado}`,
+            "_blank"
+        );
+
+        carrito = [];
+        actualizarVistaCarrito();
+        cerrarModal();
+
+        document.getElementById("nombre_cliente").value = "";
+
+    } catch (error) {
+
+        console.error("Error PDF:", error);
+
+        alert(
+            "Ocurrió un error al generar el PDF. Revisa la consola."
+        );
+
+    } finally {
+
+        const pdfTemporal =
+            document.getElementById("pdf-temporal-minuit");
+
+        if (pdfTemporal) {
+            pdfTemporal.remove();
+        }
+    }
 }
