@@ -329,30 +329,36 @@ header p {
 /* =========================================
    Botón Flotante (FAB Carrito) - CON ANIMACIÓN PULSANTE
    ========================================= */
+/* ===== BARRA FIJA INFERIOR (Sticky Total) ===== */
 #fab-carrito {
     position: fixed; 
-    bottom: 25px; 
-    right: 25px;
-    background: var(--rosa-gradiente); 
-    color: var(--blanco);
-    padding: 16px 28px; 
-    border-radius: 30px; 
-    font-weight: 600;
-    font-size: 1.05rem;
-    box-shadow: 0 10px 25px rgba(232, 123, 158, 0.5); 
+    bottom: 0; 
+    left: 0;
+    width: 100%;
+    background: var(--blanco); 
+    color: var(--texto-oscuro);
+    padding: 15px 25px; 
+    font-weight: 700;
+    font-size: 1.2rem;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08); 
     cursor: pointer;
     z-index: 100;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation: pulse-fab 2s ease-in-out infinite;
+    border-top: 2px solid var(--rosa-principal);
 }
 
-#fab-carrito:hover { 
-    transform: scale(1.08);
-    animation: none;
+#fab-carrito::before { content: none; } /* Quitamos el tooltip viejo */
+
+#fab-total {
+    color: var(--rosa-principal);
+    font-size: 1.4rem;
 }
+
+/* Ajuste para que el cuerpo no se oculte bajo la barra */
+body { padding-bottom: 100px; }
+
 
 /* Animación pulsante para atraer atención */
 @keyframes pulse-fab {
