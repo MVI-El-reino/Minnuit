@@ -122,10 +122,11 @@ function agregarBaseConfigAlCarrito() {
     actualizarVistaCarrito();
     animarBotónCarrito();
 
-    document.getElementById("sel_linea_base").selectedIndex = 0;
-    document.getElementById("sel_grosor_base").selectedIndex = 0;
-    document.getElementById("sel_tamano_base").selectedIndex = 0;
-    document.getElementById("sel_forma_base").selectedIndex = 0;
+    // --- RESETEO FORZADO BLINDADO ---
+    document.getElementById("sel_linea_base").value = "Basic";
+    document.getElementById("sel_grosor_base").value = "3MM";
+    document.getElementById("sel_tamano_base").value = "15cm";
+    document.getElementById("sel_forma_base").value = "Círculo";
     document.getElementById("cant_base_config").value = "1"; 
     actualizarConfiguradorBases();
 }
@@ -167,8 +168,9 @@ function agregarCupcakeConfigAlCarrito() {
     actualizarVistaCarrito();
     animarBotónCarrito();
 
-    document.getElementById("sel_tamano_cupcake").selectedIndex = 0;
-    document.getElementById("sel_color_soporte").selectedIndex = 0;
+    // --- RESETEO FORZADO BLINDADO ---
+    document.getElementById("sel_tamano_cupcake").value = "2";
+    document.getElementById("sel_color_soporte").value = "Blanco";
     document.getElementById("cant_cupcake_config").value = "1"; 
     actualizarConfiguradorCupcakes();
 }
@@ -213,9 +215,10 @@ function agregarPastelConfigAlCarrito() {
     actualizarVistaCarrito();
     animarBotónCarrito();
 
-    document.getElementById("sel_tamano_pastel").selectedIndex = 0;
-    document.getElementById("sel_material_pastel").selectedIndex = 0;
-    document.getElementById("sel_ventana_pastel").selectedIndex = 0;
+    // --- RESETEO FORZADO BLINDADO ---
+    document.getElementById("sel_tamano_pastel").value = "Chico";
+    document.getElementById("sel_material_pastel").value = "Blanco";
+    document.getElementById("sel_ventana_pastel").value = "Cerrada";
     document.getElementById("detalle_pastel1").value = "";
     document.getElementById("cant_pastel_config").value = "1"; 
     actualizarConfiguradorPasteles();
