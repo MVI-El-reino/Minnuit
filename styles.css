@@ -485,9 +485,7 @@ body { padding-bottom: 100px; }
     opacity: 1;
 }
 
-/* =========================================
-   Modal (Look Vidrio)
-   ========================================= */
+/* ===== MODAL CORREGIDO ===== */
 .modal {
     display: none; 
     position: fixed; 
@@ -498,18 +496,26 @@ body { padding-bottom: 100px; }
     height: 100%; 
     background-color: rgba(74, 59, 64, 0.5); 
     backdrop-filter: blur(4px); 
+    /* Agregamos esto por si la pantalla es extremadamente pequeña */
+    overflow-y: auto; 
 }
 
 .modal-contenido {
     background-color: var(--blanco); 
-    margin: 15% auto; 
-    padding: 30px;
+    /* Cambiamos el margen superior para que se adapte mejor */
+    margin: 5vh auto; 
+    padding: 25px; /* Un poco menos de relleno para ahorrar espacio */
     width: 90%; 
     max-width: 450px; 
     border-radius: 20px; 
     position: relative;
     box-shadow: 0 25px 50px -12px rgba(232, 123, 158, 0.3);
     animation: modalPop 0.3s ease-out;
+    
+    /* ===== LA MAGIA PARA QUE NUNCA SE CORTE EL BOTÓN ===== */
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh; /* El modal nunca será más alto que el 90% de la pantalla */
 }
 
 @keyframes modalPop {
@@ -522,24 +528,30 @@ body { padding-bottom: 100px; }
     right: 25px; 
     top: 20px; 
     font-size: 32px; 
-    font-weight: 400; 
     cursor: pointer; 
     color: var(--texto-secundario); 
-    transition: 0.2s;
+    z-index: 10;
 }
-.cerrar:hover { color: var(--rosa-principal); }
 
-.modal-contenido h2 { color: var(--texto-oscuro); margin-bottom: 20px; }
+.modal-contenido h2 { 
+    color: var(--texto-oscuro); 
+    margin-bottom: 20px; 
+    flex-shrink: 0; /* Evita que el título se aplaste */
+}
 
+.input-cliente {
+    flex-shrink: 0; /* Evita que el campo de nombre se aplaste */
+}
+
+/* ===== LA LISTA AHORA TOMA EL ESPACIO SOBRANTE ===== */
 #lista-carrito { 
     list-style: none; 
-    margin: 20px 0; 
-    max-height: 250px; 
-    overflow-y: auto; 
-    padding-right: 10px;
+    margin: 10px 0; 
+    padding-right: 10px; 
+    flex-grow: 1; /* Obliga a la lista a encogerse/estirarse dinámicamente */
+    overflow-y: auto; /* Solo esta parte tendrá scroll */
+    min-height: 50px;
 }
-#lista-carrito::-webkit-scrollbar { width: 6px; }
-#lista-carrito::-webkit-scrollbar-thumb { background: var(--borde-suave); border-radius: 10px; }
 
 #lista-carrito li { 
     padding: 15px 0; 
@@ -547,15 +559,54 @@ body { padding-bottom: 100px; }
     font-size: 0.95rem; 
     line-height: 1.5; 
 }
-#lista-carrito li:last-child { border-bottom: none; }
+
+.btn-eliminar-item { 
+    background: none; 
+    border: none; 
+    color: #ff7675; 
+    font-size: 1.4rem; 
+    cursor: pointer; 
+    float: right; 
+}
 
 .total-modal { 
-    color: var(--texto-oscuro); 
     text-align: right; 
-    margin: 20px 0; 
-    font-size: 1.4rem;
+    margin: 15px 0; 
+    font-size: 1.4rem; 
+    color: var(--texto-oscuro); 
+    flex-shrink: 0; /* Evita que el total se aplaste */
 }
-.total-modal span { color: var(--rosa-principal); font-weight: 700; }
+
+.total-modal span { 
+    color: var(--rosa-principal); 
+    font-weight: 800; 
+}
+
+.btn-pedido {
+    width: 100%; 
+    padding: 16px; 
+    border: none; 
+    border-radius: 12px; 
+    background: var(--rosa-gradiente); 
+    color: var(--blanco); 
+    font-weight: 600; 
+    font-size: 1.1rem; 
+    cursor: pointer; 
+    position: relative; 
+    z-index: 1;
+    flex-shrink: 0; /* El botón es intocable, jamás se encogerá */
+}
+
+.btn-pedido:disabled { 
+    background: #dcdde1 !important; 
+    color: #a6b1b7 !important; 
+    cursor: not-allowed; 
+}
+
+/* Alertas en modal */
+#alertas-cantidades {
+    flex-shrink: 0;
+}
 
 /* =========================================
    Alertas Elegantes (Toasts Flotantes)
