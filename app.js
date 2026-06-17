@@ -234,7 +234,7 @@ function eliminarDelCarrito(index) {
 function actualizarVistaCarrito() {
     let totalDinero = 0;
     let totalBases = 0;
-    let totalCajas = 0; // Cupcakes y pasteles comparten el mínimo de 30 piezas
+    let totalCajas = 0; 
     let listaHTML = "";
     
     carrito.forEach((item, index) => {
@@ -258,6 +258,10 @@ function actualizarVistaCarrito() {
 
     const btnPedido = document.querySelector(".btn-pedido");
     const alertaPiezas = document.getElementById("contador-piezas-alerta");
+    
+    // Elementos de la barra inferior
+    const fabCarrito = document.getElementById("fab-carrito");
+    const fabTexto = fabCarrito.querySelector("span:first-child");
 
     let advertenciaHTML = "";
     let bloqueado = false;
@@ -271,8 +275,14 @@ function actualizarVistaCarrito() {
         bloqueado = true;
     }
 
+    // APLICAMOS LA MAGIA VISUAL AQUÍ
     if (!bloqueado && carrito.length > 0) {
         advertenciaHTML = `<div class="texto-valido-verde">✅ ¡Cantidades correctas! Pedido autorizado.</div>`;
+        fabCarrito.classList.add("carrito-listo");
+        fabTexto.innerHTML = "✅ ¡Pedido Listo! Toca aquí";
+    } else {
+        fabCarrito.classList.remove("carrito-listo");
+        fabTexto.innerHTML = "🛒 Ver Pedido";
     }
 
     alertaPiezas.innerHTML = advertenciaHTML;
