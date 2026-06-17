@@ -385,8 +385,6 @@ Quedo a la espera de los datos de transferencia.
 
     try {
 
-       const { jsPDF } = window.jspdf;
-
 const { jsPDF } = window.jspdf;
 
 const pdf = new jsPDF("p", "mm", "a4");
