@@ -385,42 +385,75 @@ Quedo a la espera de los datos de transferencia.
 
     try {
 
-        const opcionesPDF = {
-            margin: 10,
-            filename: `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`,
-            image: {
-                type: "jpeg",
-                quality: 1
-            },
-            html2canvas: {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: "#FFFFFF"
-            },
-            jsPDF: {
-                unit: "mm",
-                format: "a4",
-                orientation: "portrait"
-            }
-        };
+       const { jsPDF } = window.jspdf;
 
-        await html2pdf()
-            .set(opcionesPDF)
-            .from(element)
-            .save();
+const pdf = new jsPDF();
 
-        let textoCodificado = encodeURIComponent(textoWhatsApp);
+pdf.setFontSize(24);
+pdf.setTextColor(232, 123, 158);
+pdf.text("Minuit", 20, 20);
 
-        window.open(
-            `https://wa.me/${numeroDueno}?text=${textoCodificado}`,
-            "_blank"
-        );
+pdf.setFontSize(12);
+pdf.setTextColor(0, 0, 0);
 
-        carrito = [];
-        actualizarVistaCarrito();
-        cerrarModal();
+pdf.text(`Cliente: ${nombreCliente}`, 20, 35);
 
-        document.getElementById("nombre_cliente").value = "";
+pdf.text(
+    `Fecha: ${new Date().toLocaleDateString("es-MX")}`,
+    20,
+    43
+);
+
+pdf.text("Estado: Por transferir", 20, 51);
+
+let y = 70;
+
+carrito.forEach(item => {
+
+    pdf.text(
+        `${item.cantidad}x ${item.nombre}`,
+        20,
+        y
+    );
+
+    y += 7;
+
+    pdf.text(
+        `Ref: ${item.detalle}`,
+        25,
+        y
+    );
+
+    y += 7;
+
+    pdf.text(
+        `$${item.subtotal.toFixed(2)}`,
+        150,
+        y - 7
+    );
+
+    y += 8;
+
+    // Nueva página si se llena
+    if (y > 260) {
+        pdf.addPage();
+        y = 20;
+    }
+
+});
+
+pdf.setFontSize(16);
+pdf.setTextColor(232, 123, 158);
+
+pdf.text(
+    `Total a Pagar: ${totalTxt}`,
+    20,
+    y + 15
+);
+
+pdf.save(
+    `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`
+);
 
     } catch (error) {
 
