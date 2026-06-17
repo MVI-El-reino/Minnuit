@@ -387,69 +387,212 @@ Quedo a la espera de los datos de transferencia.
 
        const { jsPDF } = window.jspdf;
 
-const pdf = new jsPDF();
+const { jsPDF } = window.jspdf;
 
-pdf.setFontSize(24);
-pdf.setTextColor(232, 123, 158);
-pdf.text("Minuit", 20, 20);
+const pdf = new jsPDF("p", "mm", "a4");
 
-pdf.setFontSize(12);
-pdf.setTextColor(0, 0, 0);
+const COLOR_PRINCIPAL = [232, 123, 158];
+const COLOR_FONDO = [253, 240, 244];
+const COLOR_TEXTO = [74, 59, 64];
 
-pdf.text(`Cliente: ${nombreCliente}`, 20, 35);
+// =====================================
+// ENCABEZADO
+// =====================================
 
+pdf.setFillColor(...COLOR_PRINCIPAL);
+pdf.rect(0, 0, 210, 35, "F");
+
+pdf.setTextColor(255, 255, 255);
+pdf.setFont("helvetica", "bold");
+pdf.setFontSize(28);
+pdf.text("MINUIT", 105, 18, { align: "center" });
+
+pdf.setFontSize(11);
+pdf.text("Nota de Pedido", 105, 27, { align: "center" });
+
+// =====================================
+// DATOS CLIENTE
+// =====================================
+
+pdf.setFillColor(...COLOR_FONDO);
+pdf.roundedRect(15, 45, 180, 28, 4, 4, "F");
+
+pdf.setTextColor(...COLOR_TEXTO);
+pdf.setFontSize(11);
+
+pdf.setFont("helvetica", "bold");
+pdf.text("Cliente:", 20, 56);
+
+pdf.setFont("helvetica", "normal");
+pdf.text(nombreCliente, 45, 56);
+
+pdf.setFont("helvetica", "bold");
+pdf.text("Fecha:", 20, 66);
+
+pdf.setFont("helvetica", "normal");
 pdf.text(
-    `Fecha: ${new Date().toLocaleDateString("es-MX")}`,
-    20,
-    43
+    new Date().toLocaleDateString("es-MX"),
+    45,
+    66
 );
 
-pdf.text("Estado: Por transferir", 20, 51);
+pdf.setFont("helvetica", "bold");
+pdf.text("Estado:", 120, 56);
 
-let y = 70;
+pdf.setFont("helvetica", "normal");
+pdf.text("Por transferir", 145, 56);
+
+// =====================================
+// TABLA ENCABEZADO
+// =====================================
+
+let y = 90;
+
+pdf.setFillColor(...COLOR_PRINCIPAL);
+pdf.rect(15, y, 180, 10, "F");
+
+pdf.setTextColor(255, 255, 255);
+pdf.setFont("helvetica", "bold");
+pdf.setFontSize(10);
+
+pdf.text("PRODUCTO", 20, y + 7);
+pdf.text("CANT.", 120, y + 7);
+pdf.text("TOTAL", 170, y + 7);
+
+y += 15;
+
+// =====================================
+// PRODUCTOS
+// =====================================
+
+pdf.setTextColor(...COLOR_TEXTO);
 
 carrito.forEach(item => {
 
-    pdf.text(
-        `${item.cantidad}x ${item.nombre}`,
-        20,
-        y
-    );
-
-    y += 7;
-
-    pdf.text(
-        `Ref: ${item.detalle}`,
-        25,
-        y
-    );
-
-    y += 7;
-
-    pdf.text(
-        `$${item.subtotal.toFixed(2)}`,
-        150,
-        y - 7
-    );
-
-    y += 8;
-
-    // Nueva página si se llena
     if (y > 260) {
+
         pdf.addPage();
+
         y = 20;
+
+        pdf.setFillColor(...COLOR_PRINCIPAL);
+        pdf.rect(15, y, 180, 10, "F");
+
+        pdf.setTextColor(255,255,255);
+
+        pdf.text("PRODUCTO", 20, y + 7);
+        pdf.text("CANT.", 120, y + 7);
+        pdf.text("TOTAL", 170, y + 7);
+
+        y += 15;
+
+        pdf.setTextColor(...COLOR_TEXTO);
     }
 
+    pdf.setFont("helvetica", "bold");
+    pdf.text(item.nombre, 20, y);
+
+    pdf.setFont("helvetica", "normal");
+
+    pdf.setFontSize(8);
+
+    pdf.text(
+        String(item.detalle || ""),
+        20,
+        y + 5
+    );
+
+    pdf.setFontSize(10);
+
+    pdf.text(
+        String(item.cantidad),
+        125,
+        y
+    );
+
+    pdf.text(
+        "$" + item.subtotal.toFixed(2),
+        165,
+        y
+    );
+
+    pdf.setDrawColor(240, 220, 227);
+
+    pdf.line(
+        20,
+        y + 8,
+        190,
+        y + 8
+    );
+
+    y += 15;
 });
 
-pdf.setFontSize(16);
-pdf.setTextColor(232, 123, 158);
+// =====================================
+// TOTAL
+// =====================================
+
+y += 10;
+
+pdf.setFillColor(...COLOR_FONDO);
+
+pdf.roundedRect(
+    110,
+    y,
+    85,
+    22,
+    4,
+    4,
+    "F"
+);
+
+pdf.setFont("helvetica", "bold");
+
+pdf.setTextColor(...COLOR_PRINCIPAL);
+
+pdf.setFontSize(12);
 
 pdf.text(
-    `Total a Pagar: ${totalTxt}`,
-    20,
-    y + 15
+    "TOTAL A PAGAR",
+    152,
+    y + 8,
+    { align: "center" }
 );
+
+pdf.setFontSize(18);
+
+pdf.text(
+    totalTxt,
+    152,
+    y + 17,
+    { align: "center" }
+);
+
+// =====================================
+// PIE
+// =====================================
+
+pdf.setTextColor(120,120,120);
+
+pdf.setFontSize(10);
+
+pdf.text(
+    "Gracias por tu compra en Minuit ♥",
+    105,
+    285,
+    { align: "center" }
+);
+
+pdf.text(
+    "Conserva este comprobante para futuras referencias",
+    105,
+    291,
+    { align: "center" }
+);
+
+// =====================================
+// GUARDAR
+// =====================================
 
 pdf.save(
     `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`
