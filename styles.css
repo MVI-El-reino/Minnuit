@@ -660,3 +660,57 @@ body { padding-bottom: 100px; }
     color: #d63031;
     transform: scale(1.1);
 }
+/* ===== ESTILO PARA EL INPUT DEL NOMBRE ===== */
+.input-cliente {
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.input-cliente label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--texto-oscuro);
+    margin-bottom: 8px;
+}
+
+.input-cliente input {
+    width: 100%;
+    padding: 15px 18px;
+    border: 2px solid var(--borde-suave);
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    color: var(--texto-oscuro);
+    background-color: #fffafb;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.input-cliente input:focus {
+    outline: none;
+    border-color: var(--rosa-principal);
+    box-shadow: 0 0 0 4px rgba(232, 123, 158, 0.15);
+}
+
+/* ===== ANIMACIÓN DEL CARRITO LISTO ===== */
+@keyframes latidoExito {
+    0% { transform: scale(1); box-shadow: 0 -10px 30px rgba(232, 123, 158, 0.2); }
+    50% { transform: scale(1.02); box-shadow: 0 -10px 40px rgba(232, 123, 158, 0.6); }
+    100% { transform: scale(1); box-shadow: 0 -10px 30px rgba(232, 123, 158, 0.2); }
+}
+
+.carrito-listo {
+    background: var(--rosa-gradiente) !important;
+    animation: latidoExito 2s infinite;
+    border-top: none !important;
+}
+
+.carrito-listo span {
+    color: var(--blanco) !important; 
+    font-weight: 800;
+}
+
+.carrito-listo #fab-total {
+    color: var(--blanco) !important;
+}
