@@ -6,10 +6,10 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Pedido Exclusivo - Minuit</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body onload="inicializarBases()">
+<body onload="inicializarTienda()">
 
     <header>
         <h1>Minuit</h1>
@@ -25,26 +25,26 @@
     <main>
         <section id="bases" class="categoria-seccion active">
             <div class="card-producto card-configurador">
-    <h3>Bases Personalizadas - Configura la Tuya</h3>
+                <h3>Bases Personalizadas - Configura la Tuya</h3>
+                <p>Mínimo acumulado: 35 piezas.</p>
 
-    <div class="fila-precio-cantidad">
-    <div class="precio-col">
-        <span class="etiqueta-precio">Precio p/u</span>
-        <p id="precio_config_base" class="precio-grande">$25.00 MXN</p>
-    </div>
-    <div class="cantidad-col">
-        <span class="etiqueta-precio">Cantidad</span>
-        <div class="controles-cantidad">
-            <button onclick="cambiarCantidad('cant_base_config', -1, 1)">-</button>
-            <input type="number" id="cant_base_config" value="10" readonly>
-            <button onclick="cambiarCantidad('cant_base_config', 1, 1)">+</button>
-        </div>
-    </div>
-</div>
-                <p>Mínimo 35 piezas. Combina tamaños, grosores y figuras.</p>
+                <div class="fila-precio-cantidad">
+                    <div class="precio-col">
+                        <span class="etiqueta-precio">Precio p/u</span>
+                        <p id="precio_config_base" class="precio-grande">$25.00 MXN</p>
+                    </div>
+                    <div class="cantidad-col">
+                        <span class="etiqueta-precio">Cantidad</span>
+                        <div class="controles-cantidad">
+                            <button onclick="cambiarCantidad('cant_base_config', -1, 1)">-</button>
+                            <input type="number" id="cant_base_config" value="1" readonly>
+                            <button onclick="cambiarCantidad('cant_base_config', 1, 1)">+</button>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="controles-config">
-                    <label>Línea:</label>
+                    <label for="sel_linea_base">Línea:</label>
                     <select id="sel_linea_base" onchange="actualizarConfiguradorBases()">
                         <option value="Basic">Basic (Blanco ó Negro mate)</option>
                         <option value="Premium">Premium (+100 colores/texturas)</option>
@@ -52,7 +52,7 @@
                 </div>
 
                 <div class="controles-config">
-                    <label>Tamaño:</label>
+                    <label for="sel_tamano_base">Tamaño:</label>
                     <select id="sel_tamano_base" onchange="actualizarConfiguradorBases()">
                         <option value="15cm">#15cm (6")</option>
                         <option value="20cm">#20cm (8")</option>
@@ -68,7 +68,7 @@
                 </div>
                 
                 <div class="controles-config">
-                    <label>Grosor:</label>
+                    <label for="sel_grosor_base">Grosor:</label>
                     <select id="sel_grosor_base" onchange="actualizarConfiguradorBases()">
                         <option value="3MM">3 MM</option>
                         <option value="6MM">6 MM</option>
@@ -77,7 +77,7 @@
                 </div>
                 
                 <div class="controles-config">
-                    <label>Forma:</label>
+                    <label for="sel_forma_base">Forma:</label>
                     <select id="sel_forma_base">
                         <option value="Círculo">Círculo</option>
                         <option value="Cuadrado">Cuadrado</option>
@@ -87,87 +87,138 @@
                 </div>
                 
                 <div class="controles-config">
-                    <label>Color Logotipo:</label>
-                    <select id="sel_color_logo_base">
-                        </select>
+                    <label for="sel_color_logo_base">Color Logotipo:</label>
+                    <select id="sel_color_logo_base"></select>
                 </div>
-                <br> <br>
+                
+                <br>
                 <button class="btn-agregar" onclick="agregarBaseConfigAlCarrito()">Agregar al Carrito</button>
             </div>
         </section>
 
         <section id="cajas_cupcakes" class="categoria-seccion">
-            <div class="card-producto">
-                <h3>Caja 2 Cupcakes</h3>
-                <p>Medida 22x12x7.5. Soporte blanco incluido.</p>
-                <p class="precio">$18.00 MXN</p>
-                <div class="controles">
-                    <label>Color de soporte (Blanco es gratis):</label>
-                    <input type="text" id="color_soporte1" placeholder="Ej. Blanco">
+            <div class="card-producto card-configurador">
+                <h3>Cajas para Cupcakes</h3>
+                <p>Mínimo acumulado: 30 piezas.</p>
+
+                <div class="fila-precio-cantidad">
+                    <div class="precio-col">
+                        <span class="etiqueta-precio">Precio p/u</span>
+                        <p id="precio_config_cupcake" class="precio-grande">$18.00 MXN</p>
+                    </div>
+                    <div class="cantidad-col">
+                        <span class="etiqueta-precio">Cantidad</span>
+                        <div class="controles-cantidad">
+                            <button onclick="cambiarCantidad('cant_cupcake_config', -1, 1)">-</button>
+                            <input type="number" id="cant_cupcake_config" value="1" readonly>
+                            <button onclick="cambiarCantidad('cant_cupcake_config', 1, 1)">+</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="controles-cantidad">
-                    <button onclick="cambiarCantidad('cant_caja_cup1', -1, 30)">-</button>
-                    <input type="number" id="cant_caja_cup1" value="30" readonly>
-                    <button onclick="cambiarCantidad('cant_caja_cup1', 1, 30)">+</button>
+
+                <div class="controles-config">
+                    <label for="sel_tamano_cupcake">Capacidad:</label>
+                    <select id="sel_tamano_cupcake" onchange="actualizarConfiguradorCupcakes()">
+                        <option value="2">Para 2 Cupcakes</option>
+                        <option value="4">Para 4 Cupcakes</option>
+                        <option value="6">Para 6 Cupcakes</option>
+                    </select>
                 </div>
-                <button class="btn-agregar" onclick="agregarAlCarrito('Caja 2 Cupcakes', 18, 'cant_caja_cup1', 'color_soporte1')">Agregar al Carrito</button>
+
+                <div class="controles-config">
+                    <label for="sel_color_soporte">Color del Soporte Interno:</label>
+                    <select id="sel_color_soporte" onchange="actualizarConfiguradorCupcakes()">
+                        <option value="Blanco">Blanco (Gratis)</option>
+                        <option value="Kraft">Kraft Ecológico (Gratis)</option>
+                        <option value="Dorado">Dorado Metálico</option>
+                        <option value="Rosa">Rosa Minuit</option>
+                    </select>
+                </div>
+
+                <br>
+                <button class="btn-agregar" onclick="agregarCupcakeConfigAlCarrito()">Agregar al Carrito</button>
             </div>
         </section>
 
         <section id="cajas_pastel" class="categoria-seccion">
-            <div class="card-producto">
-                <h3>Caja Pastel 15.5x15.5x10</h3>
-                <p>Personalizada con logotipo.</p>
-                <p class="precio">$20.00 MXN</p>
-                <div class="controles">
-                    <label>Detalle extra:</label>
-                    <input type="text" id="detalle_pastel1" placeholder="Ej. Sin logo">
+            <div class="card-producto card-configurador">
+                <h3>Cajas para Pastel</h3>
+                <p>Mínimo acumulado: 30 piezas. Incluye logotipo.</p>
+
+                <div class="fila-precio-cantidad">
+                    <div class="precio-col">
+                        <span class="etiqueta-precio">Precio p/u</span>
+                        <p id="precio_config_pastel" class="precio-grande">$20.00 MXN</p>
+                    </div>
+                    <div class="cantidad-col">
+                        <span class="etiqueta-precio">Cantidad</span>
+                        <div class="controles-cantidad">
+                            <button onclick="cambiarCantidad('cant_pastel_config', -1, 1)">-</button>
+                            <input type="number" id="cant_pastel_config" value="1" readonly>
+                            <button onclick="cambiarCantidad('cant_pastel_config', 1, 1)">+</button>
+                        </div>
+                    </div>
                 </div>
-                <div class="controles-cantidad">
-    <button onclick="cambiarCantidad('cant_pastel_config', -1, 1)">-</button>
-    <input type="number" id="cant_pastel_config" value="1" readonly>
-    <button onclick="cambiarCantidad('cant_pastel_config', 1, 1)">+</button>
-</div>
-                <button class="btn-agregar" onclick="agregarAlCarrito('Caja Pastel 15.5x10', 20, 'cant_caja_pas1', 'detalle_pastel1')">Agregar al Carrito</button>
+
+                <div class="controles-config">
+                    <label for="sel_tamano_pastel">Tamaño de la Caja:</label>
+                    <select id="sel_tamano_pastel" onchange="actualizarConfiguradorPasteles()">
+                        <option value="Chico">15.5 x 15.5 x 10 cm</option>
+                        <option value="Mediano">20.0 x 20.0 x 10 cm</option>
+                        <option value="Grande">25.0 x 25.0 x 10 cm</option>
+                    </select>
+                </div>
+
+                <div class="controles-config">
+                    <label for="sel_material_pastel">Material:</label>
+                    <select id="sel_material_pastel" onchange="actualizarConfiguradorPasteles()">
+                        <option value="Blanco">Caple Blanco Estándar</option>
+                        <option value="Kraft">Kraft Ecológico</option>
+                    </select>
+                </div>
+
+                <div class="controles-config">
+                    <label for="sel_ventana_pastel">Estilo de Tapa:</label>
+                    <select id="sel_ventana_pastel" onchange="actualizarConfiguradorPasteles()">
+                        <option value="Cerrada">Totalmente Cerrada</option>
+                        <option value="Ventana">Con Ventana de Acetato Transparente</option>
+                    </select>
+                </div>
+
+                <div class="controles">
+                    <label for="detalle_pastel1">Notas para el Logotipo:</label>
+                    <input type="text" id="detalle_pastel1" placeholder="Ej. Imprimir logo en dorado">
+                </div>
+
+                <br>
+                <button class="btn-agregar" onclick="agregarPastelConfigAlCarrito()">Agregar al Carrito</button>
             </div>
         </section>
     </main>
 
     <div id="fab-carrito" onclick="abrirModal()">
-        🛒 Total: <span id="fab-total">$0.00</span>
+        <span>🛒 Ver Pedido</span>
+        <span id="fab-total">$0.00 MXN</span>
     </div>
 
-
-<div id="modal-carrito" class="modal">
-    <div class="modal-contenido">
-        <span class="cerrar" onclick="cerrarModal()">&times;</span>
-        <h2>Tu Pedido Minuit</h2>
-        <div class="input-cliente">
-            <label>Tu Nombre:</label>
-            <input type="text" id="nombre_cliente" placeholder="Escribe tu nombre">
+    <div id="modal-carrito" class="modal">
+        <div class="modal-contenido">
+            <span class="cerrar" onclick="cerrarModal()">&times;</span>
+            <h2>Tu Pedido Minuit</h2>
+            <div class="input-cliente">
+                <label for="nombre_cliente">Tu Nombre:</label>
+                <input type="text" id="nombre_cliente" placeholder="Escribe tu nombre">
+            </div>
+            
+            <ul id="lista-carrito"></ul>
+            
+            <div id="alertas-cantidades"></div> <h3 class="total-modal">Total: <span id="modal-total">$0.00</span></h3>
+            <button class="btn-pedido" id="btn_hacer_pedido" onclick="procesarPedido()">Hacer Pedido y Enviar</button>
         </div>
-        
-        <ul id="lista-carrito"></ul>
-        
-        <p id="contador-piezas-alerta"></p>
-
-        <h3 class="total-modal">Total: <span id="modal-total">$0.00</span></h3>
-        <button class="btn-pedido" onclick="procesarPedido()">Hacer Pedido y Enviar a WhatsApp</button>
     </div>
-</div>
 
-    <div id="contenedor-pdf">
-        <h1 style="font-family: 'Dancing Script', cursive; color: #f48fb1; text-align: center;">Minuit</h1>
-        <h3 style="text-align: center;">Resumen de Pedido</h3>
-        <p><strong>Cliente:</strong> <span id="pdf-cliente"></span></p>
-        <hr>
-        <ul id="pdf-lista" style="list-style: none; padding: 0;"></ul>
-        <hr>
-        <h2 style="text-align: right; color: #f48fb1;">Total: <span id="pdf-total"></span></h2>
-        <p style="text-align: center; font-size: 12px; margin-top: 30px;">¡Gracias por tu compra! Conserva este comprobante.</p>
-    </div>
-    
     <div id="toast-container"></div>
+
     <script src="app.js"></script>
 </body>
 </html>
