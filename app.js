@@ -35,7 +35,7 @@ let precioPastelActual = 20;
 // ==========================================
 // 2. UTILIDADES Y NAVEGACIÓN
 // ==========================================
-function inicializarBases() { 
+function inicializarTienda() { 
     actualizarConfiguradorBases(); 
     actualizarConfiguradorCupcakes();
     actualizarConfiguradorPasteles();
