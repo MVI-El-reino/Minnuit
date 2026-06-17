@@ -423,11 +423,31 @@ async function procesarPedido() {
         pdf.setFontSize(18);
         pdf.text(totalTxt, 152, y + 17, { align: "center" });
 
-        pdf.setTextColor(120,120,120);
-        pdf.setFontSize(10);
+        // =====================================
+        // PIE DE PÁGINA (MEJORADO Y PROFESIONAL)
+        // =====================================
+        
+        // 1. Línea divisoria sutil en color rosa
+        pdf.setDrawColor(240, 220, 227); 
+        pdf.setLineWidth(0.5);
+        pdf.line(20, 278, 190, 278); 
+
+        // 2. Mensaje principal destacando la marca
+        pdf.setTextColor(74, 59, 64); // Texto oscuro elegante
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "bold");
+        pdf.text("¡Gracias por tu compra en Minuit!", 105, 285, { align: "center" });
+
+        // 3. Aviso legal / secundario en gris suave
+        pdf.setTextColor(140, 140, 140);
+        pdf.setFontSize(9);
         pdf.setFont("helvetica", "normal");
-        pdf.text("Gracias por tu compra en Minuit ♥", 105, 285, { align: "center" });
-        pdf.text("Conserva este comprobante para futuras referencias", 105, 291, { align: "center" });
+        pdf.text("Conserva este comprobante para futuras referencias.", 105, 290, { align: "center" });
+
+        // 4. Contacto de la tienda (Opcional, pero se ve increíble)
+        pdf.setTextColor(232, 123, 158); // Color rosa principal
+        pdf.setFont("helvetica", "italic");
+        pdf.text("Contacto WA: " + numeroDueno, 105, 295, { align: "center" });
 
         pdf.save(`Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`);
 
