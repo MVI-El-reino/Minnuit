@@ -340,14 +340,33 @@ async function procesarPedido() {
         const COLOR_FONDO = [253, 240, 244];
         const COLOR_TEXTO = [74, 59, 64];
 
+        // =====================================
+        // ENCABEZADO (CON LOGO EN DANCING SCRIPT)
+        // =====================================
         pdf.setFillColor(...COLOR_PRINCIPAL);
         pdf.rect(0, 0, 210, 35, "F");
+
+        // --- TRUCO: DIBUJAR LA FUENTE COMO IMAGEN ---
+        const canvasLogo = document.createElement("canvas");
+        canvasLogo.width = 400;
+        canvasLogo.height = 140;
+        const ctx = canvasLogo.getContext("2d");
+        
+        // Usamos exactamente la misma fuente de tu página
+        ctx.font = "700 120px 'Dancing Script'"; 
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Minuit", 200, 70); 
+
+        // Insertamos la "foto" del logo en el PDF (centrada)
+        pdf.addImage(canvasLogo.toDataURL("image/png"), "PNG", 75, 4, 60, 21);
+
+        // Subtítulo
         pdf.setTextColor(255, 255, 255);
         pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(28);
-        pdf.text("MINUIT", 105, 18, { align: "center" });
-        pdf.setFontSize(11);
-        pdf.text("Nota de Pedido", 105, 27, { align: "center" });
+        pdf.setFontSize(10);
+        pdf.text("NOTA DE PEDIDO", 105, 30, { align: "center" });
 
         pdf.setFillColor(...COLOR_FONDO);
         pdf.roundedRect(15, 45, 180, 28, 4, 4, "F");
