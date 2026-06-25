@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Pedido Exclusivo - Minuit</title>
+    <title>Minuit - Pedidos</title>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="styles.css">
@@ -23,6 +23,9 @@
     </nav>
 
     <main>
+         <!-- ==============================
+             SECCIÓN 1: BASES UMF
+             ============================== -->
         <section id="bases" class="categoria-seccion active">
             <div class="card-producto card-configurador">
                 <h3>Bases Personalizadas - Configura la Tuya</h3>
@@ -96,6 +99,76 @@
             </div>
         </section>
 
+        <!-- ==============================
+             SECCIÓN 2: CAJAS PASTEL 
+             ============================== -->
+        <section id="cajas_pastel" class="categoria-seccion">
+            <div class="card-producto card-configurador">
+                <h3>Cajas para Pastel Personalizadas</h3>
+                <p>Mínimo acumulado: 30 piezas (puedes combinar tamaños).</p>
+
+                <div class="fila-precio-cantidad">
+                    <div class="precio-col">
+                        <span class="etiqueta-precio">Precio p/u</span>
+                        <p id="precio_config_pastel" class="precio-grande">$0.00 MXN</p>
+                    </div>
+                    <div class="cantidad-col">
+                        <span class="etiqueta-precio">Cantidad</span>
+                        <div class="controles-cantidad">
+                            <button onclick="cambiarCantidad('cant_pastel_config', -1, 1); actualizarConfiguradorPasteles()">-</button>
+                            <input type="number" id="cant_pastel_config" value="30" readonly>
+                            <button onclick="cambiarCantidad('cant_pastel_config', 1, 1); actualizarConfiguradorPasteles()">+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Indicador visual del mayoreo -->
+                <p style="font-size: 0.8rem; color: var(--rosa-principal); text-align: center; margin-top: -15px; margin-bottom: 15px; font-weight: 600;" id="indicador_mayoreo">Nivel: Menudeo (10-39 pzas)</p>
+
+                <div class="controles-config">
+                    <label for="sel_tipo_pastel">Línea de Caja:</label>
+                    <select id="sel_tipo_pastel" onchange="actualizarOpcionesTamanoPastel()">
+                        <option value="Petite">Cajas Petite</option>
+                        <option value="Altas">Cajas Altas</option>
+                    </select>
+                </div>
+
+                <div class="controles-config">
+                    <label for="sel_tamano_pastel">Tamaño:</label>
+                    <select id="sel_tamano_pastel" onchange="actualizarConfiguradorPasteles()">
+                        <!-- Se llena automáticamente con JS -->
+                    </select>
+                </div>
+
+                <div class="controles-config">
+                    <label for="sel_color_logo_pastel">Color del Logotipo:</label>
+                    <select id="sel_color_logo_pastel">
+                        <!-- Se llena automáticamente con JS -->
+                    </select>
+                </div>
+
+                <div class="controles-config">
+                    <label for="sel_redes_pastel">Redes Sociales impresas:</label>
+                    <select id="sel_redes_pastel" onchange="actualizarConfiguradorPasteles()">
+                        <option value="No">No, gracias</option>
+                        <option value="Si">Sí (+ Costo extra por tamaño)</option>
+                    </select>
+                </div>
+
+                <div class="controles">
+                    <label for="detalle_pastel1">Notas para Logotipo / Redes:</label>
+                    <input type="text" id="detalle_pastel1" placeholder="Ej. Imprimir logo e IG: @minuit">
+                </div>
+
+                <br>
+                <button class="btn-agregar" onclick="agregarPastelConfigAlCarrito()">Agregar al Carrito</button>
+            </div>
+        </section>
+
+         <!-- ==============================
+             SECCIÓN 2: CAJAS CUPCAKE
+             ============================== -->
+        
         <section id="cajas_cupcakes" class="categoria-seccion">
             <div class="card-producto card-configurador">
                 <h3>Cajas para Cupcakes</h3>
@@ -137,61 +210,6 @@
 
                 <br>
                 <button class="btn-agregar" onclick="agregarCupcakeConfigAlCarrito()">Agregar al Carrito</button>
-            </div>
-        </section>
-
-        <section id="cajas_pastel" class="categoria-seccion">
-            <div class="card-producto card-configurador">
-                <h3>Cajas para Pastel</h3>
-                <p>Mínimo acumulado: 30 piezas. Incluye logotipo.</p>
-
-                <div class="fila-precio-cantidad">
-                    <div class="precio-col">
-                        <span class="etiqueta-precio">Precio p/u</span>
-                        <p id="precio_config_pastel" class="precio-grande">$20.00 MXN</p>
-                    </div>
-                    <div class="cantidad-col">
-                        <span class="etiqueta-precio">Cantidad</span>
-                        <div class="controles-cantidad">
-                            <button onclick="cambiarCantidad('cant_pastel_config', -1, 1)">-</button>
-                            <input type="number" id="cant_pastel_config" value="1" readonly>
-                            <button onclick="cambiarCantidad('cant_pastel_config', 1, 1)">+</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="controles-config">
-                    <label for="sel_tamano_pastel">Tamaño de la Caja:</label>
-                    <select id="sel_tamano_pastel" onchange="actualizarConfiguradorPasteles()">
-                        <option value="Chico">15.5 x 15.5 x 10 cm</option>
-                        <option value="Mediano">20.0 x 20.0 x 10 cm</option>
-                        <option value="Grande">25.0 x 25.0 x 10 cm</option>
-                    </select>
-                </div>
-
-                <div class="controles-config">
-                    <label for="sel_material_pastel">Material:</label>
-                    <select id="sel_material_pastel" onchange="actualizarConfiguradorPasteles()">
-                        <option value="Blanco">Caple Blanco Estándar</option>
-                        <option value="Kraft">Kraft Ecológico</option>
-                    </select>
-                </div>
-
-                <div class="controles-config">
-                    <label for="sel_ventana_pastel">Estilo de Tapa:</label>
-                    <select id="sel_ventana_pastel" onchange="actualizarConfiguradorPasteles()">
-                        <option value="Cerrada">Totalmente Cerrada</option>
-                        <option value="Ventana">Con Ventana de Acetato Transparente</option>
-                    </select>
-                </div>
-
-                <div class="controles">
-                    <label for="detalle_pastel1">Notas para el Logotipo:</label>
-                    <input type="text" id="detalle_pastel1" placeholder="Ej. Imprimir logo en dorado">
-                </div>
-
-                <br>
-                <button class="btn-agregar" onclick="agregarPastelConfigAlCarrito()">Agregar al Carrito</button>
             </div>
         </section>
     </main>
