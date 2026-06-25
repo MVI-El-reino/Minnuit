@@ -340,33 +340,14 @@ async function procesarPedido() {
         const COLOR_FONDO = [253, 240, 244];
         const COLOR_TEXTO = [74, 59, 64];
 
-        // =====================================
-        // ENCABEZADO (CON LOGO EN DANCING SCRIPT)
-        // =====================================
         pdf.setFillColor(...COLOR_PRINCIPAL);
         pdf.rect(0, 0, 210, 35, "F");
-
-        // --- TRUCO: DIBUJAR LA FUENTE COMO IMAGEN ---
-        const canvasLogo = document.createElement("canvas");
-        canvasLogo.width = 400;
-        canvasLogo.height = 140;
-        const ctx = canvasLogo.getContext("2d");
-        
-        // Usamos exactamente la misma fuente de tu página
-        ctx.font = "700 120px 'Dancing Script'"; 
-        ctx.fillStyle = "#ffffff";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("Minuit", 200, 70); 
-
-        // Insertamos la "foto" del logo en el PDF (centrada)
-        pdf.addImage(canvasLogo.toDataURL("image/png"), "PNG", 75, 4, 60, 21);
-
-        // Subtítulo
         pdf.setTextColor(255, 255, 255);
         pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(10);
-        pdf.text("NOTA DE PEDIDO", 105, 30, { align: "center" });
+        pdf.setFontSize(28);
+        pdf.text("MINUIT", 105, 18, { align: "center" });
+        pdf.setFontSize(11);
+        pdf.text("Nota de Pedido", 105, 27, { align: "center" });
 
         pdf.setFillColor(...COLOR_FONDO);
         pdf.roundedRect(15, 45, 180, 28, 4, 4, "F");
@@ -442,31 +423,11 @@ async function procesarPedido() {
         pdf.setFontSize(18);
         pdf.text(totalTxt, 152, y + 17, { align: "center" });
 
-        // =====================================
-        // PIE DE PÁGINA (MEJORADO Y PROFESIONAL)
-        // =====================================
-        
-        // 1. Línea divisoria sutil en color rosa
-        pdf.setDrawColor(240, 220, 227); 
-        pdf.setLineWidth(0.5);
-        pdf.line(20, 278, 190, 278); 
-
-        // 2. Mensaje principal destacando la marca
-        pdf.setTextColor(74, 59, 64); // Texto oscuro elegante
-        pdf.setFontSize(11);
-        pdf.setFont("helvetica", "bold");
-        pdf.text("¡Gracias por tu compra en Minuit!", 105, 285, { align: "center" });
-
-        // 3. Aviso legal / secundario en gris suave
-        pdf.setTextColor(140, 140, 140);
-        pdf.setFontSize(9);
+        pdf.setTextColor(120,120,120);
+        pdf.setFontSize(10);
         pdf.setFont("helvetica", "normal");
-        pdf.text("Conserva este comprobante para futuras referencias.", 105, 290, { align: "center" });
-
-        // 4. Contacto de la tienda (Opcional, pero se ve increíble)
-        pdf.setTextColor(232, 123, 158); // Color rosa principal
-        pdf.setFont("helvetica", "italic");
-        pdf.text("Contacto WA: " + numeroDueno, 105, 295, { align: "center" });
+        pdf.text("Gracias por tu compra en Minuit ♥", 105, 285, { align: "center" });
+        pdf.text("Conserva este comprobante para futuras referencias", 105, 291, { align: "center" });
 
         pdf.save(`Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`);
 
