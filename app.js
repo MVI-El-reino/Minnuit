@@ -1,5 +1,7 @@
 let carrito = [];
-const numeroDueno = "522227125366"; // CAMBIA ESTO POR EL NÚMERO DEL DUEÑO
+const numeroDueno = "522227125366"; 
+const TELEGRAM_BOT_TOKEN = "PEGA_AQUI_EL_TOKEN_DEL_BOTFATHER"; 
+const TELEGRAM_CHAT_ID = "PEGA_AQUI_TU_ID"; 
 
 // ==========================================
 // 1. BASES DE DATOS DE PRECIOS
@@ -21,16 +23,34 @@ const coloresLogotipo = {
     "Premium": ["blanco", "dorado", "negro"]
 };
 
-// PRECIOS CUPCAKES Y PASTELES
+// CUPCAKES
 const cupcakesPreciosBase = { "2": 18, "4": 25, "6": 35 };
 const cupcakesPreciosSoporte = { "Blanco": 0, "Kraft": 0, "Dorado": 5, "Rosa": 5 };
 
-const pastelesPreciosBase = { "Chico": 20, "Mediano": 28, "Grande": 35 };
-const pastelesPreciosVentana = { "Cerrada": 0, "Ventana": 8 };
+// NUEVA ESTRUCTURA DE PASTELES (Precios en arreglo: [Menudeo, 1er, 2do, 3er])
+const pastelesData = {
+    "Petite": {
+        "15.5x15.5x10 cm": { precios: [20, 19, 18, 17], extraRedes: 5 },
+        "25.5x25.5x15 cm": { precios: [40, 37, 35, 33], extraRedes: 6 },
+        "25.5x25.5x25 cm": { precios: [45, 42, 40, 38], extraRedes: 7 },
+        "30.5x30.5x25 cm": { precios: [55, 53, 50, 48], extraRedes: 8 }
+    },
+    "Altas": {
+        "15.5x15.5x20 cm": { precios: [30, 29, 28, 26], extraRedes: 5 },
+        "20.5x20.5x27 cm": { precios: [42, 40, 38, 36], extraRedes: 6 },
+        "25.5x25.5x34 cm": { precios: [50, 47, 45, 43], extraRedes: 7 },
+        "30.5x30.5x41 cm": { precios: [60, 57, 55, 53], extraRedes: 8 }
+    }
+};
+
+const coloresLogotipoPastel = [
+    "Rosa pastel", "Rosa mexicano", "Azul cielo", "Morado", "Jade", 
+    "Rojo", "Negro", "Dorado espejo", "Rosa espejo", "Tornasol sirena"
+];
 
 let precioBaseActual = 25; 
 let precioCupcakeActual = 18;
-let precioPastelActual = 20;
+let precioPastelActual = 0;
 
 // ==========================================
 // 2. UTILIDADES Y NAVEGACIÓN
@@ -38,7 +58,18 @@ let precioPastelActual = 20;
 function inicializarTienda() { 
     actualizarConfiguradorBases(); 
     actualizarConfiguradorCupcakes();
-    actualizarConfiguradorPasteles();
+    
+    // Llenar select de colores de pasteles
+    const selectColorPastel = document.getElementById("sel_color_logo_pastel");
+    if (selectColorPastel) {
+        selectColorPastel.innerHTML = "";
+        coloresLogotipoPastel.forEach(color => {
+            let option = document.createElement("option");
+            option.value = color; option.text = color;
+            selectColorPastel.add(option);
+        });
+    }
+    actualizarOpcionesTamanoPastel();
 }
 
 function mostrarAlerta(mensaje) {
@@ -64,7 +95,7 @@ function cambiarCantidad(inputId, cambio, minimo) {
     let valorActual = parseInt(input.value);
     let nuevoValor = valorActual + cambio;
     if (nuevoValor >= minimo) { input.value = nuevoValor; } 
-    else { mostrarAlerta(`⚠️ La cantidad mínima por selección es ${minimo}.`); }
+    else { mostrarAlerta(`⚠️ La cantidad mínima permitida es ${minimo}.`); }
 }
 
 function animarBotónCarrito() {
@@ -178,7 +209,7 @@ function agregarCupcakeConfigAlCarrito() {
     try {
         document.getElementById("sel_tamano_cupcake").selectedIndex = 0;
         document.getElementById("sel_color_soporte").selectedIndex = 0;
-        document.getElementById("cant_cupcake_config").value = "1"; 
+        document.getElementById("cant_cupcake_config").value = "30"; 
         document.getElementById("sel_tamano_cupcake").dispatchEvent(new Event('change'));
     } catch(e) {}
 
@@ -188,54 +219,77 @@ function agregarCupcakeConfigAlCarrito() {
 }
 
 // ==========================================
-// 5. LÓGICA DE CAJAS PASTEL
+// 5. LÓGICA DE CAJAS PASTEL (NUEVA)
 // ==========================================
-function actualizarConfiguradorPasteles() {
+function actualizarOpcionesTamanoPastel() {
+    const tipo = document.getElementById("sel_tipo_pastel").value;
     const tamanoSelect = document.getElementById("sel_tamano_pastel");
-    if (!tamanoSelect) return;
-
-    const ventanaSelect = document.getElementById("sel_ventana_pastel");
-    const tamano = tamanoSelect.value;
-    const ventana = ventanaSelect.value;
-
-    Array.from(tamanoSelect.options).forEach(opt => {
-        let p = pastelesPreciosBase[opt.value] + pastelesPreciosVentana[ventana];
-        opt.text = `${opt.text.split(' - ')[0]} - $${p}`;
+    
+    tamanoSelect.innerHTML = "";
+    
+    Object.keys(pastelesData[tipo]).forEach(tamano => {
+        let option = document.createElement("option");
+        option.value = tamano;
+        option.text = tamano;
+        tamanoSelect.add(option);
     });
 
-    Array.from(ventanaSelect.options).forEach(opt => {
-        let pExtra = pastelesPreciosVentana[opt.value];
-        let extraTxt = pExtra > 0 ? `(+$${pExtra})` : `(Estándar)`;
-        opt.text = `${opt.text.split(' (')[0]} ${extraTxt}`;
-    });
+    actualizarConfiguradorPasteles();
+}
 
-    precioPastelActual = pastelesPreciosBase[tamano] + pastelesPreciosVentana[ventana];
+function actualizarConfiguradorPasteles() {
+    const tipoObj = document.getElementById("sel_tipo_pastel");
+    const tamanoObj = document.getElementById("sel_tamano_pastel");
+    
+    if (!tipoObj || !tamanoObj || !tamanoObj.value) return;
+
+    const cantidad = parseInt(document.getElementById("cant_pastel_config").value) || 1;
+    const redes = document.getElementById("sel_redes_pastel").value;
+    
+    let indicePrecio = 0; 
+    let nivelTexto = "Menudeo (10-39 pzas)";
+
+    if (cantidad >= 40 && cantidad <= 79) { indicePrecio = 1; nivelTexto = "1er Mayoreo (40-79 pzas)"; }
+    else if (cantidad >= 80 && cantidad <= 149) { indicePrecio = 2; nivelTexto = "2do Mayoreo (80-149 pzas)"; }
+    else if (cantidad >= 150) { indicePrecio = 3; nivelTexto = "3er Mayoreo (+150 pzas)"; }
+
+    const datosTamano = pastelesData[tipoObj.value][tamanoObj.value];
+    let precioBase = datosTamano.precios[indicePrecio];
+
+    if (redes === "Si") {
+        precioBase += datosTamano.extraRedes;
+    }
+
+    precioPastelActual = precioBase;
+    
     document.getElementById("precio_config_pastel").innerText = `$${precioPastelActual.toFixed(2)} MXN`;
+    document.getElementById("indicador_mayoreo").innerText = `Nivel: ${nivelTexto}`;
 }
 
 function agregarPastelConfigAlCarrito() {
     const cantidad = parseInt(document.getElementById("cant_pastel_config").value);
-    const tamanoObj = document.getElementById("sel_tamano_pastel");
-    const nombreTamano = tamanoObj.options[tamanoObj.selectedIndex].text.split(' -')[0];
-    const material = document.getElementById("sel_material_pastel").value;
-    const ventana = document.getElementById("sel_ventana_pastel").value;
+    const tipo = document.getElementById("sel_tipo_pastel").value;
+    const tamano = document.getElementById("sel_tamano_pastel").value;
+    const colorLogo = document.getElementById("sel_color_logo_pastel").value;
+    const redes = document.getElementById("sel_redes_pastel").value;
     const extraInfo = document.getElementById("detalle_pastel1").value || "Sin notas extra";
     
-    const nombre = `Caja Pastel (${nombreTamano})`;
-    const detalle = `Mat: ${material} | Estilo: ${ventana} | Notas: ${extraInfo}`;
+    const nombre = `Caja Pastel ${tipo} (${tamano})`;
+    const detalle = `Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
     
     carrito.push({ nombre, cantidad, detalle, precio: precioPastelActual, subtotal: precioPastelActual * cantidad });
     
     try {
-        document.getElementById("sel_tamano_pastel").selectedIndex = 0;
-        document.getElementById("sel_material_pastel").selectedIndex = 0;
-        document.getElementById("sel_ventana_pastel").selectedIndex = 0;
+        document.getElementById("sel_tipo_pastel").selectedIndex = 0;
+        actualizarOpcionesTamanoPastel();
+        document.getElementById("sel_color_logo_pastel").selectedIndex = 0;
+        document.getElementById("sel_redes_pastel").selectedIndex = 0;
         document.getElementById("detalle_pastel1").value = "";
-        document.getElementById("cant_pastel_config").value = "1"; 
-        document.getElementById("sel_tamano_pastel").dispatchEvent(new Event('change'));
+        document.getElementById("cant_pastel_config").value = "30"; 
+        actualizarConfiguradorPasteles();
     } catch(e) {}
 
-    mostrarAlerta(`🛒 ¡Cajas agregadas!`);
+    mostrarAlerta(`🛒 ¡Cajas de Pastel agregadas!`);
     actualizarVistaCarrito();
     animarBotónCarrito();
 }
@@ -253,14 +307,16 @@ function eliminarDelCarrito(index) {
 function actualizarVistaCarrito() {
     let totalDinero = 0;
     let totalBases = 0;
-    let totalCajas = 0; 
+    let totalCupcakes = 0; 
+    let totalPasteles = 0;
     let listaHTML = "";
     
     carrito.forEach((item, index) => {
         totalDinero += item.subtotal;
         
         if(item.nombre.includes("Base")) { totalBases += item.cantidad; }
-        if(item.nombre.includes("Caja")) { totalCajas += item.cantidad; }
+        if(item.nombre.includes("Cupcake")) { totalCupcakes += item.cantidad; }
+        if(item.nombre.includes("Pastel")) { totalPasteles += item.cantidad; }
         
         listaHTML += `
             <li>
@@ -287,8 +343,12 @@ function actualizarVistaCarrito() {
         advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalBases} Bases. Mínimo 35 piezas.</div>`;
         bloqueado = true;
     }
-    if (totalCajas > 0 && totalCajas < 30) {
-        advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalCajas} Cajas. Mínimo 30 piezas.</div>`;
+    if (totalCupcakes > 0 && totalCupcakes < 30) {
+        advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalCupcakes} Cajas Cupcakes. Mínimo 30 piezas.</div>`;
+        bloqueado = true;
+    }
+    if (totalPasteles > 0 && totalPasteles < 30) {
+        advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalPasteles} Cajas Pastel. Mínimo 30 piezas.</div>`;
         bloqueado = true;
     }
 
@@ -325,12 +385,7 @@ async function procesarPedido() {
     document.querySelector(".btn-pedido").disabled = true;
 
     let totalTxt = document.getElementById("modal-total").innerText;
-    let textoWhatsApp = `✨ *¡Hola Minuit! Nuevo pedido* ✨\n\n*Cliente:* ${nombreCliente}\n\n*Detalles:*\n`;
-
-    carrito.forEach(item => {
-        textoWhatsApp += `▪️ ${item.cantidad}x ${item.nombre} (${item.detalle}) - $${item.subtotal.toFixed(2)}\n`;
-    });
-    textoWhatsApp += `\n💰 *Total:* ${totalTxt}\n\nQuedo a la espera de los datos de transferencia.`;
+    let textoWhatsApp = `✨ *¡Hola Minuit!* ✨\n\nSoy ${nombreCliente}, acabo de finalizar mi pedido en tu página por ${totalTxt}.\n\nAquí te adjuntaré mi PDF y quedo a la espera de los datos para la transferencia.`;
 
     try {
         const { jsPDF } = window.jspdf;
@@ -340,14 +395,35 @@ async function procesarPedido() {
         const COLOR_FONDO = [253, 240, 244];
         const COLOR_TEXTO = [74, 59, 64];
 
-        pdf.setFillColor(...COLOR_PRINCIPAL);
+        pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, 210, 35, "F");
-        pdf.setTextColor(255, 255, 255);
+
+        const canvasLogo = document.createElement("canvas");
+        canvasLogo.width = 500;
+        canvasLogo.height = 150;
+        const ctx = canvasLogo.getContext("2d");
+
+        const gradiente = ctx.createLinearGradient(0, 0, 500, 150);
+        gradiente.addColorStop(0, "#f48fb1");
+        gradiente.addColorStop(1, "#e16b90");
+
+        ctx.font = "bold 130px 'Dancing Script', cursive";
+        ctx.fillStyle = gradiente;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Minuit", 250, 75);
+
+        const logoGenerado = canvasLogo.toDataURL("image/png");
+        pdf.addImage(logoGenerado, "PNG", 70, 5, 70, 21);
+
+        pdf.setTextColor(158, 127, 138); 
         pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(28);
-        pdf.text("MINUIT", 105, 18, { align: "center" });
-        pdf.setFontSize(11);
-        pdf.text("Nota de Pedido", 105, 27, { align: "center" });
+        pdf.setFontSize(10);
+        pdf.text("NOTA DE PEDIDO", 105, 32, { align: "center" });
+
+        pdf.setDrawColor(240, 220, 227); 
+        pdf.setLineWidth(0.5);
+        pdf.line(15, 38, 195, 38);
 
         pdf.setFillColor(...COLOR_FONDO);
         pdf.roundedRect(15, 45, 180, 28, 4, 4, "F");
@@ -378,7 +454,12 @@ async function procesarPedido() {
         y += 15;
 
         pdf.setTextColor(...COLOR_TEXTO);
+        
+        let resumenTelegram = `📦 *NUEVO PEDIDO EN WEB*\n👤 Cliente: ${nombreCliente}\n💰 Total: ${totalTxt}\n\n*Artículos:*\n`;
+
         carrito.forEach(item => {
+            resumenTelegram += `▪️ ${item.cantidad}x ${item.nombre}\n`;
+
             if (y > 260) {
                 pdf.addPage();
                 y = 20;
@@ -423,27 +504,62 @@ async function procesarPedido() {
         pdf.setFontSize(18);
         pdf.text(totalTxt, 152, y + 17, { align: "center" });
 
-        pdf.setTextColor(120,120,120);
-        pdf.setFontSize(10);
+        pdf.setDrawColor(240, 220, 227); 
+        pdf.setLineWidth(0.5);
+        pdf.line(20, 278, 190, 278); 
+
+        pdf.setTextColor(74, 59, 64);
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "bold");
+        pdf.text("¡Gracias por tu compra en Minuit!", 105, 285, { align: "center" });
+
+        pdf.setTextColor(140, 140, 140);
+        pdf.setFontSize(9);
         pdf.setFont("helvetica", "normal");
-        pdf.text("Gracias por tu compra en Minuit ♥", 105, 285, { align: "center" });
-        pdf.text("Conserva este comprobante para futuras referencias", 105, 291, { align: "center" });
+        pdf.text("Conserva este comprobante para futuras referencias.", 105, 290, { align: "center" });
 
-        pdf.save(`Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`);
+        pdf.setTextColor(232, 123, 158);
+        pdf.setFont("helvetica", "italic");
+        pdf.text("Contacto WA: " + numeroDueno, 105, 295, { align: "center" });
 
-        setTimeout(() => {
-            let textoCodificado = encodeURIComponent(textoWhatsApp);
-            window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
-            carrito = [];
-            actualizarVistaCarrito();
-            cerrarModal();
-            document.getElementById("nombre_cliente").value = "";
-            document.querySelector(".btn-pedido").disabled = false;
-        }, 800);
+        const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
+        pdf.save(nombreArchivo);
+
+        if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== "PEGA_AQUI_EL_TOKEN_DEL_BOTFATHER") {
+            const pdfBlob = pdf.output('blob');
+            const formData = new FormData();
+            formData.append('chat_id', TELEGRAM_CHAT_ID);
+            formData.append('document', pdfBlob, nombreArchivo);
+            formData.append('caption', resumenTelegram);
+
+            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`, {
+                method: 'POST',
+                body: formData
+            }).then(() => {
+                abrirWhatsAppYLimpiar(textoWhatsApp);
+            }).catch(error => {
+                console.error("Error Telegram:", error);
+                abrirWhatsAppYLimpiar(textoWhatsApp); 
+            });
+        } else {
+            abrirWhatsAppYLimpiar(textoWhatsApp);
+        }
 
     } catch (error) {
         console.error("Error PDF:", error);
         alert("Ocurrió un error al generar el PDF. Revisa la consola.");
         document.querySelector(".btn-pedido").disabled = false;
     }
+}
+
+function abrirWhatsAppYLimpiar(textoWhatsApp) {
+    setTimeout(() => {
+        let textoCodificado = encodeURIComponent(textoWhatsApp);
+        window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
+        carrito = [];
+        actualizarVistaCarrito();
+        cerrarModal();
+        document.getElementById("nombre_cliente").value = "";
+        document.querySelector(".btn-pedido").disabled = false;
+    }, 800);
 }
