@@ -1,7 +1,7 @@
 let carrito = [];
 const numeroDueno = "522227125366"; 
-const TELEGRAM_BOT_TOKEN = "PEGA_AQUI_EL_TOKEN_DEL_BOTFATHER"; 
-const TELEGRAM_CHAT_ID = "PEGA_AQUI_TU_ID"; 
+const TELEGRAM_BOT_TOKEN = "8759740164:AAFyQfPnukkB4kHh9Xs2lIvexHvGPnZbGtQ"; 
+const TELEGRAM_CHAT_ID = "7536486687"; 
 
 // ==========================================
 // 1. BASES DE DATOS DE PRECIOS
