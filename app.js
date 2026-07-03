@@ -1,14 +1,12 @@
 let carrito = [];
 const numeroDueno = "522227125366"; 
-const tokenParte1 = "8759740164"; 
-const tokenParte2 = "AAFyQfPnukkB4kHh9Xs2lIvexHvGPnZbGtQ"; 
 
-const TELEGRAM_BOT_TOKEN = tokenParte1 + ":" + tokenParte2;
-const TELEGRAM_CHAT_ID = "7536486687"; 
+// Usa tus variables ofuscadas de Telegram aquí
+const tokenParte1 = "AQUI_TU_NUMERO"; 
+const tokenParte2 = "AQUI_TUS_LETRAS"; 
+const TELEGRAM_BOT_TOKEN = tokenParte1 + ":" + tokenParte2; 
+const TELEGRAM_CHAT_ID = "PEGA_AQUI_TU_ID"; 
 
-// ==========================================
-// 1. BASES DE DATOS DE PRECIOS
-// ==========================================
 const basesBasicPrecios = {
     "3MM": { "15cm": 25, "20cm": 35, "23cm": 38, "25cm": 40, "28cm": 45, "30cm": 50, "35cm": 65, "40cm": 80, "45cm": 110, "50cm": 125 },
     "6MM": { "15cm": 35, "20cm": 45, "23cm": 50, "25cm": 65, "28cm": 75, "30cm": 90, "35cm": 110, "40cm": 130, "45cm": 150, "50cm": 180 },
@@ -26,11 +24,9 @@ const coloresLogotipo = {
     "Premium": ["blanco", "dorado", "negro"]
 };
 
-// CUPCAKES
 const cupcakesPreciosBase = { "2": 18, "4": 25, "6": 35 };
 const cupcakesPreciosSoporte = { "Blanco": 0, "Kraft": 0, "Dorado": 5, "Rosa": 5 };
 
-// NUEVA ESTRUCTURA DE PASTELES (Precios en arreglo: [Menudeo, 1er, 2do, 3er])
 const pastelesData = {
     "Petite": {
         "15.5x15.5x10 cm": { precios: [20, 19, 18, 17], extraRedes: 5 },
@@ -55,14 +51,11 @@ let precioBaseActual = 25;
 let precioCupcakeActual = 18;
 let precioPastelActual = 0;
 
-// ==========================================
-// 2. UTILIDADES Y NAVEGACIÓN
-// ==========================================
+// === NUEVO: ALMACÉN DE MENÚS ANIMADOS ===
+const instanciasSelect = {};
+
 function inicializarTienda() { 
-    actualizarConfiguradorBases(); 
-    actualizarConfiguradorCupcakes();
-    
-    // Llenar select de colores de pasteles
+    // Llenar select de colores de pasteles (Nativo primero)
     const selectColorPastel = document.getElementById("sel_color_logo_pastel");
     if (selectColorPastel) {
         selectColorPastel.innerHTML = "";
@@ -72,9 +65,56 @@ function inicializarTienda() {
             selectColorPastel.add(option);
         });
     }
+
+    // Convertir todos los selects a la capa premium
+    document.querySelectorAll('.controles-config select').forEach(select => {
+        instanciasSelect[select.id] = new Choices(select, {
+            searchEnabled: false,
+            itemSelectText: '',
+            shouldSort: false
+        });
+    });
+
+    actualizarConfiguradorBases(); 
+    actualizarConfiguradorCupcakes();
     actualizarOpcionesTamanoPastel();
 }
 
+// Helper para que el diseño premium lea los cambios de tu código
+function sincronizarChoice(id) {
+    if (instanciasSelect[id]) {
+        const selectNat = document.getElementById(id);
+        const opciones = Array.from(selectNat.options).map(opt => ({
+            value: opt.value, label: opt.text, selected: opt.selected, disabled: opt.disabled
+        }));
+        instanciasSelect[id].setChoices(opciones, 'value', 'label', true);
+    }
+}
+
+// Helper para resetear los menús tras agregar al carrito
+function resetearSelect(id, indice = 0) {
+    const select = document.getElementById(id);
+    if(select && select.options.length > 0) {
+        select.selectedIndex = indice;
+        if(instanciasSelect[id]) {
+            instanciasSelect[id].setChoiceByValue(select.options[indice].value);
+        }
+    }
+}
+
+// Helper para Validar Teclado Manual
+function validarManual(id, minimo) {
+    let input = document.getElementById(id);
+    let valor = parseInt(input.value);
+    if (isNaN(valor) || valor < minimo) {
+        input.value = minimo;
+        mostrarAlerta(`⚠️ La cantidad mínima permitida es ${minimo}.`);
+    }
+}
+
+// ==========================================
+// UTILIDADES Y NAVEGACIÓN
+// ==========================================
 function mostrarAlerta(mensaje) {
     const contenedor = document.getElementById('toast-container');
     if(!contenedor) return;
@@ -95,7 +135,7 @@ function cambiarTab(idSeccion) {
 function cambiarCantidad(inputId, cambio, minimo) {
     let input = document.getElementById(inputId);
     if(!input) return;
-    let valorActual = parseInt(input.value);
+    let valorActual = parseInt(input.value) || 0;
     let nuevoValor = valorActual + cambio;
     if (nuevoValor >= minimo) { input.value = nuevoValor; } 
     else { mostrarAlerta(`⚠️ La cantidad mínima permitida es ${minimo}.`); }
@@ -110,7 +150,7 @@ function animarBotónCarrito() {
 }
 
 // ==========================================
-// 3. LÓGICA DE BASES MDF
+// LÓGICA DE BASES MDF
 // ==========================================
 function actualizarConfiguradorBases() {
     const lineaSelect = document.getElementById("sel_linea_base");
@@ -144,6 +184,11 @@ function actualizarConfiguradorBases() {
         option.value = color; option.text = color.charAt(0).toUpperCase() + color.slice(1);
         selectColor.add(option);
     });
+
+    // Actualizar la capa visual suave
+    sincronizarChoice("sel_tamano_base");
+    sincronizarChoice("sel_grosor_base");
+    sincronizarChoice("sel_color_logo_base");
 }
 
 function agregarBaseConfigAlCarrito() {
@@ -159,14 +204,12 @@ function agregarBaseConfigAlCarrito() {
     
     carrito.push({ nombre: nombreCompuesto, cantidad, detalle: detalleCompuesto, precio: precioBaseActual, subtotal: precioBaseActual * cantidad });
     
-    try {
-        document.getElementById("sel_linea_base").selectedIndex = 0;
-        document.getElementById("sel_grosor_base").selectedIndex = 0;
-        document.getElementById("sel_tamano_base").selectedIndex = 0;
-        document.getElementById("sel_forma_base").selectedIndex = 0;
-        document.getElementById("cant_base_config").value = "1"; 
-        document.getElementById("sel_linea_base").dispatchEvent(new Event('change'));
-    } catch(error) { console.error("Error limpiando:", error); }
+    resetearSelect("sel_linea_base");
+    resetearSelect("sel_grosor_base");
+    resetearSelect("sel_tamano_base");
+    resetearSelect("sel_forma_base");
+    document.getElementById("cant_base_config").value = "1"; 
+    actualizarConfiguradorBases();
 
     mostrarAlerta(`🛒 ¡Agregado al carrito!`);
     actualizarVistaCarrito();
@@ -174,7 +217,7 @@ function agregarBaseConfigAlCarrito() {
 }
 
 // ==========================================
-// 4. LÓGICA DE CAJAS CUPCAKES
+// LÓGICA DE CAJAS CUPCAKES
 // ==========================================
 function actualizarConfiguradorCupcakes() {
     const tamanoSelect = document.getElementById("sel_tamano_cupcake");
@@ -197,6 +240,9 @@ function actualizarConfiguradorCupcakes() {
 
     precioCupcakeActual = cupcakesPreciosBase[tamano] + cupcakesPreciosSoporte[soporte];
     document.getElementById("precio_config_cupcake").innerText = `$${precioCupcakeActual.toFixed(2)} MXN`;
+
+    sincronizarChoice("sel_tamano_cupcake");
+    sincronizarChoice("sel_color_soporte");
 }
 
 function agregarCupcakeConfigAlCarrito() {
@@ -209,12 +255,10 @@ function agregarCupcakeConfigAlCarrito() {
     
     carrito.push({ nombre, cantidad, detalle, precio: precioCupcakeActual, subtotal: precioCupcakeActual * cantidad });
     
-    try {
-        document.getElementById("sel_tamano_cupcake").selectedIndex = 0;
-        document.getElementById("sel_color_soporte").selectedIndex = 0;
-        document.getElementById("cant_cupcake_config").value = "30"; 
-        document.getElementById("sel_tamano_cupcake").dispatchEvent(new Event('change'));
-    } catch(e) {}
+    resetearSelect("sel_tamano_cupcake");
+    resetearSelect("sel_color_soporte");
+    document.getElementById("cant_cupcake_config").value = "30"; 
+    actualizarConfiguradorCupcakes();
 
     mostrarAlerta(`🛒 ¡Cajas agregadas!`);
     actualizarVistaCarrito();
@@ -222,21 +266,20 @@ function agregarCupcakeConfigAlCarrito() {
 }
 
 // ==========================================
-// 5. LÓGICA DE CAJAS PASTEL (NUEVA)
+// LÓGICA DE CAJAS PASTEL 
 // ==========================================
 function actualizarOpcionesTamanoPastel() {
     const tipo = document.getElementById("sel_tipo_pastel").value;
     const tamanoSelect = document.getElementById("sel_tamano_pastel");
     
     tamanoSelect.innerHTML = "";
-    
     Object.keys(pastelesData[tipo]).forEach(tamano => {
         let option = document.createElement("option");
-        option.value = tamano;
-        option.text = tamano;
+        option.value = tamano; option.text = tamano;
         tamanoSelect.add(option);
     });
 
+    sincronizarChoice("sel_tamano_pastel");
     actualizarConfiguradorPasteles();
 }
 
@@ -246,7 +289,7 @@ function actualizarConfiguradorPasteles() {
     
     if (!tipoObj || !tamanoObj || !tamanoObj.value) return;
 
-    const cantidad = parseInt(document.getElementById("cant_pastel_config").value) || 1;
+    const cantidad = parseInt(document.getElementById("cant_pastel_config").value) || 30;
     const redes = document.getElementById("sel_redes_pastel").value;
     
     let indicePrecio = 0; 
@@ -259,9 +302,7 @@ function actualizarConfiguradorPasteles() {
     const datosTamano = pastelesData[tipoObj.value][tamanoObj.value];
     let precioBase = datosTamano.precios[indicePrecio];
 
-    if (redes === "Si") {
-        precioBase += datosTamano.extraRedes;
-    }
+    if (redes === "Si") { precioBase += datosTamano.extraRedes; }
 
     precioPastelActual = precioBase;
     
@@ -282,15 +323,13 @@ function agregarPastelConfigAlCarrito() {
     
     carrito.push({ nombre, cantidad, detalle, precio: precioPastelActual, subtotal: precioPastelActual * cantidad });
     
-    try {
-        document.getElementById("sel_tipo_pastel").selectedIndex = 0;
-        actualizarOpcionesTamanoPastel();
-        document.getElementById("sel_color_logo_pastel").selectedIndex = 0;
-        document.getElementById("sel_redes_pastel").selectedIndex = 0;
-        document.getElementById("detalle_pastel1").value = "";
-        document.getElementById("cant_pastel_config").value = "30"; 
-        actualizarConfiguradorPasteles();
-    } catch(e) {}
+    resetearSelect("sel_tipo_pastel");
+    actualizarOpcionesTamanoPastel();
+    resetearSelect("sel_color_logo_pastel");
+    resetearSelect("sel_redes_pastel");
+    document.getElementById("detalle_pastel1").value = "";
+    document.getElementById("cant_pastel_config").value = "30"; 
+    actualizarConfiguradorPasteles();
 
     mostrarAlerta(`🛒 ¡Cajas de Pastel agregadas!`);
     actualizarVistaCarrito();
@@ -298,7 +337,7 @@ function agregarPastelConfigAlCarrito() {
 }
 
 // ==========================================
-// 6. CONTROL DEL CARRITO
+// CONTROL DEL CARRITO
 // ==========================================
 function eliminarDelCarrito(index) {
     carrito.splice(index, 1);
@@ -316,7 +355,6 @@ function actualizarVistaCarrito() {
     
     carrito.forEach((item, index) => {
         totalDinero += item.subtotal;
-        
         if(item.nombre.includes("Base")) { totalBases += item.cantidad; }
         if(item.nombre.includes("Cupcake")) { totalCupcakes += item.cantidad; }
         if(item.nombre.includes("Pastel")) { totalPasteles += item.cantidad; }
@@ -342,18 +380,9 @@ function actualizarVistaCarrito() {
     let advertenciaHTML = "";
     let bloqueado = false;
 
-    if (totalBases > 0 && totalBases < 35) {
-        advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalBases} Bases. Mínimo 35 piezas.</div>`;
-        bloqueado = true;
-    }
-    if (totalCupcakes > 0 && totalCupcakes < 30) {
-        advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalCupcakes} Cajas Cupcakes. Mínimo 30 piezas.</div>`;
-        bloqueado = true;
-    }
-    if (totalPasteles > 0 && totalPasteles < 30) {
-        advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalPasteles} Cajas Pastel. Mínimo 30 piezas.</div>`;
-        bloqueado = true;
-    }
+    if (totalBases > 0 && totalBases < 35) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalBases} Bases. Mínimo 35 piezas.</div>`; bloqueado = true; }
+    if (totalCupcakes > 0 && totalCupcakes < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalCupcakes} Cajas Cupcakes. Mínimo 30 piezas.</div>`; bloqueado = true; }
+    if (totalPasteles > 0 && totalPasteles < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalPasteles} Cajas Pastel. Mínimo 30 piezas.</div>`; bloqueado = true; }
 
     if (!bloqueado && carrito.length > 0) {
         advertenciaHTML = `<div class="texto-valido-verde">✅ ¡Cantidades correctas! Pedido autorizado.</div>`;
@@ -377,7 +406,7 @@ function cerrarModal() {
 }
 
 // ==========================================
-// 7. GENERACIÓN DEL PDF NATIVO (jsPDF) Y WHATSAPP
+// GENERACIÓN DEL PDF NATIVO Y WHATSAPP
 // ==========================================
 async function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value.trim();
@@ -528,7 +557,7 @@ async function procesarPedido() {
         const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
         pdf.save(nombreArchivo);
 
-        if (TELEGRAM_BOT_TOKEN && TELEGRAM_BOT_TOKEN !== "PEGA_AQUI_EL_TOKEN_DEL_BOTFATHER") {
+        if (TELEGRAM_BOT_TOKEN && !TELEGRAM_BOT_TOKEN.includes("AQUI")) {
             const pdfBlob = pdf.output('blob');
             const formData = new FormData();
             formData.append('chat_id', TELEGRAM_CHAT_ID);
@@ -536,21 +565,15 @@ async function procesarPedido() {
             formData.append('caption', resumenTelegram);
 
             fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`, {
-                method: 'POST',
-                body: formData
-            }).then(() => {
-                abrirWhatsAppYLimpiar(textoWhatsApp);
-            }).catch(error => {
-                console.error("Error Telegram:", error);
-                abrirWhatsAppYLimpiar(textoWhatsApp); 
-            });
+                method: 'POST', body: formData
+            }).then(() => abrirWhatsAppYLimpiar(textoWhatsApp))
+              .catch(() => abrirWhatsAppYLimpiar(textoWhatsApp));
         } else {
             abrirWhatsAppYLimpiar(textoWhatsApp);
         }
-
     } catch (error) {
         console.error("Error PDF:", error);
-        alert("Ocurrió un error al generar el PDF. Revisa la consola.");
+        alert("Ocurrió un error al generar el PDF.");
         document.querySelector(".btn-pedido").disabled = false;
     }
 }
