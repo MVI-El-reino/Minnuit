@@ -368,7 +368,7 @@ function actualizarVistaCarrito() {
     carrito.forEach(item => {
         if(item.nombre.includes("Base")) { totalBases += item.cantidad; }
         if(item.nombre.includes("Cupcake")) { totalCupcakes += item.cantidad; }
-        if(item.tipoPastel) { totalPasteles += item.cantidad; } // Usamos la propiedad oculta
+        if(item.tipoPastel) { totalPasteles += item.cantidad; } 
     });
 
     // 2. Determinar Nivel de Mayoreo Global para los Pasteles en el carrito
@@ -377,7 +377,7 @@ function actualizarVistaCarrito() {
     else if (totalPasteles >= 80 && totalPasteles <= 149) indiceMayoreoGlobal = 2;
     else if (totalPasteles >= 150) indiceMayoreoGlobal = 3;
 
-    // 3. RECALCULAR PRECIOS: Actualizamos el costo de los pasteles previos si se alcanzó un nuevo mayoreo
+    // 3. RECALCULAR PRECIOS
     carrito.forEach(item => {
         if(item.tipoPastel) {
             const datos = pastelesData[item.tipoPastel][item.tamanoPastel];
@@ -408,9 +408,28 @@ function actualizarVistaCarrito() {
     document.getElementById("modal-total").innerText = "$" + totalDinero.toFixed(2);
     document.getElementById("lista-carrito").innerHTML = listaHTML;
 
-    // Validar mínimos de compra globales
+    // ===== 5. NUEVO: LÓGICA DEL BANNER DE MAYOREO =====
+    let bannerMayoreoHTML = "";
+    if (totalPasteles > 0) {
+        if (totalPasteles < 40) {
+            let faltan = 40 - totalPasteles;
+            bannerMayoreoHTML = `<div class="banner-mayoreo">📦 Cajas Pastel: <span>Menudeo</span>.<br>¡Agrega <b>${faltan} cajas</b> más para desbloquear el 1er Mayoreo!</div>`;
+        } else if (totalPasteles < 80) {
+            let faltan = 80 - totalPasteles;
+            bannerMayoreoHTML = `<div class="banner-mayoreo">🎉 Cajas Pastel: <span>1er Mayoreo</span>.<br>¡Agrega <b>${faltan} cajas</b> más para el 2do Mayoreo!</div>`;
+        } else if (totalPasteles < 150) {
+            let faltan = 150 - totalPasteles;
+            bannerMayoreoHTML = `<div class="banner-mayoreo">🔥 Cajas Pastel: <span>2do Mayoreo</span>.<br>¡Agrega <b>${faltan} cajas</b> más para el 3er Mayoreo!</div>`;
+        } else {
+            bannerMayoreoHTML = `<div class="banner-mayoreo">👑 Cajas Pastel: <span>3er Mayoreo</span>.<br>¡Has desbloqueado el mejor precio posible!</div>`;
+        }
+    }
+
+    // 6. Validar mínimos de compra globales
     const btnPedido = document.querySelector(".btn-pedido");
-    const alertaPiezas = document.getElementById("contador-piezas-alerta");
+    
+    // CORRECCIÓN: Ahora lee correctamente el contenedor del HTML
+    const alertaPiezas = document.getElementById("alertas-cantidades"); 
     const fabCarrito = document.getElementById("fab-carrito");
     const fabTexto = fabCarrito ? fabCarrito.querySelector("span:first-child") : null;
 
@@ -422,7 +441,7 @@ function actualizarVistaCarrito() {
     if (totalPasteles > 0 && totalPasteles < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalPasteles} Cajas Pastel. Mínimo 30 piezas combinadas.</div>`; bloqueado = true; }
 
     if (!bloqueado && carrito.length > 0) {
-        advertenciaHTML = `<div class="texto-valido-verde">✅ ¡Cantidades correctas! Pedido autorizado.</div>`;
+        advertenciaHTML += `<div class="texto-valido-verde">✅ ¡Cantidades correctas! Pedido autorizado.</div>`;
         if(fabCarrito) fabCarrito.classList.add("carrito-listo");
         if(fabTexto && fabTexto.id !== "fab-total") fabTexto.innerHTML = "✅ ¡Pedido Listo! Toca aquí";
     } else {
@@ -430,10 +449,10 @@ function actualizarVistaCarrito() {
         if(fabTexto && fabTexto.id !== "fab-total") fabTexto.innerHTML = "🛒 Ver Pedido";
     }
 
-    if(alertaPiezas) alertaPiezas.innerHTML = advertenciaHTML;
+    // Inyectamos el Banner de Gamificación + Las Advertencias en el modal
+    if(alertaPiezas) alertaPiezas.innerHTML = bannerMayoreoHTML + advertenciaHTML;
     if(btnPedido) btnPedido.disabled = bloqueado;
 }
-
 function abrirModal() {
     if(carrito.length === 0) return mostrarAlerta("🛍️ Tu carrito está vacío.");
     document.getElementById("modal-carrito").style.display = "block";
