@@ -209,8 +209,13 @@ header p {
 .card-producto p { 
     font-size: 0.9rem; 
     color: var(--texto-secundario); 
-    margin-bottom: 20px;
-    line-height: 1.5;
+    margin-bottom: 4px; /* Reducimos drásticamente el espacio inferior */
+    line-height: 1.2; /* Acercamos los renglones */
+}
+
+/* Le devolvemos el espacio a la caja gris de precios para que no se pegue al texto */
+.card-producto .fila-precio-cantidad {
+    margin-top: 15px;
 }
 
 /* =========================================
