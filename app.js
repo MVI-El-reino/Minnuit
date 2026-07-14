@@ -270,32 +270,20 @@ function agregarCupcakeConfigAlCarrito() {
 // LÓGICA DE CAJAS PASTEL 
 // ==========================================
 function actualizarOpcionesTamanoPastel() {
-    const tipo = document.getElementById("sel_tipo_pastel").value;
-    const tamanoSelect = document.getElementById("sel_tamano_pastel");
-    
-    tamanoSelect.innerHTML = "";
-    Object.keys(pastelesData[tipo]).forEach(tamano => {
-        let option = document.createElement("option");
-        option.value = tamano; 
-        option.text = tamano; // Inicializamos con el nombre puro
-        tamanoSelect.add(option);
-    });
-
-    // En lugar de sincronizar aquí, llamamos directo a la función de abajo 
-    // para que calcule los precios y luego dibuje el menú.
+    // Al cambiar la línea de caja, simplemente mandamos llamar al configurador maestro
+    // Él se encargará de destruir la lista vieja y construir la nueva sin duplicar.
     actualizarConfiguradorPasteles();
 }
+
 function actualizarConfiguradorPasteles() {
     const tipoObj = document.getElementById("sel_tipo_pastel");
     const tamanoObj = document.getElementById("sel_tamano_pastel");
     
-    if (!tipoObj || !tamanoObj || tamanoObj.options.length === 0) return;
+    if (!tipoObj || !tamanoObj) return;
 
-    // 1. Contamos cuántos pasteles YA existen en el carrito
+    // 1. Matemáticas de Mayoreo
     let totalEnCarrito = carrito.reduce((sum, item) => item.tipoPastel ? sum + item.cantidad : sum, 0);
     const cantidadActual = parseInt(document.getElementById("cant_pastel_config").value) || 1;
-    
-    // 2. Evaluamos el nivel de mayoreo basándonos en la SUMA TOTAL
     let cantidadTotalEvaluada = totalEnCarrito + cantidadActual;
 
     let indicePrecio = 0; 
@@ -306,22 +294,46 @@ function actualizarConfiguradorPasteles() {
     else if (cantidadTotalEvaluada >= 150) { indicePrecio = 3; nivelTexto = "3er Mayoreo (+150 pzas)"; }
 
     const redes = document.getElementById("sel_redes_pastel").value;
+    const tipo = tipoObj.value;
 
-    // 3. ¡LA MAGIA FALTANTE! Inyectamos el precio actualizado a cada opción del menú
-    Array.from(tamanoObj.options).forEach(opt => {
-        let precioOpcion = pastelesData[tipoObj.value][opt.value].precios[indicePrecio];
-        if (redes === "Si") { precioOpcion += pastelesData[tipoObj.value][opt.value].extraRedes; }
+    // 2. Rescatamos el tamaño seleccionado para no borrarle la selección al cliente
+    let tamanoSeleccionado = tamanoObj.value;
+    let tamanosDisponibles = Object.keys(pastelesData[tipo]);
+
+    // Si cambió de categoría (ej. de Petite a Altas) y su tamaño ya no existe, seleccionamos el primero por defecto
+    if (!tamanosDisponibles.includes(tamanoSeleccionado)) {
+        tamanoSeleccionado = tamanosDisponibles[0];
+    }
+
+    // 3. Construimos el nuevo menú en la memoria (Limpio)
+    let nuevasOpcionesChoices = [];
+    
+    tamanosDisponibles.forEach(tamano => {
+        let precioOpcion = pastelesData[tipo][tamano].precios[indicePrecio];
+        if (redes === "Si") { precioOpcion += pastelesData[tipo][tamano].extraRedes; }
         
-        // Separamos el texto base para no duplicar el símbolo de "$" si el cliente cambia cantidades varias veces
-        let nombreLimpio = opt.text.split(' - $')[0];
-        opt.text = `${nombreLimpio} - $${precioOpcion}`;
+        nuevasOpcionesChoices.push({
+            value: tamano,
+            label: `${tamano} - $${precioOpcion}`,
+            selected: (tamano === tamanoSeleccionado)
+        });
     });
 
-    // 4. Sincronizamos el menú (Choices.js) para que se actualicen las opciones con el nuevo texto
-    sincronizarChoice("sel_tamano_pastel");
+    // 4. LA MAGIA: Le inyectamos la lista a Choices.js pidiéndole que REEMPLACE (true) la anterior
+    if (instanciasSelect["sel_tamano_pastel"]) {
+        instanciasSelect["sel_tamano_pastel"].setChoices(nuevasOpcionesChoices, 'value', 'label', true);
+    } else {
+        // Respaldo de seguridad por si falla la librería
+        tamanoObj.innerHTML = "";
+        nuevasOpcionesChoices.forEach(opt => {
+            let nuevaOpcionHtml = new Option(opt.label, opt.value);
+            if(opt.selected) nuevaOpcionHtml.selected = true;
+            tamanoObj.add(nuevaOpcionHtml);
+        });
+    }
 
     // 5. Actualizamos el precio principal gigante
-    const datosTamano = pastelesData[tipoObj.value][tamanoObj.value];
+    const datosTamano = pastelesData[tipo][tamanoSeleccionado];
     let precioBase = datosTamano.precios[indicePrecio];
     if (redes === "Si") { precioBase += datosTamano.extraRedes; }
 
