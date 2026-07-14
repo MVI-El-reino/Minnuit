@@ -114,9 +114,10 @@ header p {
    ========================================= */
 .tabs {
     display: flex;
-    background: transparent; /* Dejamos ver el fondo rosa */
-    padding: 15px;
-    gap: 10px;
+    justify-content: center; /* Esta línea centra los botones mágicamente */
+    background: transparent; 
+    padding: 25px 15px; /* Distancia exactamente igual arriba y abajo (líneas verdes) */
+    gap: 12px;
     overflow-x: auto;
     scrollbar-width: none; 
 }
@@ -150,7 +151,7 @@ header p {
    ========================================= */
 .categoria-seccion { 
     display: none; 
-    padding: 15px 15px 25px; 
+    padding: 0 15px 25px; /* 0 margen arriba para que la separación la dicte solo el menú */
     max-width: 600px;
     margin: 0 auto; 
 }
