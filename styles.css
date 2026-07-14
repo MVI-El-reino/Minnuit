@@ -24,6 +24,18 @@
     --sombra-boton: 0 8px 20px -6px rgba(255, 166, 201, 0.5);
     --sombra-header: 0 4px 20px rgba(255, 166, 201, 0.12);
 }
+/* 1. Mata el destello gris/azul que hace el celular al tocar */
+* {
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 2. Forzamos a que NINGUNA tarjeta intente encogerse jamás */
+.card-producto:active,
+.card-configurador:active,
+.categoria-seccion:active,
+.tabs:active {
+    transform: none !important;
+}
 /* =========================================
    BLOQUEO DE ZOOM AUTOMÁTICO EN IPHONE
    ========================================= */
