@@ -42,7 +42,7 @@ select,
 .fila-precio-cantidad {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end; /* LA CLAVE: Obliga a ambos elementos a sentarse en el piso de la caja */
     background: var(--rosa-claro);
     padding: 18px 15px;
     border-radius: 12px;
@@ -54,7 +54,7 @@ select,
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end; /* Alinea los elementos por la base para que no floten */
+    justify-content: flex-end; 
     width: 48%;
 }
 
@@ -70,20 +70,17 @@ select,
 /* =========================================
    ALINEACIÓN VERTICAL ABSOLUTA DEL PRECIO
    ========================================= */
+
 .precio-grande {
     font-size: 1.35rem !important; 
     font-weight: 800;
     color: var(--rosa-principal);
     margin: 0 !important; 
-    height: 42px; /* Mide exactamente lo mismo que la caja de cantidad */
-    
-    /* Magia flexbox para forzar el centro perfecto */
+    height: 42px; /* Misma altura de la caja */
     display: flex;
-    align-items: center; /* Lo centra verticalmente */
-    justify-content: center; /* Lo centra horizontalmente */
-    
-    /* CORRECCIÓN: Le devolvemos su volumen natural para que no aplaste al título */
-    line-height: normal !important; 
+    align-items: center; 
+    justify-content: center;
+    line-height: 1 !important; 
 }
 
 .controles-cantidad {
