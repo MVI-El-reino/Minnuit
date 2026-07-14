@@ -372,7 +372,7 @@ function actualizarVistaCarrito() {
         if(item.tipoPastel) { totalPasteles += item.cantidad; } 
     });
 
-    // 2. Determinar Nivel de Mayoreo Global para los Pasteles en el carrito
+    // 2. Determinar Nivel de Mayoreo Global para los Pasteles
     let indiceMayoreoGlobal = 0;
     if (totalPasteles >= 40 && totalPasteles <= 79) indiceMayoreoGlobal = 1;
     else if (totalPasteles >= 80 && totalPasteles <= 149) indiceMayoreoGlobal = 2;
@@ -396,12 +396,20 @@ function actualizarVistaCarrito() {
     
     carrito.forEach((item, index) => {
         totalDinero += item.subtotal;
+        
+        // ===== DISEÑO SIMPLIFICADO A 2 LÍNEAS =====
+        // Quitamos la palabra "Caja Pastel" para no repetir y ahorrar espacio
+        let nombreCorto = item.nombre.replace('Caja Pastel ', '');
+        
         listaHTML += `
-            <li>
-                <button class="btn-eliminar-item" onclick="eliminarDelCarrito(${index})">&times;</button>
-                <strong>${item.cantidad}x ${item.nombre}</strong><br>
-                <small>Ref: ${item.detalle}</small><br>
-                <small>Sub: $${item.subtotal.toFixed(2)}</small>
+            <li style="position: relative;">
+                <button class="btn-eliminar-item" style="position: absolute; right: 0; top: 10px;" onclick="eliminarDelCarrito(${index})">&times;</button>
+                <div style="font-weight: 700; font-size: 0.95rem; color: var(--texto-oscuro); width: 90%;">
+                    ${item.cantidad} Cajas ${nombreCorto} <span style="color: var(--rosa-principal)">$${item.subtotal.toFixed(2)}</span>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--texto-secundario); margin-top: 3px; line-height: 1.2; width: 90%;">
+                    Ref: ${item.detalle}
+                </div>
             </li>`;
     });
     
@@ -409,27 +417,22 @@ function actualizarVistaCarrito() {
     document.getElementById("modal-total").innerText = "$" + totalDinero.toFixed(2);
     document.getElementById("lista-carrito").innerHTML = listaHTML;
 
-    // ===== 5. NUEVO: LÓGICA DEL BANNER DE MAYOREO =====
+    // ===== 5. TEXTOS DE MAYOREO ULTRA CORTOS =====
     let bannerMayoreoHTML = "";
     if (totalPasteles > 0) {
         if (totalPasteles < 40) {
-            let faltan = 40 - totalPasteles;
-            bannerMayoreoHTML = `<div class="banner-mayoreo">📦 Cajas Pastel: <span>Menudeo</span>.<br>¡Agrega <b>${faltan} cajas</b> más para desbloquear el 1er Mayoreo!</div>`;
+            bannerMayoreoHTML = `<div class="banner-mayoreo">📦 <span>Menudeo:</span> Agrega ${40 - totalPasteles} cajas para 1er Mayoreo</div>`;
         } else if (totalPasteles < 80) {
-            let faltan = 80 - totalPasteles;
-            bannerMayoreoHTML = `<div class="banner-mayoreo">🎉 Cajas Pastel: <span>1er Mayoreo</span>.<br>¡Agrega <b>${faltan} cajas</b> más para el 2do Mayoreo!</div>`;
+            bannerMayoreoHTML = `<div class="banner-mayoreo">🎉 <span>1er Mayoreo:</span> Agrega ${80 - totalPasteles} para 2do Mayoreo</div>`;
         } else if (totalPasteles < 150) {
-            let faltan = 150 - totalPasteles;
-            bannerMayoreoHTML = `<div class="banner-mayoreo">🔥 Cajas Pastel: <span>2do Mayoreo</span>.<br>¡Agrega <b>${faltan} cajas</b> más para el 3er Mayoreo!</div>`;
+            bannerMayoreoHTML = `<div class="banner-mayoreo">🔥 <span>2do Mayoreo:</span> Agrega ${150 - totalPasteles} para 3er Mayoreo</div>`;
         } else {
-            bannerMayoreoHTML = `<div class="banner-mayoreo">👑 Cajas Pastel: <span>3er Mayoreo</span>.<br>¡Has desbloqueado el mejor precio posible!</div>`;
+            bannerMayoreoHTML = `<div class="banner-mayoreo">👑 <span>3er Mayoreo:</span> ¡Mejor precio desbloqueado!</div>`;
         }
     }
 
-    // 6. Validar mínimos de compra globales
+    // 6. Validar mínimos de compra globales (Textos más cortos)
     const btnPedido = document.querySelector(".btn-pedido");
-    
-    // CORRECCIÓN: Ahora lee correctamente el contenedor del HTML
     const alertaPiezas = document.getElementById("alertas-cantidades"); 
     const fabCarrito = document.getElementById("fab-carrito");
     const fabTexto = fabCarrito ? fabCarrito.querySelector("span:first-child") : null;
@@ -437,12 +440,12 @@ function actualizarVistaCarrito() {
     let advertenciaHTML = "";
     let bloqueado = false;
 
-    if (totalBases > 0 && totalBases < 35) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalBases} Bases. Mínimo 35 piezas.</div>`; bloqueado = true; }
-    if (totalCupcakes > 0 && totalCupcakes < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalCupcakes} Cajas Cupcakes. Mínimo 30 piezas combinadas.</div>`; bloqueado = true; }
-    if (totalPasteles > 0 && totalPasteles < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalPasteles} Cajas Pastel. Mínimo 30 piezas combinadas.</div>`; bloqueado = true; }
+    if (totalBases > 0 && totalBases < 35) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Bases: Faltan ${35 - totalBases} piezas (Mínimo: 35)</div>`; bloqueado = true; }
+    if (totalCupcakes > 0 && totalCupcakes < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Cupcakes: Faltan ${30 - totalCupcakes} piezas (Mínimo: 30)</div>`; bloqueado = true; }
+    if (totalPasteles > 0 && totalPasteles < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Pastel: Faltan ${30 - totalPasteles} piezas (Mínimo: 30)</div>`; bloqueado = true; }
 
     if (!bloqueado && carrito.length > 0) {
-        advertenciaHTML += `<div class="texto-valido-verde">✅ ¡Cantidades correctas! Pedido autorizado.</div>`;
+        advertenciaHTML += `<div class="texto-valido-verde">✅ Pedido autorizado</div>`;
         if(fabCarrito) fabCarrito.classList.add("carrito-listo");
         if(fabTexto && fabTexto.id !== "fab-total") fabTexto.innerHTML = "✅ ¡Pedido Listo! Toca aquí";
     } else {
@@ -450,7 +453,6 @@ function actualizarVistaCarrito() {
         if(fabTexto && fabTexto.id !== "fab-total") fabTexto.innerHTML = "🛒 Ver Pedido";
     }
 
-    // Inyectamos el Banner de Gamificación + Las Advertencias en el modal
     if(alertaPiezas) alertaPiezas.innerHTML = bannerMayoreoHTML + advertenciaHTML;
     if(btnPedido) btnPedido.disabled = bloqueado;
 }
