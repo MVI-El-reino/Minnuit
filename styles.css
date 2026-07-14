@@ -808,3 +808,16 @@ body { padding-bottom: 100px; }
     margin-top: 0 !important;
     border-radius: 12px !important;
 }
+/* ===================================================
+   CORRECCIÓN DE MENÚS CORTADOS (OVERLAP SUAVE)
+   =================================================== */
+
+/* 1. Obligamos al menú abierto a pasar por ENCIMA del botón pegajoso */
+.choices.is-open {
+    z-index: 105 !important;
+}
+
+/* 2. Le damos espacio de "respiro" al último menú para que no choque con el botón */
+.controles-config:last-of-type {
+    margin-bottom: 50px;
+}
