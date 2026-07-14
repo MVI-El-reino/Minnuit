@@ -79,9 +79,11 @@ select,
     
     /* Magia flexbox para forzar el centro perfecto */
     display: flex;
-    align-items: center; 
-    justify-content: center;
-    line-height: 0 !important; /* Destruye el relleno invisible de la fuente */
+    align-items: center; /* Lo centra verticalmente */
+    justify-content: center; /* Lo centra horizontalmente */
+    
+    /* CORRECCIÓN: Le devolvemos su volumen natural para que no aplaste al título */
+    line-height: normal !important; 
 }
 
 .controles-cantidad {
