@@ -289,25 +289,30 @@ function actualizarConfiguradorPasteles() {
     
     if (!tipoObj || !tamanoObj || !tamanoObj.value) return;
 
-    const cantidad = parseInt(document.getElementById("cant_pastel_config").value) || 30;
-    const redes = document.getElementById("sel_redes_pastel").value;
+    // 1. Contamos cuántos pasteles YA existen en el carrito
+    let totalEnCarrito = carrito.reduce((sum, item) => item.tipoPastel ? sum + item.cantidad : sum, 0);
+    const cantidadActual = parseInt(document.getElementById("cant_pastel_config").value) || 1;
     
+    // 2. Evaluamos el nivel de mayoreo basándonos en la SUMA TOTAL
+    let cantidadTotalEvaluada = totalEnCarrito + cantidadActual;
+
     let indicePrecio = 0; 
     let nivelTexto = "Menudeo (10-39 pzas)";
 
-    if (cantidad >= 40 && cantidad <= 79) { indicePrecio = 1; nivelTexto = "1er Mayoreo (40-79 pzas)"; }
-    else if (cantidad >= 80 && cantidad <= 149) { indicePrecio = 2; nivelTexto = "2do Mayoreo (80-149 pzas)"; }
-    else if (cantidad >= 150) { indicePrecio = 3; nivelTexto = "3er Mayoreo (+150 pzas)"; }
+    if (cantidadTotalEvaluada >= 40 && cantidadTotalEvaluada <= 79) { indicePrecio = 1; nivelTexto = "1er Mayoreo (40-79 pzas)"; }
+    else if (cantidadTotalEvaluada >= 80 && cantidadTotalEvaluada <= 149) { indicePrecio = 2; nivelTexto = "2do Mayoreo (80-149 pzas)"; }
+    else if (cantidadTotalEvaluada >= 150) { indicePrecio = 3; nivelTexto = "3er Mayoreo (+150 pzas)"; }
 
     const datosTamano = pastelesData[tipoObj.value][tamanoObj.value];
     let precioBase = datosTamano.precios[indicePrecio];
 
+    const redes = document.getElementById("sel_redes_pastel").value;
     if (redes === "Si") { precioBase += datosTamano.extraRedes; }
 
     precioPastelActual = precioBase;
     
     document.getElementById("precio_config_pastel").innerText = `$${precioPastelActual.toFixed(2)} MXN`;
-    document.getElementById("indicador_mayoreo").innerText = `Nivel: ${nivelTexto}`;
+    document.getElementById("indicador_mayoreo").innerText = `Nivel Activo: ${nivelTexto}`;
 }
 
 function agregarPastelConfigAlCarrito() {
@@ -321,18 +326,26 @@ function agregarPastelConfigAlCarrito() {
     const nombre = `Caja Pastel ${tipo} (${tamano})`;
     const detalle = `Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
     
-    carrito.push({ nombre, cantidad, detalle, precio: precioPastelActual, subtotal: precioPastelActual * cantidad });
+    // IMPORTANTE: Guardamos parámetros ocultos para poder recalcular precios después
+    carrito.push({ 
+        nombre, cantidad, detalle, precio: precioPastelActual, subtotal: precioPastelActual * cantidad,
+        tipoPastel: tipo,
+        tamanoPastel: tamano,
+        redesPastel: redes
+    });
     
     resetearSelect("sel_tipo_pastel");
     actualizarOpcionesTamanoPastel();
     resetearSelect("sel_color_logo_pastel");
     resetearSelect("sel_redes_pastel");
     document.getElementById("detalle_pastel1").value = "";
-    document.getElementById("cant_pastel_config").value = "30"; 
+    document.getElementById("cant_pastel_config").value = "10"; 
+    
+    // Forzamos la actualización visual
+    actualizarVistaCarrito();
     actualizarConfiguradorPasteles();
 
     mostrarAlerta(`🛒 ¡Cajas de Pastel agregadas!`);
-    actualizarVistaCarrito();
     animarBotónCarrito();
 }
 
@@ -347,18 +360,41 @@ function eliminarDelCarrito(index) {
 }
 
 function actualizarVistaCarrito() {
-    let totalDinero = 0;
+    // 1. Calcular totales de piezas por categoría
     let totalBases = 0;
     let totalCupcakes = 0; 
     let totalPasteles = 0;
+    
+    carrito.forEach(item => {
+        if(item.nombre.includes("Base")) { totalBases += item.cantidad; }
+        if(item.nombre.includes("Cupcake")) { totalCupcakes += item.cantidad; }
+        if(item.tipoPastel) { totalPasteles += item.cantidad; } // Usamos la propiedad oculta
+    });
+
+    // 2. Determinar Nivel de Mayoreo Global para los Pasteles en el carrito
+    let indiceMayoreoGlobal = 0;
+    if (totalPasteles >= 40 && totalPasteles <= 79) indiceMayoreoGlobal = 1;
+    else if (totalPasteles >= 80 && totalPasteles <= 149) indiceMayoreoGlobal = 2;
+    else if (totalPasteles >= 150) indiceMayoreoGlobal = 3;
+
+    // 3. RECALCULAR PRECIOS: Actualizamos el costo de los pasteles previos si se alcanzó un nuevo mayoreo
+    carrito.forEach(item => {
+        if(item.tipoPastel) {
+            const datos = pastelesData[item.tipoPastel][item.tamanoPastel];
+            let nuevoPrecio = datos.precios[indiceMayoreoGlobal];
+            if (item.redesPastel === "Si") { nuevoPrecio += datos.extraRedes; }
+            
+            item.precio = nuevoPrecio;
+            item.subtotal = nuevoPrecio * item.cantidad;
+        }
+    });
+
+    // 4. Renderizar el HTML y sumar el dinero final
+    let totalDinero = 0;
     let listaHTML = "";
     
     carrito.forEach((item, index) => {
         totalDinero += item.subtotal;
-        if(item.nombre.includes("Base")) { totalBases += item.cantidad; }
-        if(item.nombre.includes("Cupcake")) { totalCupcakes += item.cantidad; }
-        if(item.nombre.includes("Pastel")) { totalPasteles += item.cantidad; }
-        
         listaHTML += `
             <li>
                 <button class="btn-eliminar-item" onclick="eliminarDelCarrito(${index})">&times;</button>
@@ -372,6 +408,7 @@ function actualizarVistaCarrito() {
     document.getElementById("modal-total").innerText = "$" + totalDinero.toFixed(2);
     document.getElementById("lista-carrito").innerHTML = listaHTML;
 
+    // Validar mínimos de compra globales
     const btnPedido = document.querySelector(".btn-pedido");
     const alertaPiezas = document.getElementById("contador-piezas-alerta");
     const fabCarrito = document.getElementById("fab-carrito");
@@ -381,8 +418,8 @@ function actualizarVistaCarrito() {
     let bloqueado = false;
 
     if (totalBases > 0 && totalBases < 35) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalBases} Bases. Mínimo 35 piezas.</div>`; bloqueado = true; }
-    if (totalCupcakes > 0 && totalCupcakes < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalCupcakes} Cajas Cupcakes. Mínimo 30 piezas.</div>`; bloqueado = true; }
-    if (totalPasteles > 0 && totalPasteles < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalPasteles} Cajas Pastel. Mínimo 30 piezas.</div>`; bloqueado = true; }
+    if (totalCupcakes > 0 && totalCupcakes < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalCupcakes} Cajas Cupcakes. Mínimo 30 piezas combinadas.</div>`; bloqueado = true; }
+    if (totalPasteles > 0 && totalPasteles < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Llevas ${totalPasteles} Cajas Pastel. Mínimo 30 piezas combinadas.</div>`; bloqueado = true; }
 
     if (!bloqueado && carrito.length > 0) {
         advertenciaHTML = `<div class="texto-valido-verde">✅ ¡Cantidades correctas! Pedido autorizado.</div>`;
