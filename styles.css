@@ -24,7 +24,18 @@
     --sombra-boton: 0 8px 20px -6px rgba(255, 166, 201, 0.5);
     --sombra-header: 0 4px 20px rgba(255, 166, 201, 0.12);
 }
-
+/* =========================================
+   BLOQUEO DE ZOOM AUTOMÁTICO EN IPHONE
+   ========================================= */
+button, 
+input, 
+select, 
+.tab-btn, 
+.controles-cantidad, 
+.choices__inner {
+    /* Le dice a iOS: "Esto es para interactuar, no hagas zoom al doble toque" */
+    touch-action: manipulation !important;
+}
 /* =========================================
    SIMETRÍA ABSOLUTA EN PRECIO Y CANTIDAD
    ========================================= */
