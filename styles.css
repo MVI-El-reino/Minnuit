@@ -1,19 +1,18 @@
 :root {
-    /* Paleta refinada con MÁS ROSA MINUIT */
-    --rosa-principal: #e87b9e;
-    --rosa-gradiente: linear-gradient(135deg, #f48fb1 0%, #e16b90 100%);
-    --rosa-claro: #fdf0f4;     /* <--- Fondo general de la página (Rosa Minuit pastel) */
-    --rosa-medio: #fadbe4;     /* <--- Para detalles y bordes */
-    --rosa-hover: #d66488;
+    /* Paleta actualizada con el nuevo Rosa (#FFA6C9) */
+    --rosa-principal: #FFA6C9;
+    --rosa-gradiente: linear-gradient(135deg, #FFA6C9 0%, #e87b9e 100%);
+    --rosa-claro: #fdf0f4;     
+    --rosa-medio: #fadbe4;     
+    --rosa-hover: #e87b9e; /* Un tono ligeramente más oscuro para los efectos hover */
     --blanco: #ffffff;
-    --texto-oscuro: #4a3b40;     /* <--- Un gris muy oscuro casi café/rosado */
-    --texto-secundario: #9e7f8a; /* <--- Gris con tinte rosado para textos menores */
-    --borde-suave: #f8dce5;      /* <--- Bordes rosados en lugar de grises */
+    --texto-oscuro: #4a3b40;     
+    --texto-secundario: #9e7f8a; 
+    --borde-suave: #f8dce5;      
     
-    /* Sombras teñidas de rosa */
-    --sombra-tarjeta: 0 10px 30px -5px rgba(232, 123, 158, 0.2); 
-    --sombra-boton: 0 8px 20px -6px rgba(225, 107, 144, 0.5);
-    --sombra-header: 0 4px 20px rgba(232, 123, 158, 0.12);
+    --sombra-tarjeta: 0 10px 30px -5px rgba(255, 166, 201, 0.2); 
+    --sombra-boton: 0 8px 20px -6px rgba(255, 166, 201, 0.5);
+    --sombra-header: 0 4px 20px rgba(255, 166, 201, 0.12);
 }
 
 /* =========================================
