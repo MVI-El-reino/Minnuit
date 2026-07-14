@@ -71,7 +71,8 @@ function inicializarTienda() {
         instanciasSelect[select.id] = new Choices(select, {
             searchEnabled: false,
             itemSelectText: '',
-            shouldSort: false
+            shouldSort: false,
+            position: 'top'
         });
     });
 
