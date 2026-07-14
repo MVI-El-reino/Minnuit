@@ -42,9 +42,9 @@ select,
 .fila-precio-cantidad {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end; /* LA CLAVE: Obliga a ambos elementos a sentarse en el piso de la caja */
+    align-items: flex-end; /* Alinea ambas columnas desde el piso */
     background: var(--rosa-claro);
-    padding: 18px 15px;
+    padding: 15px 15px 20px 15px; 
     border-radius: 12px;
     margin: 15px 0 25px;
     border: 1px solid var(--borde-suave);
@@ -54,7 +54,6 @@ select,
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end; 
     width: 48%;
 }
 
@@ -63,37 +62,48 @@ select,
     text-transform: uppercase;
     color: var(--texto-secundario);
     font-weight: 700;
-    margin: 0 0 6px 0 !important; /* Margen exacto hacia abajo */
-    line-height: 1;
+    margin: 0 0 10px 0 !important; 
 }
 
-/* =========================================
-   ALINEACIÓN VERTICAL ABSOLUTA DEL PRECIO
-   ========================================= */
-
+/* El texto del precio */
 .precio-grande {
-    font-size: 1.35rem !important; 
+    font-size: 1.4rem !important; 
     font-weight: 800;
     color: var(--rosa-principal);
     margin: 0 !important; 
-    height: 42px; /* Misma altura de la caja */
-    display: flex;
-    align-items: center; 
-    justify-content: center;
-    line-height: 1 !important; 
+    padding: 0 !important;
+    height: 44px; /* Altura maestra */
+    line-height: 44px !important; /* El secreto del centrado perfecto */
+    text-align: center;
+    display: block; 
 }
 
+/* El recuadro blanco */
 .controles-cantidad {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background: var(--blanco);
     border-radius: 10px;
-    padding: 4px;
-    margin: 0 !important; /* Cero márgenes invisibles */
+    margin: 0 !important; 
+    padding: 0 !important; /* CERO relleno para no desfasar el texto */
     border: 1px solid var(--borde-suave);
-    height: 42px; /* Altura idéntica a la del precio para lograr simetría */
+    height: 44px; /* Misma altura maestra que el precio */
     width: 100%;
+    display: block;
+}
+
+/* El número adentro del recuadro */
+.controles-cantidad input {
+    width: 100%;
+    height: 100% !important; /* Obliga al input a medir los mismos 44px */
+    border: none;
+    background: transparent;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem; 
+    color: var(--texto-oscuro);
+    text-align: center;
+    padding: 0 !important; /* Destruye rellenos que estorben */
+    margin: 0 !important;
+    line-height: 44px !important; /* Mismo secreto de centrado que el precio */
 }
 /* =========================================
    Reset y Tipografía General
