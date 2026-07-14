@@ -164,8 +164,6 @@ header p {
     transition: transform 0.2s ease;
 }
 
-.card-producto:active { transform: scale(0.99); }
-
 .card-producto h3 { 
     color: var(--texto-oscuro); 
     font-weight: 600;
