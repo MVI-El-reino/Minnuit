@@ -66,32 +66,15 @@ function inicializarTienda() {
         });
     }
 
-    // Convertir todos los selects a la capa premium
-    // Convertir todos los selects a la capa premium
+    // Convertir todos los selects a la capa premium (Versión fluida)
     document.querySelectorAll('.controles-config select').forEach(select => {
         instanciasSelect[select.id] = new Choices(select, {
             searchEnabled: false,
             itemSelectText: '',
             shouldSort: false,
-            position: 'auto' // Lo regresamos a inteligente
-        });
-
-        // ===== LA MAGIA DEL CENTRADO AUTOMÁTICO =====
-        select.addEventListener('showDropdown', function() {
-            // Buscamos la caja que contiene al menú
-            const cajaContenedora = select.closest('.controles-config');
-            if (cajaContenedora) {
-                // Le damos un respiro de 100 milisegundos y deslizamos suavemente al centro
-                setTimeout(() => {
-                    cajaContenedora.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'center' 
-                    });
-                }, 100);
-            }
+            position: 'auto' 
         });
     });
-
     actualizarConfiguradorBases(); 
     actualizarConfiguradorCupcakes();
     actualizarOpcionesTamanoPastel();
