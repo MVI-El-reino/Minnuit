@@ -769,3 +769,28 @@ body { padding-bottom: 100px; }
 .carrito-listo #fab-total {
     color: var(--blanco) !important;
 }
+/* CAJAS DE PASTEL, BANNER DE CUANTO VA DEL MAYOREO*/
+/* =========================================
+   BANNER DE MAYOREO (GAMIFICACIÓN)
+   ========================================= */
+.banner-mayoreo {
+    background: linear-gradient(135deg, var(--rosa-claro) 0%, var(--rosa-medio) 100%);
+    border: 1px solid var(--rosa-principal);
+    color: var(--texto-oscuro);
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin: 5px 0 15px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.4;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5);
+    animation: fadeIn 0.4s ease-out;
+}
+
+.banner-mayoreo span {
+    color: var(--rosa-principal);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.95rem;
+}
