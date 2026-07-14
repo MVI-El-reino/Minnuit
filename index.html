@@ -40,10 +40,10 @@
                     <div class="cantidad-col">
                         <span class="etiqueta-precio">Cantidad</span>
                         <div class="controles-cantidad">
-                            <button onclick="cambiarCantidad('cant_base_config', -1, 1)">-</button>
-                            <input type="number" id="cant_base_config" value="1" readonly>
-                            <button onclick="cambiarCantidad('cant_base_config', 1, 1)">+</button>
-                        </div>
+    <button onclick="cambiarCantidad('cant_base_config', -1, 1); actualizarConfiguradorBases()">-</button>
+    <input type="number" id="cant_base_config" value="1" min="1" onchange="validarManual('cant_base_config', 1); actualizarConfiguradorBases()">
+    <button onclick="cambiarCantidad('cant_base_config', 1, 1); actualizarConfiguradorBases()">+</button>
+</div>
                     </div>
                 </div>
                 
@@ -116,10 +116,10 @@
                     <div class="cantidad-col">
                         <span class="etiqueta-precio">Cantidad</span>
                         <div class="controles-cantidad">
-                            <button onclick="cambiarCantidad('cant_pastel_config', -1, 1); actualizarConfiguradorPasteles()">-</button>
-                            <input type="number" id="cant_pastel_config" value="30" readonly>
-                            <button onclick="cambiarCantidad('cant_pastel_config', 1, 1); actualizarConfiguradorPasteles()">+</button>
-                        </div>
+    <button onclick="cambiarCantidad('cant_pastel_config', -1, 1); actualizarConfiguradorPasteles()">-</button>
+    <input type="number" id="cant_pastel_config" value="10" min="1" onchange="validarManual('cant_pastel_config', 1); actualizarConfiguradorPasteles()">
+    <button onclick="cambiarCantidad('cant_pastel_config', 1, 1); actualizarConfiguradorPasteles()">+</button>
+</div>
                     </div>
                 </div>
                 
@@ -183,10 +183,10 @@
                     <div class="cantidad-col">
                         <span class="etiqueta-precio">Cantidad</span>
                         <div class="controles-cantidad">
-                            <button onclick="cambiarCantidad('cant_cupcake_config', -1, 1)">-</button>
-                            <input type="number" id="cant_cupcake_config" value="1" readonly>
-                            <button onclick="cambiarCantidad('cant_cupcake_config', 1, 1)">+</button>
-                        </div>
+    <button onclick="cambiarCantidad('cant_cupcake_config', -1, 1); actualizarConfiguradorCupcakes()">-</button>
+    <input type="number" id="cant_cupcake_config" value="10" min="1" onchange="validarManual('cant_cupcake_config', 1); actualizarConfiguradorCupcakes()">
+    <button onclick="cambiarCantidad('cant_cupcake_config', 1, 1); actualizarConfiguradorCupcakes()">+</button>
+</div>
                     </div>
                 </div>
 
