@@ -318,9 +318,12 @@ function actualizarConfiguradorPasteles() {
             selected: (tamano === tamanoSeleccionado)
         });
     });
-
-    // 4. LA MAGIA: Le inyectamos la lista a Choices.js pidiéndole que REEMPLACE (true) la anterior
+    // 4. LA MAGIA BLINDADA: Destruimos la lista primero, luego inyectamos.
     if (instanciasSelect["sel_tamano_pastel"]) {
+        // Orden #1: Borra absolutamente todo sin preguntar
+        instanciasSelect["sel_tamano_pastel"].clearChoices();
+        
+        // Orden #2: Dibuja la lista limpia
         instanciasSelect["sel_tamano_pastel"].setChoices(nuevasOpcionesChoices, 'value', 'label', true);
     } else {
         // Respaldo de seguridad por si falla la librería
