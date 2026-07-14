@@ -75,6 +75,7 @@ function inicializarTienda() {
             position: 'auto' 
         });
     });
+    
     actualizarConfiguradorBases(); 
     actualizarConfiguradorCupcakes();
     actualizarOpcionesTamanoPastel();
