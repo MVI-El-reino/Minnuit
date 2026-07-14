@@ -386,17 +386,6 @@ header p {
     transform: scale(0.95);
 }
 
-.controles-cantidad input {
-    width: 70px; 
-    text-align: center; 
-    border: none; 
-    background: transparent;
-    font-family: 'Poppins', sans-serif; 
-    font-weight: 700; 
-    font-size: 1.1rem; 
-    color: var(--texto-oscuro);
-}
-
 /* =========================================
    Botones Principales
    ========================================= */
