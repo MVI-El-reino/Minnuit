@@ -276,19 +276,20 @@ function actualizarOpcionesTamanoPastel() {
     tamanoSelect.innerHTML = "";
     Object.keys(pastelesData[tipo]).forEach(tamano => {
         let option = document.createElement("option");
-        option.value = tamano; option.text = tamano;
+        option.value = tamano; 
+        option.text = tamano; // Inicializamos con el nombre puro
         tamanoSelect.add(option);
     });
 
-    sincronizarChoice("sel_tamano_pastel");
+    // En lugar de sincronizar aquí, llamamos directo a la función de abajo 
+    // para que calcule los precios y luego dibuje el menú.
     actualizarConfiguradorPasteles();
 }
-
 function actualizarConfiguradorPasteles() {
     const tipoObj = document.getElementById("sel_tipo_pastel");
     const tamanoObj = document.getElementById("sel_tamano_pastel");
     
-    if (!tipoObj || !tamanoObj || !tamanoObj.value) return;
+    if (!tipoObj || !tamanoObj || tamanoObj.options.length === 0) return;
 
     // 1. Contamos cuántos pasteles YA existen en el carrito
     let totalEnCarrito = carrito.reduce((sum, item) => item.tipoPastel ? sum + item.cantidad : sum, 0);
@@ -304,10 +305,24 @@ function actualizarConfiguradorPasteles() {
     else if (cantidadTotalEvaluada >= 80 && cantidadTotalEvaluada <= 149) { indicePrecio = 2; nivelTexto = "2do Mayoreo (80-149 pzas)"; }
     else if (cantidadTotalEvaluada >= 150) { indicePrecio = 3; nivelTexto = "3er Mayoreo (+150 pzas)"; }
 
+    const redes = document.getElementById("sel_redes_pastel").value;
+
+    // 3. ¡LA MAGIA FALTANTE! Inyectamos el precio actualizado a cada opción del menú
+    Array.from(tamanoObj.options).forEach(opt => {
+        let precioOpcion = pastelesData[tipoObj.value][opt.value].precios[indicePrecio];
+        if (redes === "Si") { precioOpcion += pastelesData[tipoObj.value][opt.value].extraRedes; }
+        
+        // Separamos el texto base para no duplicar el símbolo de "$" si el cliente cambia cantidades varias veces
+        let nombreLimpio = opt.text.split(' - $')[0];
+        opt.text = `${nombreLimpio} - $${precioOpcion}`;
+    });
+
+    // 4. Sincronizamos el menú (Choices.js) para que se actualicen las opciones con el nuevo texto
+    sincronizarChoice("sel_tamano_pastel");
+
+    // 5. Actualizamos el precio principal gigante
     const datosTamano = pastelesData[tipoObj.value][tamanoObj.value];
     let precioBase = datosTamano.precios[indicePrecio];
-
-    const redes = document.getElementById("sel_redes_pastel").value;
     if (redes === "Si") { precioBase += datosTamano.extraRedes; }
 
     precioPastelActual = precioBase;
@@ -315,7 +330,6 @@ function actualizarConfiguradorPasteles() {
     document.getElementById("precio_config_pastel").innerText = `$${precioPastelActual.toFixed(2)} MXN`;
     document.getElementById("indicador_mayoreo").innerText = `Nivel Activo: ${nivelTexto}`;
 }
-
 function agregarPastelConfigAlCarrito() {
     const cantidad = parseInt(document.getElementById("cant_pastel_config").value);
     const tipo = document.getElementById("sel_tipo_pastel").value;
