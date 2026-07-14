@@ -1,15 +1,25 @@
 :root {
-    /* Paleta actualizada con el nuevo Rosa (#FFA6C9) */
-    --rosa-principal: #FFA6C9;
-    --rosa-gradiente: linear-gradient(135deg, #FFA6C9 0%, #e87b9e 100%);
-    --rosa-claro: #fdf0f4;     
+    /* El tope máximo de oscuridad: Tu nuevo Rosa Principal */
+    --rosa-principal: #FFA6C9; 
+    
+    /* Efecto Hover: Ahora se "ilumina" a un tono más claro en lugar de oscurecerse */
+    --rosa-hover: #ffb8d2; 
+    
+    /* Gradiente: Va del principal a uno ligeramente más claro */
+    --rosa-gradiente: linear-gradient(135deg, #FFA6C9 0%, #ffbbd5 100%); 
+    
+    /* Tonos progresivamente más claros para fondos y detalles */
     --rosa-medio: #fadbe4;     
-    --rosa-hover: #e87b9e; /* Un tono ligeramente más oscuro para los efectos hover */
+    --borde-suave: #f8dce5;      
+    --rosa-claro: #fdf0f4;     
+    
     --blanco: #ffffff;
+    
+    /* Textos (Se mantienen oscuros/grises por obligación de legibilidad) */
     --texto-oscuro: #4a3b40;     
     --texto-secundario: #9e7f8a; 
-    --borde-suave: #f8dce5;      
     
+    /* Sombras teñidas con el rosa principal */
     --sombra-tarjeta: 0 10px 30px -5px rgba(255, 166, 201, 0.2); 
     --sombra-boton: 0 8px 20px -6px rgba(255, 166, 201, 0.5);
     --sombra-header: 0 4px 20px rgba(255, 166, 201, 0.12);
