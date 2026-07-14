@@ -63,18 +63,25 @@ select,
     text-transform: uppercase;
     color: var(--texto-secundario);
     font-weight: 700;
-    margin: 0 0 8px 0 !important; /* Misma separación exacta debajo del texto para ambos */
+    margin: 0 0 6px 0 !important; /* Margen exacto hacia abajo */
+    line-height: 1;
 }
 
+/* =========================================
+   ALINEACIÓN VERTICAL ABSOLUTA DEL PRECIO
+   ========================================= */
 .precio-grande {
-    font-size: 1.3rem !important; 
+    font-size: 1.35rem !important; 
     font-weight: 800;
     color: var(--rosa-principal);
-    margin: 0 !important; /* Eliminamos los márgenes viejos que rompían el centro */
-    line-height: 1;
+    margin: 0 !important; 
+    height: 42px; /* Mide exactamente lo mismo que la caja de cantidad */
+    
+    /* Magia flexbox para forzar el centro perfecto */
     display: flex;
-    align-items: center;
-    height: 42px; /* Forzamos a que mida lo mismo que la caja de cantidad */
+    align-items: center; 
+    justify-content: center;
+    line-height: 0 !important; /* Destruye el relleno invisible de la fuente */
 }
 
 .controles-cantidad {
