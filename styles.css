@@ -199,22 +199,22 @@ header p {
 }
 
 /* =========================================
-   Tarjetas de Productos
+   Tarjetas de Productos (Blindaje Estático)
    ========================================= */
 .categoria-seccion { 
     display: none; 
-    padding: 0 15px 25px; /* 0 margen arriba para que la separación la dicte solo el menú */
+    padding: 0 15px 25px; 
     max-width: 600px;
     margin: 0 auto; 
-}
-.categoria-seccion.active { 
-    display: block; 
-    animation: none !important; /* Apagamos la animación para evitar el colapso de altura */
+    /* Forzamos a que conserve su espacio incluso estando oculta */
+    min-height: 100%;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.categoria-seccion.active { 
+    display: block; 
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
 }
 
 .card-producto {
@@ -224,9 +224,9 @@ header p {
     margin-bottom: 25px;
     box-shadow: var(--sombra-tarjeta);
     border: 1px solid var(--blanco);
-    transition: transform 0.2s ease;
+    transform: none !important; /* Mata cualquier intento de movimiento */
+    transition: none !important; /* Desactiva el efecto de entrada */
 }
-
 .card-producto h3 { 
     color: var(--texto-oscuro); 
     font-weight: 600;
