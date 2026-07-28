@@ -148,7 +148,7 @@ header {
 
 /* Estilos para que el logo se vea nítido y proporcionado */
 .logo-principal {
-    max-width: 180px; /* Ajusta este número si lo quieres más grande o más chico */
+    max-width: 300px; /* Ajusta este número si lo quieres más grande o más chico */
     width: 100%; /* Lo hace responsivo en celulares muy pequeños */
     height: auto;
     display: block;
