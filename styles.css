@@ -158,6 +158,17 @@ header {
     image-rendering: -webkit-optimize-contrast; 
     object-fit: contain;
 }
+/* =========================================
+   DOMANDO EL LOGO GIGANTE
+   ========================================= */
+header img.logo-principal {
+    max-width: 160px !important; /* El candado estricto de tamaño */
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+    margin: 0 auto 10px auto !important; 
+    object-fit: contain;
+}
 
 header p {
     font-size: 0.85rem;
