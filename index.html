@@ -149,12 +149,23 @@
                 </div>
 
                 <div class="controles-config">
-                    <label for="sel_redes_pastel">Redes Sociales:</label>
-                    <select id="sel_redes_pastel" onchange="actualizarConfiguradorPasteles()">
-                        <option value="No">No, gracias</option>
-                        <option value="Si">Sí (+ Costo extra por tamaño)</option>
-                    </select>
-                </div>
+    <label for="sel_redes_pastel">Redes Sociales:</label>
+    <select id="sel_redes_pastel" onchange="actualizarConfiguradorPasteles()">
+        <option value="No">No, gracias</option>
+        <option value="Si">Sí (+ Costo extra por tamaño)</option>
+    </select>
+</div>
+
+<!-- 2. EL NUEVO MENÚ (Oculto por defecto) -->
+<div class="controles-config" id="contenedor_redes_medida" style="display: none; margin-top: 15px;">
+    <label for="sel_medida_redes">Medida de Redes:</label>
+    <!-- Los "value" son directamente los precios para facilitar el cálculo matemático -->
+    <select id="sel_medida_redes" onchange="actualizarConfiguradorPasteles()">
+        <option value="5">15cm - $5</option>
+        <option value="6">20cm - $6</option>
+        <option value="8">25 y 30cm - $8</option>
+    </select>
+</div>
 
                 <div class="controles">
                     <label for="detalle_pastel1">Anota tu redes / Observacioens:</label>
