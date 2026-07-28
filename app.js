@@ -296,46 +296,44 @@ function actualizarConfiguradorPasteles() {
     const redes = document.getElementById("sel_redes_pastel").value;
     const tipo = tipoObj.value;
 
-    // 2. Rescatamos el tamaño seleccionado para no borrarle la selección al cliente
+    // 2. Rescatamos el tamaño que el cliente tenía seleccionado
     let tamanoSeleccionado = tamanoObj.value;
     let tamanosDisponibles = Object.keys(pastelesData[tipo]);
 
-    // Si cambió de categoría (ej. de Petite a Altas) y su tamaño ya no existe, seleccionamos el primero por defecto
     if (!tamanosDisponibles.includes(tamanoSeleccionado)) {
         tamanoSeleccionado = tamanosDisponibles[0];
     }
 
-    // 3. Construimos el nuevo menú en la memoria (Limpio)
-    let nuevasOpcionesChoices = [];
-    
+    // ================================================================
+    // 3. LA OPCIÓN NUCLEAR: Destruimos la librería para evitar el bug
+    // ================================================================
+    if (instanciasSelect["sel_tamano_pastel"]) {
+        instanciasSelect["sel_tamano_pastel"].destroy();
+    }
+
+    // 4. Limpiamos el HTML y lo reconstruimos desde cero, sano y salvo
+    tamanoObj.innerHTML = "";
     tamanosDisponibles.forEach(tamano => {
         let precioOpcion = pastelesData[tipo][tamano].precios[indicePrecio];
         if (redes === "Si") { precioOpcion += pastelesData[tipo][tamano].extraRedes; }
         
-        nuevasOpcionesChoices.push({
-            value: tamano,
-            label: `${tamano} - $${precioOpcion}`,
-            selected: (tamano === tamanoSeleccionado)
-        });
+        let nuevaOpcion = new Option(`${tamano} - $${precioOpcion}`, tamano);
+        if (tamano === tamanoSeleccionado) {
+            nuevaOpcion.selected = true;
+        }
+        tamanoObj.add(nuevaOpcion);
     });
-    // 4. LA MAGIA BLINDADA: Destruimos la lista primero, luego inyectamos.
-    if (instanciasSelect["sel_tamano_pastel"]) {
-        // Orden #1: Borra absolutamente todo sin preguntar
-        instanciasSelect["sel_tamano_pastel"].clearChoices();
-        
-        // Orden #2: Dibuja la lista limpia
-        instanciasSelect["sel_tamano_pastel"].setChoices(nuevasOpcionesChoices, 'value', 'label', true);
-    } else {
-        // Respaldo de seguridad por si falla la librería
-        tamanoObj.innerHTML = "";
-        nuevasOpcionesChoices.forEach(opt => {
-            let nuevaOpcionHtml = new Option(opt.label, opt.value);
-            if(opt.selected) nuevaOpcionHtml.selected = true;
-            tamanoObj.add(nuevaOpcionHtml);
-        });
-    }
 
-    // 5. Actualizamos el precio principal gigante
+    // 5. Revivimos la librería visual con las opciones ya limpias
+    instanciasSelect["sel_tamano_pastel"] = new Choices(tamanoObj, {
+        searchEnabled: false,
+        itemSelectText: '',
+        shouldSort: false,
+        position: 'auto'
+    });
+    // ================================================================
+
+    // 6. Actualizamos el precio principal gigante
     const datosTamano = pastelesData[tipo][tamanoSeleccionado];
     let precioBase = datosTamano.precios[indicePrecio];
     if (redes === "Si") { precioBase += datosTamano.extraRedes; }
