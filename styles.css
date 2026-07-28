@@ -79,15 +79,17 @@ select,
 
 /* El texto del precio */
 .precio-grande {
-    font-size: 1.4rem !important; 
+    /* clamp(mínimo, ideal, máximo) encoge la letra automáticamente en Androids angostos */
+    font-size: clamp(1.1rem, 4.5vw, 1.4rem) !important; 
     font-weight: 800;
     color: var(--rosa-principal);
     margin: 0 !important; 
     padding: 0 !important;
-    height: 44px; /* Altura maestra */
-    line-height: 44px !important; /* El secreto del centrado perfecto */
+    height: 44px; 
+    line-height: 44px !important; 
     text-align: center;
     display: block; 
+    white-space: nowrap !important; /* EL SECRETO: Prohíbe terminantemente que el texto baje de línea */
 }
 
 /* El recuadro blanco */
