@@ -133,26 +133,30 @@ body {
 }
 
 /* =========================================
-   Header (Cabecera)
+   Header y Logo Principal
    ========================================= */
 header {
     background: var(--blanco);
     text-align: center;
-    padding: 25px 15px 20px;
+    padding: 20px 15px 15px; /* Ajustamos un poco el relleno superior */
     box-shadow: var(--sombra-header);
     position: sticky;
     top: 0;
     z-index: 50;
-    border-bottom: 1px solid var(--rosa-medio); /* Línea divisoria sutil */
+    border-bottom: 1px solid var(--rosa-medio);
 }
 
-header h1 {
-    font-family: 'Dancing Script', cursive;
-    font-size: 3.2rem;
-    background: var(--rosa-gradiente);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 2px;
+/* Estilos para que el logo se vea nítido y proporcionado */
+.logo-principal {
+    max-width: 180px; /* Ajusta este número si lo quieres más grande o más chico */
+    width: 100%; /* Lo hace responsivo en celulares muy pequeños */
+    height: auto;
+    display: block;
+    margin: 0 auto 10px auto; /* Lo centra perfectamente y le da espacio abajo */
+    
+    /* Previene que la imagen pierda calidad al escalarse */
+    image-rendering: -webkit-optimize-contrast; 
+    object-fit: contain;
 }
 
 header p {
@@ -161,6 +165,7 @@ header p {
     letter-spacing: 1px;
     text-transform: uppercase;
     font-weight: 600;
+    margin: 0;
 }
 
 /* =========================================
