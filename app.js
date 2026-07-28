@@ -353,10 +353,27 @@ function actualizarConfiguradorPasteles() {
     else if (cantidadTotalEvaluada >= 80 && cantidadTotalEvaluada <= 149) { indicePrecio = 2; nivelTexto = "2do Mayoreo (80-149 pzas)"; }
     else if (cantidadTotalEvaluada >= 150) { indicePrecio = 3; nivelTexto = "3er Mayoreo (+150 pzas)"; }
 
-    const redes = document.getElementById("sel_redes_pastel").value;
     const tipo = tipoObj.value;
 
-    // 2. Rescatamos el tamaño que el cliente tenía seleccionado
+    // ================================================================
+    // 2. NUEVA LÓGICA: MENÚ DINÁMICO DE REDES SOCIALES
+    // ================================================================
+    const redes = document.getElementById("sel_redes_pastel").value;
+    const contenedorRedes = document.getElementById("contenedor_redes_medida");
+    const medidaRedesObj = document.getElementById("sel_medida_redes");
+    
+    let costoExtraRedes = 0;
+
+    if (redes === "Si") {
+        contenedorRedes.style.display = "block"; // Revelamos el menú
+        costoExtraRedes = parseFloat(medidaRedesObj.value) || 0; // Extraemos el precio del value (5, 6 u 8)
+    } else {
+        contenedorRedes.style.display = "none"; // Ocultamos el menú
+        costoExtraRedes = 0; // El costo vuelve a cero
+    }
+    // ================================================================
+
+    // 3. Rescatamos el tamaño que el cliente tenía seleccionado
     let tamanoSeleccionado = tamanoObj.value;
     let tamanosDisponibles = Object.keys(pastelesData[tipo]);
 
@@ -364,18 +381,18 @@ function actualizarConfiguradorPasteles() {
         tamanoSeleccionado = tamanosDisponibles[0];
     }
 
-    // ================================================================
-    // 3. LA OPCIÓN NUCLEAR: Destruimos la librería para evitar el bug
-    // ================================================================
+    // 4. OPCIÓN NUCLEAR: Destruimos la librería
     if (instanciasSelect["sel_tamano_pastel"]) {
         instanciasSelect["sel_tamano_pastel"].destroy();
     }
 
-    // 4. Limpiamos el HTML y lo reconstruimos desde cero, sano y salvo
+    // 5. Limpiamos HTML e inyectamos los nuevos precios
     tamanoObj.innerHTML = "";
     tamanosDisponibles.forEach(tamano => {
         let precioOpcion = pastelesData[tipo][tamano].precios[indicePrecio];
-        if (redes === "Si") { precioOpcion += pastelesData[tipo][tamano].extraRedes; }
+        
+        // Aquí sumamos el costo dinámico de las redes (será 0 si eligió "No")
+        precioOpcion += costoExtraRedes; 
         
         let nuevaOpcion = new Option(`${tamano} - $${precioOpcion}`, tamano);
         if (tamano === tamanoSeleccionado) {
@@ -384,19 +401,19 @@ function actualizarConfiguradorPasteles() {
         tamanoObj.add(nuevaOpcion);
     });
 
-    // 5. Revivimos la librería visual con las opciones ya limpias
+    // 6. Revivimos la librería
     instanciasSelect["sel_tamano_pastel"] = new Choices(tamanoObj, {
         searchEnabled: false,
         itemSelectText: '',
         shouldSort: false,
         position: 'auto'
     });
-    // ================================================================
 
-    // 6. Actualizamos el precio principal gigante
+    // 7. Actualizamos el precio principal gigante
     const datosTamano = pastelesData[tipo][tamanoSeleccionado];
     let precioBase = datosTamano.precios[indicePrecio];
-    if (redes === "Si") { precioBase += datosTamano.extraRedes; }
+    
+    precioBase += costoExtraRedes; // Actualizamos el total maestro
 
     precioPastelActual = precioBase;
     
