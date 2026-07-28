@@ -435,17 +435,18 @@ header p {
     transition: all 0.3s ease;
     
     /* MAGIA PARA MÓVILES (Fuerza el efecto pegajoso) */
-    position: -webkit-sticky; /* Obligatorio para iPhone/iOS */
+    position: -webkit-sticky; 
     position: sticky;
     bottom: 85px; 
     z-index: 90;
     
-    /* Aceleración gráfica (Evita que desaparezca al hacer scroll rápido) */
+    /* ESCUDO PARA ANDROID: Sombra sólida blanca que tapa el texto que pasa por debajo */
+    box-shadow: 0 -15px 0px 8px var(--blanco), 0 8px 20px -6px rgba(225, 107, 144, 0.5) !important;
+    
+    /* Aceleración gráfica blindada (Evita parpadeos en celulares de gama media) */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    
-    /* El difuminado de fondo para que el texto no choque */
-    box-shadow: 0 -20px 20px rgba(253, 240, 244, 0.95), 0 8px 20px -6px rgba(225, 107, 144, 0.5);
+    backface-visibility: hidden;
 }
 
 /* IMPORTANTE: Esta regla asegura que ningún contenedor "corte" el efecto en celular */
