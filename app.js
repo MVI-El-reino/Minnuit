@@ -160,36 +160,68 @@ function actualizarConfiguradorBases() {
     const linea = lineaSelect.value;
     const grosorSelect = document.getElementById("sel_grosor_base");
     const tamanoSelect = document.getElementById("sel_tamano_base");
-    const grosor = grosorSelect.value;
-    const tamano = tamanoSelect.value;
+    const selectColor = document.getElementById("sel_color_logo_base");
+
+    // 1. Rescatamos los valores que el cliente tiene seleccionados actualmente
+    const grosorActual = grosorSelect.value;
+    const tamanoActual = tamanoSelect.value;
+    const colorActual = selectColor.value;
+
+    // 2. Extraemos los valores puros disponibles (sin los precios viejos)
+    const tamanosDisponibles = Array.from(tamanoSelect.options).map(opt => opt.value);
+    const grosoresDisponibles = Array.from(grosorSelect.options).map(opt => opt.value);
 
     const precios = (linea === "Basic") ? basesBasicPrecios : basesPremiumPrecios;
-    
-    Array.from(tamanoSelect.options).forEach(opt => {
-        let precio = precios[grosor][opt.value];
-        opt.text = `${opt.text.split(' - ')[0]} - $${precio}`;
+
+    // ================================================================
+    // OPCIÓN NUCLEAR 1: TAMAÑOS
+    // ================================================================
+    if (instanciasSelect["sel_tamano_base"]) {
+        instanciasSelect["sel_tamano_base"].destroy();
+    }
+    tamanoSelect.innerHTML = "";
+    tamanosDisponibles.forEach(val => {
+        let precio = precios[grosorActual][val];
+        let nuevaOpcion = new Option(`${val} - $${precio}`, val);
+        if (val === tamanoActual) nuevaOpcion.selected = true;
+        tamanoSelect.add(nuevaOpcion);
     });
+    instanciasSelect["sel_tamano_base"] = new Choices(tamanoSelect, { searchEnabled: false, itemSelectText: '', shouldSort: false, position: 'auto' });
 
-    Array.from(grosorSelect.options).forEach(opt => {
-        let precio = precios[opt.value][tamano];
-        opt.text = `${opt.text.split(' - ')[0]} - $${precio}`;
+    // ================================================================
+    // OPCIÓN NUCLEAR 2: GROSORES
+    // ================================================================
+    if (instanciasSelect["sel_grosor_base"]) {
+        instanciasSelect["sel_grosor_base"].destroy();
+    }
+    grosorSelect.innerHTML = "";
+    grosoresDisponibles.forEach(val => {
+        let precio = precios[val][tamanoActual];
+        let nuevaOpcion = new Option(`${val} - $${precio}`, val);
+        if (val === grosorActual) nuevaOpcion.selected = true;
+        grosorSelect.add(nuevaOpcion);
     });
+    instanciasSelect["sel_grosor_base"] = new Choices(grosorSelect, { searchEnabled: false, itemSelectText: '', shouldSort: false, position: 'auto' });
 
-    precioBaseActual = precios[grosor][tamano];
-    document.getElementById("precio_config_base").innerText = `$${precioBaseActual.toFixed(2)} MXN`;
-
-    const selectColor = document.getElementById("sel_color_logo_base");
+    // ================================================================
+    // OPCIÓN NUCLEAR 3: COLORES DE LOGOTIPO
+    // ================================================================
+    if (instanciasSelect["sel_color_logo_base"]) {
+        instanciasSelect["sel_color_logo_base"].destroy();
+    }
     selectColor.innerHTML = "";
     coloresLogotipo[linea].forEach(color => {
-        let option = document.createElement("option");
-        option.value = color; option.text = color.charAt(0).toUpperCase() + color.slice(1);
-        selectColor.add(option);
+        let nuevaOpcion = new Option(color.charAt(0).toUpperCase() + color.slice(1), color);
+        if (color === colorActual) nuevaOpcion.selected = true;
+        selectColor.add(nuevaOpcion);
     });
+    instanciasSelect["sel_color_logo_base"] = new Choices(selectColor, { searchEnabled: false, itemSelectText: '', shouldSort: false, position: 'auto' });
 
-    // Actualizar la capa visual suave
-    sincronizarChoice("sel_tamano_base");
-    sincronizarChoice("sel_grosor_base");
-    sincronizarChoice("sel_color_logo_base");
+    // ================================================================
+    // 4. ACTUALIZACIÓN DEL PRECIO MAESTRO EN PANTALLA
+    // ================================================================
+    precioBaseActual = precios[grosorActual][tamanoActual];
+    document.getElementById("precio_config_base").innerText = `$${precioBaseActual.toFixed(2)} MXN`;
 }
 
 function agregarBaseConfigAlCarrito() {
@@ -222,28 +254,56 @@ function agregarBaseConfigAlCarrito() {
 // ==========================================
 function actualizarConfiguradorCupcakes() {
     const tamanoSelect = document.getElementById("sel_tamano_cupcake");
-    if (!tamanoSelect) return; 
-
     const soporteSelect = document.getElementById("sel_color_soporte");
-    const tamano = tamanoSelect.value;
-    const soporte = soporteSelect.value;
-
-    Array.from(tamanoSelect.options).forEach(opt => {
-        let pBase = cupcakesPreciosBase[opt.value] + cupcakesPreciosSoporte[soporte];
-        opt.text = `${opt.text.split(' - ')[0]} - $${pBase}`;
-    });
     
-    Array.from(soporteSelect.options).forEach(opt => {
-        let pExtra = cupcakesPreciosSoporte[opt.value];
-        let extraTxt = pExtra > 0 ? `(+$${pExtra})` : `(Gratis)`;
-        opt.text = `${opt.text.split(' (')[0]} ${extraTxt}`;
+    if (!tamanoSelect || !soporteSelect) return; 
+
+    // 1. Rescatamos los valores que el cliente tiene seleccionados actualmente
+    const tamanoActual = tamanoSelect.value;
+    const soporteActual = soporteSelect.value;
+
+    // 2. Extraemos los valores puros disponibles (sin los precios viejos)
+    const tamanosDisponibles = Array.from(tamanoSelect.options).map(opt => opt.value);
+    const soportesDisponibles = Array.from(soporteSelect.options).map(opt => opt.value);
+
+    // ================================================================
+    // OPCIÓN NUCLEAR 1: TAMAÑOS
+    // ================================================================
+    if (instanciasSelect["sel_tamano_cupcake"]) {
+        instanciasSelect["sel_tamano_cupcake"].destroy();
+    }
+    tamanoSelect.innerHTML = "";
+    tamanosDisponibles.forEach(val => {
+        // Calculamos el precio base + el extra del soporte seleccionado
+        let pBase = cupcakesPreciosBase[val] + cupcakesPreciosSoporte[soporteActual];
+        let nuevaOpcion = new Option(`${val} - $${pBase}`, val);
+        if (val === tamanoActual) nuevaOpcion.selected = true;
+        tamanoSelect.add(nuevaOpcion);
     });
+    instanciasSelect["sel_tamano_cupcake"] = new Choices(tamanoSelect, { searchEnabled: false, itemSelectText: '', shouldSort: false, position: 'auto' });
 
-    precioCupcakeActual = cupcakesPreciosBase[tamano] + cupcakesPreciosSoporte[soporte];
+    // ================================================================
+    // OPCIÓN NUCLEAR 2: COLORES DE SOPORTE
+    // ================================================================
+    if (instanciasSelect["sel_color_soporte"]) {
+        instanciasSelect["sel_color_soporte"].destroy();
+    }
+    soporteSelect.innerHTML = "";
+    soportesDisponibles.forEach(val => {
+        // Verificamos si el soporte tiene costo extra o es gratis
+        let pExtra = cupcakesPreciosSoporte[val];
+        let extraTxt = pExtra > 0 ? `(+$${pExtra})` : `(Gratis)`;
+        let nuevaOpcion = new Option(`${val} ${extraTxt}`, val);
+        if (val === soporteActual) nuevaOpcion.selected = true;
+        soporteSelect.add(nuevaOpcion);
+    });
+    instanciasSelect["sel_color_soporte"] = new Choices(soporteSelect, { searchEnabled: false, itemSelectText: '', shouldSort: false, position: 'auto' });
+
+    // ================================================================
+    // 3. ACTUALIZACIÓN DEL PRECIO MAESTRO EN PANTALLA
+    // ================================================================
+    precioCupcakeActual = cupcakesPreciosBase[tamanoActual] + cupcakesPreciosSoporte[soporteActual];
     document.getElementById("precio_config_cupcake").innerText = `$${precioCupcakeActual.toFixed(2)} MXN`;
-
-    sincronizarChoice("sel_tamano_cupcake");
-    sincronizarChoice("sel_color_soporte");
 }
 
 function agregarCupcakeConfigAlCarrito() {
