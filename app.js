@@ -20,7 +20,7 @@ const basesPremiumPrecios = {
 };
 
 const coloresLogotipo = {
-    "Basic": ["dorado", "rosa pastel", "rosa mexicano", "azul cielo", "negro", "jade", "tornasol"],
+    "Basic": ["dorado espejo", "tornasol sirena", "rosa espejo", "rosa pastel", "rosa mexicano", "morado", "azul cielo", "jade(verde azulado)", "negro mate"],
     "Premium": ["blanco", "dorado", "negro"]
 };
 
