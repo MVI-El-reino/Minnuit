@@ -276,7 +276,8 @@ function actualizarConfiguradorCupcakes() {
     const tamanoActual = tamanoSelect.value;
     const tieneSoporteActual = tieneSoporteSelect.value;
     const colorActual = soporteSelect.value;
-
+    const soporteActual = soporteSelect.value; 
+    
     const tamanosDisponibles = Array.from(tamanoSelect.options).map(opt => opt.value);
     const soportesDisponibles = Array.from(soporteSelect.options).map(opt => opt.value);
 
