@@ -168,8 +168,8 @@
 </div>
 
                 <div class="controles">
-                    <label for="detalle_pastel1">Anota tu redes / Observacioens:</label>
-                    <input type="text" id="detalle_pastel1" placeholder="Ej. Insta: @minuit, Face Minnuit, Whats 2215836232">
+                    <label for="detalle_pastel1">Anota tus redes / Observacioens:</label>
+                    <input type="text" id="detalle_pastel1" placeholder="Ej. Insta / Face / Whats / Tiktok">
                 </div>
 
                 <br>
@@ -183,8 +183,9 @@
         
         <section id="cajas_cupcakes" class="categoria-seccion">
             <div class="card-producto card-configurador">
-                <h3>Cajas para Cupcakes</h3>
-                <p>Mínimo acumulado: 30 piezas.</p>
+                <h3>Cajas para Cupcakes, galletas y/o postres.</h3>
+                <p>Mínimo de compra: 30 piezas.</p>
+                <p>Combinalas con cajas para pasteles</p>
 
                 <div class="fila-precio-cantidad">
                     <div class="precio-col">
@@ -194,29 +195,38 @@
                     <div class="cantidad-col">
                         <span class="etiqueta-precio">Cantidad</span>
                         <div class="controles-cantidad">
-    <input type="number" id="cant_cupcake_config" value="10" min="1" onchange="validarManual('cant_cupcake_config', 1); actualizarConfiguradorCupcakes()">
-</div>
+                            <input type="number" id="cant_cupcake_config" value="1" min="1" onchange="validarManual('cant_cupcake_config', 1); actualizarConfiguradorCupcakes()">
+                        </div>
                     </div>
                 </div>
+<!--Select capacidad y soporte -->
+<div class="controles-config">
+    <label for="sel_tamano_cupcake">Capacidad:</label>
+    <select id="sel_tamano_cupcake" onchange="actualizarConfiguradorCupcakes()">
+        <option value="22x12x7.5">22 x 12 x 7.5 de alto</option>
+        <option value="31x12x7.5">31 x 12 x 7.5 de alto</option>
+    </select>
+</div>
 
-                <div class="controles-config">
-                    <label for="sel_tamano_cupcake">Capacidad:</label>
-                    <select id="sel_tamano_cupcake" onchange="actualizarConfiguradorCupcakes()">
-                        <option value="2">Para 2 Cupcakes</option>
-                        <option value="4">Para 4 Cupcakes</option>
-                        <option value="6">Para 6 Cupcakes</option>
-                    </select>
-                </div>
+<!--¿Quiere soporte? -->
+<div class="controles-config">
+    <label for="sel_tiene_soporte">Soporte para cupcakes:</label>
+    <select id="sel_tiene_soporte" onchange="actualizarConfiguradorCupcakes()">
+        <option value="No">No, gracias (Solo la caja)</option>
+        <option value="Si">Sí, agregar soporte</option>
+    </select>
+</div>
 
-                <div class="controles-config">
-                    <label for="sel_color_soporte">Color del Soporte Interno:</label>
-                    <select id="sel_color_soporte" onchange="actualizarConfiguradorCupcakes()">
-                        <option value="Blanco">Blanco (Gratis)</option>
-                        <option value="Kraft">Kraft Ecológico (Gratis)</option>
-                        <option value="Dorado">Dorado Metálico</option>
-                        <option value="Rosa">Rosa Minuit</option>
-                    </select>
-                </div>
+<!-- MENÚ DE COLOR (Oculto por defecto) -->
+<div class="controles-config" id="contenedor_color_soporte" style="display: none; margin-top: 15px;">
+    <label for="sel_color_soporte">Color del Soporte Interno:</label>
+    <select id="sel_color_soporte" onchange="actualizarConfiguradorCupcakes()">
+        <option value="Blanco">Blanco (Gratis)</option>
+        <option value="Kraft">Kraft Ecológico (Gratis)</option>
+        <option value="Dorado">Dorado Metálico</option>
+        <option value="Rosa">Rosa Minuit</option>
+    </select>
+</div>
 
                 <br>
                 <button class="btn-agregar" onclick="agregarCupcakeConfigAlCarrito()">Agregar al Carrito</button>
