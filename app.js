@@ -253,16 +253,30 @@ function agregarBaseConfigAlCarrito() {
 // LÓGICA DE CAJAS CUPCAKES
 // ==========================================
 function actualizarConfiguradorCupcakes() {
-    const tamanoSelect = document.getElementById("sel_tamano_cupcake");
-    const soporteSelect = document.getElementById("sel_color_soporte");
     
-    if (!tamanoSelect || !soporteSelect) return; 
+    const tamanoSelect = document.getElementById("sel_tamano_cupcake");
+    const tieneSoporteSelect = document.getElementById("sel_tiene_soporte"); // El nuevo interruptor
+    const colorSelect = document.getElementById("sel_color_soporte"); // El menú de colores
 
-    // 1. Rescatamos los valores que el cliente tiene seleccionados actualmente
+    if (!tamanoSelect || !tieneSoporteSelect || !colorSelect) return; 
+
+    // ================================================================
+    // Mostrar u ocultar el menú de colores
+    // ================================================================
+    const contenedorColorSoporte = document.getElementById("contenedor_color_soporte");
+    if (tieneSoporteSelect.value === "Si") {
+        contenedorColorSoporte.style.display = "block";
+    } else {
+        contenedorColorSoporte.style.display = "none";
+    }
+
+    // ================================================================
+    // EL CÓDIGO QUE ME MANDASTE: Rescate para la opción nuclear
+    // ================================================================
     const tamanoActual = tamanoSelect.value;
-    const soporteActual = soporteSelect.value;
+    const tieneSoporteActual = tieneSoporteSelect.value;
+    const colorActual = colorSelect.value;
 
-    // 2. Extraemos los valores puros disponibles (sin los precios viejos)
     const tamanosDisponibles = Array.from(tamanoSelect.options).map(opt => opt.value);
     const soportesDisponibles = Array.from(soporteSelect.options).map(opt => opt.value);
 
