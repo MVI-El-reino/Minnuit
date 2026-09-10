@@ -258,7 +258,7 @@ function actualizarConfiguradorCupcakes() {
     const tieneSoporteSelect = document.getElementById("sel_tiene_soporte"); // El nuevo interruptor
     const soporteSelect = document.getElementById("sel_color_soporte"); // El menú de colores
 
-    if (!tamanoSelect || !tieneSoporteSelect || !colorSelect) return; 
+    if (!tamanoSelect || !tieneSoporteSelect || !soporteSelect) return; 
 
     // ================================================================
     // Mostrar u ocultar el menú de colores
