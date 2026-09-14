@@ -273,8 +273,40 @@
         </div>
     </div>
 
+
+<!-- Modal de Datos del Cliente (Oculto por defecto) -->
+<div id="modal-datos" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow: auto;">
+    <div class="modal-content" style="background: #fdf0f4; border: 2px solid #fce4ec; margin: 10% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 12px; position: relative;">
+        
+        <span class="close" onclick="cerrarModalDatos()" style="position: absolute; right: 15px; top: 10px; font-size: 24px; font-weight: bold; cursor: pointer; color: #e87b9e;">&times;</span>
+        
+        <h3 style="text-align: center; color: #e87b9e; margin-top: 5px; margin-bottom: 10px;">✨ TUS DATOS ✨</h3>
+        <p style="font-size: 0.8rem; color: #4a3b40; text-align: center; margin-bottom: 15px;">Es muy importante que tus datos estén completos y correctos para hacerte el envío de ser necesario 🚚</p>
+        
+        <input type="text" id="nombre_cliente" placeholder=" Nombre completo *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="tel" id="tel_cliente" placeholder=" # Telefónico *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+            <input type="email" id="correo_cliente" placeholder="Correo electrónico" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="text" id="marca_cliente" placeholder="Nombre de tu marca" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+            <input type="text" id="ig_cliente" placeholder="Usuario de Instagram" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        </div>
+
+        <textarea id="direccion_cliente" rows="3" placeholder="Dirección completa * (Calle, Num, Colonia, C.P, Ciudad, Estado, Referencias 🙏🏻)" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box; resize: none;"></textarea>
+
+        <!-- El Botón Definitivo -->
+        <button id="btn_finalizar_pedido" class="btn-pedido" onclick="procesarPedido()" style="width: 100%; background: #e87b9e; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem;">✅ Confirmar y Enviar Pedido</button>
+    </div>
+</div>
+
+    
     <div id="toast-container"></div>
 
     <script src="app.js"></script>
+
+    
 </body>
 </html>
