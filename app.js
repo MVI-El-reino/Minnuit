@@ -603,7 +603,8 @@ async function procesarPedido() {
     let direccionCliente = document.getElementById("direccion_cliente").value.trim();
 
     if (!nombreCliente || !telCliente || !direccionCliente) {
-        return mostrarAlerta("⚠️ Por favor, llena tu Nombre, Teléfono y Dirección para el envío.");
+        abrirModalDatos();
+        return mostrarAlerta("⚠️ Por favor llena tus datos antes de enviar.");
     }
     if (carrito.length === 0) return mostrarAlerta("🛒 Tu carrito está vacío.");
 
