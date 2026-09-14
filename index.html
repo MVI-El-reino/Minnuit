@@ -262,8 +262,9 @@
             <span class="cerrar" onclick="cerrarModal()">&times;</span>
             <h2>Tu Pedido Minuit</h2>
             <div class="input-cliente">
-                <label for="nombre_cliente">Tu Nombre:</label>
-                <input type="text" id="nombre_cliente" placeholder="Escribe tu nombre">
+                <button type="button" onclick="abrirModalDatos()" style="width: 100%; padding: 12px; background: #fdf0f4; border: 2px dashed #e87b9e; border-radius: 8px; color: #e87b9e; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 1rem;">
+    📝 Llenar mis datos
+</button>
             </div>
             
             <ul id="lista-carrito"></ul>
@@ -274,31 +275,31 @@
     </div>
 
 
-<!-- Modal de Datos del Cliente (Oculto por defecto) -->
-<div id="modal-datos" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow: auto;">
-    <div class="modal-content" style="background: #fdf0f4; border: 2px solid #fce4ec; margin: 10% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 12px; position: relative;">
+<div id="modal-datos" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+    <div style="background: #fff; margin: 10% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 12px; position: relative;">
+        <span onclick="cerrarModalDatos()" style="position: absolute; right: 15px; top: 10px; font-size: 24px; color: #e87b9e; cursor: pointer; font-weight: bold;">&times;</span>
+        <h3 style="text-align: center; color: #e87b9e; margin-top: 0;">✨ TUS DATOS ✨</h3>
         
-        <span class="close" onclick="cerrarModalDatos()" style="position: absolute; right: 15px; top: 10px; font-size: 24px; font-weight: bold; cursor: pointer; color: #e87b9e;">&times;</span>
-        
-        <h3 style="text-align: center; color: #e87b9e; margin-top: 5px; margin-bottom: 10px;">✨ TUS DATOS ✨</h3>
-        <p style="font-size: 0.8rem; color: #4a3b40; text-align: center; margin-bottom: 15px;">Es muy importante que tus datos estén completos y correctos para hacerte el envío de ser necesario 🚚</p>
-        
-        <input type="text" id="nombre_cliente" placeholder=" Nombre completo *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <input type="tel" id="tel_cliente" placeholder=" # Telefónico *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-            <input type="email" id="correo_cliente" placeholder="Correo electrónico" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-        </div>
+        <input type="text" id="nombre_cliente" placeholder="Nombre completo *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        <input type="tel" id="tel_cliente" placeholder=" # Telefónico *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        <input type="text" id="marca_cliente" placeholder=" Nombre de tu marca" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        <input type="text" id="ig_cliente" placeholder=" Usuario de Instagram" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        <input type="email" id="correo_cliente" placeholder=" Correo electrónico" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        <textarea id="direccion_cliente" rows="3" placeholder=" Dirección completa * (Calle, Colonia, C.P, Ciudad, Referencias)" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box; resize: none;"></textarea>
 
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <input type="text" id="marca_cliente" placeholder="Nombre de tu marca" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-            <input type="text" id="ig_cliente" placeholder="Usuario de Instagram" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-        </div>
+        <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40;">🚚 Envío:</label>
+        <select id="sel_entrega" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px;">
+            <option value="0">Recoger / Acordar con Minuit</option>
+            <option value="300">Envío Nacional (+$300.00 MXN)</option>
+        </select>
+        
+        <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40;">💳 Pago:</label>
+        <select id="sel_pago" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px;">
+            <option value="Transferencia">Transferencia Bancaria (Sin comisión)</option>
+            <option value="Tarjeta">Tarjeta / PayPal (+5% de comisión)</option>
+        </select>
 
-        <textarea id="direccion_cliente" rows="3" placeholder="Dirección completa * (Calle, Num, Colonia, C.P, Ciudad, Estado, Referencias 🙏🏻)" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box; resize: none;"></textarea>
-
-        <!-- El Botón Definitivo -->
-        <button id="btn_finalizar_pedido" class="btn-pedido" onclick="procesarPedido()" style="width: 100%; background: #e87b9e; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem;">✅ Confirmar y Enviar Pedido</button>
+        <button type="button" onclick="cerrarModalDatos()" style="width: 100%; background: #e87b9e; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">Guardar Datos</button>
     </div>
 </div>
 
