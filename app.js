@@ -582,9 +582,8 @@ function abrirModal() {
 function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
-
 // ==========================================
-// GENERACIÓN DEL PDF NATIVO Y WHATSAPP
+// GENERACIÓN DEL PDF NATIVO Y GOOGLE DRIVE
 // ==========================================
 async function procesarPedido() {
     let nombreCliente = document.getElementById("nombre_cliente").value.trim();
@@ -595,7 +594,9 @@ async function procesarPedido() {
     document.querySelector(".btn-pedido").disabled = true;
 
     let totalTxt = document.getElementById("modal-total").innerText;
-    let textoWhatsApp = `✨ *¡Hola Minuit!* ✨\n\nSoy ${nombreCliente}, acabo de finalizar mi pedido en tu página por ${totalTxt}.\n\nAquí te adjuntaré mi PDF y quedo a la espera de los datos para la transferencia.`;
+    
+    // Armamos el texto base para WhatsApp
+    let textoWhatsApp = `✨ *¡Hola Minuit!* ✨\n\nSoy ${nombreCliente}, acabo de finalizar mi pedido en tu página por ${totalTxt}.\n\nQuedo a la espera de los datos para la transferencia.`;
 
     try {
         const { jsPDF } = window.jspdf;
@@ -665,11 +666,7 @@ async function procesarPedido() {
 
         pdf.setTextColor(...COLOR_TEXTO);
         
-        let resumenTelegram = `📦 *NUEVO PEDIDO EN WEB*\n👤 Cliente: ${nombreCliente}\n💰 Total: ${totalTxt}\n\n*Artículos:*\n`;
-
         carrito.forEach(item => {
-            resumenTelegram += `▪️ ${item.cantidad}x ${item.nombre}\n`;
-
             if (y > 260) {
                 pdf.addPage();
                 y = 20;
@@ -733,29 +730,56 @@ async function procesarPedido() {
         pdf.text("Contacto WA: " + numeroDueno, 105, 295, { align: "center" });
 
         const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
-        pdf.save(nombreArchivo);
 
-        if (TELEGRAM_BOT_TOKEN && !TELEGRAM_BOT_TOKEN.includes("AQUI")) {
-            const pdfBlob = pdf.output('blob');
-            const formData = new FormData();
-            formData.append('chat_id', TELEGRAM_CHAT_ID);
-            formData.append('document', pdfBlob, nombreArchivo);
-            formData.append('caption', resumenTelegram);
+        // =========================================================
+        // LA BÓVEDA SECRETA: SUBIR A GOOGLE DRIVE 
+        // =========================================================
+        mostrarAlerta("☁️ Asegurando pedido en la nube...");
+        
+        // Convertimos el PDF a texto Base64
+        const pdfBase64 = pdf.output('datauristring');
+        
+        // Tu puente oficial a Apps Script
+        const urlGoogleScript = "https://script.google.com/macros/s/AKfycbw_RFDbSPc0tZNODZ2cltlC26DtKGciqqkkrLvhHSeg-NkyJ-CfpaQiMbfS0ftjHa77-A/exec";
 
-            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`, {
-                method: 'POST', body: formData
-            }).then(() => abrirWhatsAppYLimpiar(textoWhatsApp))
-              .catch(() => abrirWhatsAppYLimpiar(textoWhatsApp));
+        const respuesta = await fetch(urlGoogleScript, {
+            method: 'POST',
+            body: JSON.stringify({
+                nombreArchivo: nombreArchivo,
+                base64: pdfBase64
+            })
+        });
+
+        const resultado = await respuesta.json();
+
+        if (resultado.estatus === 'exito') {
+            // ÉXITO: El archivo está seguro. Agregamos el link al texto de WhatsApp.
+            textoWhatsApp += `\n\n📁 *Aquí está mi recibo seguro para tu registro:*\n${resultado.urlDrive}`;
+            
+            // Le descargamos su copia local de cortesía al cliente
+            pdf.save(nombreArchivo);
+            
+            mostrarAlerta("✅ ¡Pedido asegurado con éxito!");
         } else {
-            abrirWhatsAppYLimpiar(textoWhatsApp);
+            // FALLO DE LA NUBE: Si falla el script, aplicamos la de seguridad
+            console.error("Error Drive:", resultado.mensaje);
+            mostrarAlerta("⚠️ Ocurrió un detalle al subir. Abriendo WhatsApp normal...");
+            pdf.save(nombreArchivo); // Descargamos el archivo normal
         }
+
+        // Finalmente, disparamos a WhatsApp en cualquiera de los dos casos
+        abrirWhatsAppYLimpiar(textoWhatsApp);
+
     } catch (error) {
-        console.error("Error PDF:", error);
-        alert("Ocurrió un error al generar el PDF.");
+        console.error("Error al procesar el pedido:", error);
+        alert("Ocurrió un error general al generar el PDF o conectarse a la nube.");
         document.querySelector(".btn-pedido").disabled = false;
     }
 }
 
+// ====================================================================
+// La función de WhatsApp que tenías abajo se queda igual
+// ====================================================================
 function abrirWhatsAppYLimpiar(textoWhatsApp) {
     setTimeout(() => {
         let textoCodificado = encodeURIComponent(textoWhatsApp);
