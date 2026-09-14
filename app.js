@@ -586,17 +586,33 @@ function cerrarModal() {
 // GENERACIÓN DEL PDF NATIVO Y GOOGLE DRIVE
 // ==========================================
 async function procesarPedido() {
+    // 1. Recolección y validación de datos
     let nombreCliente = document.getElementById("nombre_cliente").value.trim();
-    if (!nombreCliente) return mostrarAlerta("✏️ Por favor, escribe tu nombre.");
+    let telCliente = document.getElementById("tel_cliente").value.trim();
+    let correoCliente = document.getElementById("correo_cliente").value.trim() || "No especificado";
+    let marcaCliente = document.getElementById("marca_cliente").value.trim() || "N/A";
+    let igCliente = document.getElementById("ig_cliente").value.trim() || "N/A";
+    let direccionCliente = document.getElementById("direccion_cliente").value.trim();
+
+    if (!nombreCliente || !telCliente || !direccionCliente) {
+        return mostrarAlerta("⚠️ Por favor, llena tu Nombre, Teléfono y Dirección para el envío.");
+    }
     if (carrito.length === 0) return mostrarAlerta("🛒 Tu carrito está vacío.");
 
     mostrarAlerta("⏳ Generando nota de pedido...");
     document.querySelector(".btn-pedido").disabled = true;
 
+    // Rescatamos los cálculos de envío y comisión
     let totalTxt = document.getElementById("modal-total").innerText;
-    
-    // Armamos el texto base para WhatsApp
-    let textoWhatsApp = `✨ *¡Hola Minuit!* ✨\n\nSoy ${nombreCliente}, acabo de finalizar mi pedido en tu página por ${totalTxt}.\n\nQuedo a la espera de los datos para la transferencia.`;
+    let datosTotal = document.getElementById("modal-total").dataset;
+    let valSubtotal = parseFloat(datosTotal.subtotal || 0);
+    let valEnvio = parseFloat(datosTotal.envio || 0);
+    let valComision = parseFloat(datosTotal.comision || 0);
+    let metodoPagoTexto = datosTotal.metodopago || "Transferencia";
+    let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger/Acordar";
+
+    // 2. Plantilla exacta de WhatsApp solicitada por Ely
+    let textoWhatsApp = `Hola chul@ mi nombre es Ely 🫶🏻 y estoy para servirte!! Mil gracias por contactarnos💕✨ Aquí están los datos de mi pedido:\n\n✨ TUS DATOS ✨\n💕 *Nombre completo:* ${nombreCliente}\n💕 *# Telefónico:* ${telCliente}\n💕 *Nombre de tu marca:* ${marcaCliente}\n💕 *Usuario de Instagram:* ${igCliente}\n💕 *Dirección completa:* ${direccionCliente}\n💕 *Correo electrónico:* ${correoCliente}\n\n📦 *ENTREGA:* ${tipoEntrega}\n💳 *PAGO:* ${metodoPagoTexto}\n💰 *TOTAL A PAGAR: ${totalTxt}*\n`;
 
     try {
         const { jsPDF } = window.jspdf;
@@ -606,6 +622,7 @@ async function procesarPedido() {
         const COLOR_FONDO = [253, 240, 244];
         const COLOR_TEXTO = [74, 59, 64];
 
+        // --- ENCABEZADO Y LOGO ---
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, 210, 35, "F");
 
@@ -613,19 +630,16 @@ async function procesarPedido() {
         canvasLogo.width = 500;
         canvasLogo.height = 150;
         const ctx = canvasLogo.getContext("2d");
-
         const gradiente = ctx.createLinearGradient(0, 0, 500, 150);
         gradiente.addColorStop(0, "#f48fb1");
         gradiente.addColorStop(1, "#e16b90");
-
         ctx.font = "bold 130px 'Dancing Script', cursive";
         ctx.fillStyle = gradiente;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("Minuit", 250, 75);
-
-        const logoGenerado = canvasLogo.toDataURL("image/png");
-        pdf.addImage(logoGenerado, "PNG", 70, 5, 70, 21);
+        
+        pdf.addImage(canvasLogo.toDataURL("image/png"), "PNG", 70, 5, 70, 21);
 
         pdf.setTextColor(158, 127, 138); 
         pdf.setFont("helvetica", "bold");
@@ -634,26 +648,42 @@ async function procesarPedido() {
 
         pdf.setDrawColor(240, 220, 227); 
         pdf.setLineWidth(0.5);
-        pdf.line(15, 38, 195, 38);
+        pdf.line(15, 35, 195, 35);
 
+        // --- CAJA DE DATOS DEL CLIENTE AMPLIADA ---
         pdf.setFillColor(...COLOR_FONDO);
-        pdf.roundedRect(15, 45, 180, 28, 4, 4, "F");
+        pdf.roundedRect(15, 38, 180, 32, 4, 4, "F"); // Caja más alta
         pdf.setTextColor(...COLOR_TEXTO);
-        pdf.setFontSize(11);
-        pdf.setFont("helvetica", "bold");
-        pdf.text("Cliente:", 20, 56);
-        pdf.setFont("helvetica", "normal");
-        pdf.text(nombreCliente, 45, 56);
-        pdf.setFont("helvetica", "bold");
-        pdf.text("Fecha:", 20, 66);
-        pdf.setFont("helvetica", "normal");
-        pdf.text(new Date().toLocaleDateString("es-MX"), 45, 66);
-        pdf.setFont("helvetica", "bold");
-        pdf.text("Estado:", 120, 56);
-        pdf.setFont("helvetica", "normal");
-        pdf.text("Por transferir", 145, 56);
+        pdf.setFontSize(9);
+        
+        // Columna 1
+        pdf.setFont("helvetica", "bold"); pdf.text("Cliente:", 20, 44);
+        pdf.setFont("helvetica", "normal"); pdf.text(nombreCliente, 40, 44);
+        
+        pdf.setFont("helvetica", "bold"); pdf.text("Teléfono:", 20, 49);
+        pdf.setFont("helvetica", "normal"); pdf.text(telCliente, 40, 49);
+        
+        pdf.setFont("helvetica", "bold"); pdf.text("Marca/IG:", 20, 54);
+        pdf.setFont("helvetica", "normal"); pdf.text(`${marcaCliente} | ${igCliente}`, 40, 54);
+        
+        // Columna 2
+        pdf.setFont("helvetica", "bold"); pdf.text("Fecha:", 115, 44);
+        pdf.setFont("helvetica", "normal"); pdf.text(new Date().toLocaleDateString("es-MX"), 135, 44);
+        
+        pdf.setFont("helvetica", "bold"); pdf.text("Entrega:", 115, 49);
+        pdf.setFont("helvetica", "normal"); pdf.text(tipoEntrega, 135, 49);
+        
+        pdf.setFont("helvetica", "bold"); pdf.text("Pago:", 115, 54);
+        pdf.setFont("helvetica", "normal"); pdf.text(metodoPagoTexto, 135, 54);
 
-        let y = 90;
+        // Dirección abarcando el ancho inferior de la caja
+        pdf.setFont("helvetica", "bold"); pdf.text("Dirección:", 20, 61);
+        pdf.setFont("helvetica", "normal");
+        let lineasDir = pdf.splitTextToSize(direccionCliente, 150);
+        pdf.text(lineasDir, 40, 61);
+
+        // --- TABLA DE PRODUCTOS ---
+        let y = 76; // Bajamos el inicio de la tabla
         pdf.setFillColor(...COLOR_PRINCIPAL);
         pdf.rect(15, y, 180, 10, "F");
         pdf.setTextColor(255, 255, 255);
@@ -667,7 +697,7 @@ async function procesarPedido() {
         pdf.setTextColor(...COLOR_TEXTO);
         
         carrito.forEach(item => {
-            if (y > 260) {
+            if (y > 230) {
                 pdf.addPage();
                 y = 20;
                 pdf.setFillColor(...COLOR_PRINCIPAL);
@@ -701,78 +731,98 @@ async function procesarPedido() {
             y += 5;
         });
 
+        // --- CÁLCULOS FINALES Y DESGLOSE ---
         y += 5;
+        if (y > 220) { pdf.addPage(); y = 30; }
+
         pdf.setFillColor(...COLOR_FONDO);
-        pdf.roundedRect(110, y, 85, 22, 4, 4, "F");
+        pdf.roundedRect(100, y, 95, valComision > 0 ? 38 : 32, 4, 4, "F");
+        
+        pdf.setTextColor(...COLOR_TEXTO);
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "normal");
+        
+        let yDesglose = y + 8;
+        pdf.text("Subtotal artículos:", 105, yDesglose);
+        pdf.text("$" + valSubtotal.toFixed(2), 190, yDesglose, { align: "right" });
+        
+        yDesglose += 7;
+        pdf.text("Envío Nacional:", 105, yDesglose);
+        pdf.text("$" + valEnvio.toFixed(2), 190, yDesglose, { align: "right" });
+        
+        if (valComision > 0) {
+            yDesglose += 7;
+            pdf.text("Comisión Tarjeta (5%):", 105, yDesglose);
+            pdf.text("$" + valComision.toFixed(2), 190, yDesglose, { align: "right" });
+        }
+
+        yDesglose += 9;
         pdf.setFont("helvetica", "bold");
         pdf.setTextColor(...COLOR_PRINCIPAL);
         pdf.setFontSize(12);
-        pdf.text("TOTAL A PAGAR", 152, y + 8, { align: "center" });
-        pdf.setFontSize(18);
-        pdf.text(totalTxt, 152, y + 17, { align: "center" });
+        pdf.text("TOTAL A PAGAR:", 105, yDesglose);
+        pdf.setFontSize(14);
+        pdf.text(totalTxt, 190, yDesglose, { align: "right" });
 
+        // --- TÉRMINOS Y CONDICIONES (Las reglas de Ely) ---
+        let yTerminos = y + 10;
+        pdf.setTextColor(120, 120, 120);
+        pdf.setFontSize(8);
+        pdf.setFont("helvetica", "bold");
+        pdf.text("TÉRMINOS DEL PEDIDO:", 15, yTerminos);
+        pdf.setFont("helvetica", "normal");
+        
+        let terminos = [
+            "• Se requiere el pago del monto total para poder agendar tu pedido.",
+            "• Tiempo de elaboración: 2 a 3 semanas + 2 a 3 días de envío.",
+            "• Si el envío marca un costo excedente al generar la guía, se notificará para cubrir la diferencia.",
+            "• Precios no incluyen IVA. Si deseas factura, se agregará el impuesto correspondiente."
+        ];
+        
+        terminos.forEach(linea => {
+            yTerminos += 5;
+            let textoDividido = pdf.splitTextToSize(linea, 80); 
+            pdf.text(textoDividido, 15, yTerminos);
+            yTerminos += (textoDividido.length - 1) * 4; 
+        });
+
+        // --- PIE DE PÁGINA ---
         pdf.setDrawColor(240, 220, 227); 
         pdf.setLineWidth(0.5);
-        pdf.line(20, 278, 190, 278); 
+        pdf.line(20, 275, 190, 275); 
 
         pdf.setTextColor(74, 59, 64);
         pdf.setFontSize(11);
         pdf.setFont("helvetica", "bold");
-        pdf.text("¡Gracias por tu compra en Minuit!", 105, 285, { align: "center" });
-
-        pdf.setTextColor(140, 140, 140);
-        pdf.setFontSize(9);
-        pdf.setFont("helvetica", "normal");
-        pdf.text("Conserva este comprobante para futuras referencias.", 105, 290, { align: "center" });
-
+        pdf.text("¡Gracias por tu compra en Minuit!", 105, 283, { align: "center" });
         pdf.setTextColor(232, 123, 158);
         pdf.setFont("helvetica", "italic");
-        pdf.text("Contacto WA: " + numeroDueno, 105, 295, { align: "center" });
+        pdf.setFontSize(9);
+        pdf.text("Contacto WA: " + numeroDueno, 105, 289, { align: "center" });
 
         const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
 
         // =========================================================
-        // LA BÓVEDA SECRETA: SUBIR A GOOGLE DRIVE 
+        // SUBIR A GOOGLE DRIVE 
         // =========================================================
-        mostrarAlerta("☁️ Asegurando pedido en la nube...");
-        
-        // Convertimos el PDF a texto Base64
         const pdfBase64 = pdf.output('datauristring');
-        
-        // Tu puente oficial a Apps Script
         const urlGoogleScript = "https://script.google.com/macros/s/AKfycbw_RFDbSPc0tZNODZ2cltlC26DtKGciqqkkrLvhHSeg-NkyJ-CfpaQiMbfS0ftjHa77-A/exec";
 
         const respuesta = await fetch(urlGoogleScript, {
             method: 'POST',
-            // 👇 AGREGA ESTAS 3 LÍNEAS NUEVAS 👇
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-            },
-            // 👆 HASTA AQUÍ 👆
-            body: JSON.stringify({
-                nombreArchivo: nombreArchivo,
-                base64: pdfBase64
-            })
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ nombreArchivo: nombreArchivo, base64: pdfBase64 })
         });
 
         const resultado = await respuesta.json();
 
         if (resultado.estatus === 'exito') {
-            // ÉXITO: El archivo está seguro. Agregamos el link al texto de WhatsApp.
-            textoWhatsApp += `\n\n📁 *Aquí está mi recibo seguro para tu registro:*\n${resultado.urlDrive}`;
-            
-            // Le descargamos su copia local de cortesía al cliente
-            pdf.save(nombreArchivo);
-            
-            mostrarAlerta("✅ ¡Pedido asegurado con éxito!");
+            textoWhatsApp += `\n📁 *Descarga el PDF de registro aquí:*\n👉 ${resultado.urlDrive}`;
+            pdf.save(nombreArchivo); 
         } else {
-            // FALLO DE LA NUBE: Si falla el script, aplicamos la de seguridad
-            console.error("Error Drive:", resultado.mensaje);
-            mostrarAlerta("⚠️ Ocurrió un detalle al subir. Abriendo WhatsApp normal...");
-            pdf.save(nombreArchivo); // Descargamos el archivo normal
+            pdf.save(nombreArchivo); 
         }
 
-        // Finalmente, disparamos a WhatsApp en cualquiera de los dos casos
         abrirWhatsAppYLimpiar(textoWhatsApp);
 
     } catch (error) {
@@ -783,7 +833,7 @@ async function procesarPedido() {
 }
 
 // ====================================================================
-// La función de WhatsApp que tenías abajo se queda igual
+// La función de WhatsApp
 // ====================================================================
 function abrirWhatsAppYLimpiar(textoWhatsApp) {
     setTimeout(() => {
