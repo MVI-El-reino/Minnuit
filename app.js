@@ -744,6 +744,11 @@ async function procesarPedido() {
 
         const respuesta = await fetch(urlGoogleScript, {
             method: 'POST',
+            // 👇 AGREGA ESTAS 3 LÍNEAS NUEVAS 👇
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+            // 👆 HASTA AQUÍ 👆
             body: JSON.stringify({
                 nombreArchivo: nombreArchivo,
                 base64: pdfBase64
