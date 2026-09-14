@@ -582,6 +582,14 @@ function abrirModal() {
 function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
+function abrirModalDatos() {
+    if(carrito.length === 0) return mostrarAlerta("🛍️ Tu carrito está vacío.");
+    document.getElementById("modal-datos").style.display = "block";
+}
+
+function cerrarModalDatos() {
+    document.getElementById("modal-datos").style.display = "none";
+}
 // ==========================================
 // GENERACIÓN DEL PDF NATIVO Y GOOGLE DRIVE
 // ==========================================
@@ -832,17 +840,24 @@ async function procesarPedido() {
     }
 }
 
-// ====================================================================
-// La función de WhatsApp
-// ====================================================================
 function abrirWhatsAppYLimpiar(textoWhatsApp) {
-    setTimeout(() => {
-        let textoCodificado = encodeURIComponent(textoWhatsApp);
-        window.open(`https://wa.me/${numeroDueno}?text=${textoCodificado}`, '_blank');
-        carrito = [];
-        actualizarVistaCarrito();
-        cerrarModal();
-        document.getElementById("nombre_cliente").value = "";
-        document.querySelector(".btn-pedido").disabled = false;
-    }, 800);
+    let textoCodificado = encodeURIComponent(textoWhatsApp);
+    let linkWhatsApp = `https://wa.me/${numeroDueno}?text=${textoCodificado}`;
+
+    carrito = [];
+    actualizarVistaCarrito();
+    cerrarModal();          // Cierra el carrito
+    cerrarModalDatos();     // Cierra el formulario de datos
+    
+    // Limpieza de campos
+    document.getElementById("nombre_cliente").value = "";
+    document.getElementById("tel_cliente").value = "";
+    document.getElementById("direccion_cliente").value = "";
+    
+    // Reactivamos el botón por si quieren hacer otro pedido
+    if(document.getElementById("btn_finalizar_pedido")) {
+        document.getElementById("btn_finalizar_pedido").disabled = false;
+    }
+
+    window.location.href = linkWhatsApp;
 }
