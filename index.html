@@ -234,25 +234,9 @@
         </section>
     </main>
 
-    <!-- Módulo de Datos del Cliente y Envío -->
+    <!-- Módulo de Envío y Pago (Siempre visible en el carrito) -->
 <div style="background: var(--fondo-app, #fdf0f4); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #fce4ec; font-size: 0.9rem;">
-    <h3 style="text-align: center; color: var(--rosa-principal, #e87b9e); margin-top: 0; margin-bottom: 15px;">✨ TUS DATOS ✨</h3>
-    
-    <input type="text" id="nombre_cliente" placeholder="Nombre completo" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-    
-    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-        <input type="tel" id="tel_cliente" placeholder="💕 # Telefónico" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-        <input type="text" id="correo_cliente" placeholder="Correo electrónico" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-    </div>
-
-    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-        <input type="text" id="marca_cliente" placeholder="Nombre de tu marca" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-        <input type="text" id="ig_cliente" placeholder="Usuario de Instagram" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-    </div>
-
-    <textarea id="direccion_cliente" rows="3" placeholder="Dirección completa (Calle, Num, Colonia, C.P, Ciudad, Estado y Referencias 🙏🏻)" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box; resize: none;"></textarea>
-
-    <label style="display:block; font-weight: 700; color: #4a3b40; margin-bottom: 5px;">Método de Entrega:</label>
+    <label style="display:block; font-weight: 700; color: #4a3b40; margin-bottom: 5px;">🚚 Método de Entrega:</label>
     <select id="sel_entrega" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; background: white;">
         <option value="0">Recoger / Acordar con Minuit</option>
         <option value="300">Envío Nacional (+$300.00 MXN)</option>
@@ -264,6 +248,9 @@
         <option value="Tarjeta">Tarjeta / PayPal (+5% de comisión)</option>
     </select>
 </div>
+
+<!-- OJO: Reemplaza tu botón actual de "Hacer Pedido" por este nuevo que abre el formulario -->
+<button class="btn-pedido" onclick="abrirModalDatos()" style="width: 100%; margin-top: 10px;">📝 Llenar Datos y Continuar</button>
 
     <div id="fab-carrito" onclick="abrirModal()">
         <span>🛒 Ver Pedido</span>
