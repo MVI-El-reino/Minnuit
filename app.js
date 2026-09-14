@@ -590,6 +590,15 @@ function abrirModalDatos() {
 function cerrarModalDatos() {
     document.getElementById("modal-datos").style.display = "none";
 }
+function mostrarTerminosEnvio() {
+    alert(
+        "🚚 TÉRMINOS DE ENVÍO Y ELABORACIÓN 🚚\n\n" +
+        "• El pago de $300 cubre el envío estándar. Si al momento de generar tu guía el sistema marca un costo excedente (zona extendida o sobrepeso), te avisaremos para cubrir la diferencia antes del envío.\n\n" +
+        "• Tiempo de elaboración: 2 a 3 semanas.\n" +
+        "• Tiempo de trayecto (paquetería): 2 a 3 días hábiles adicionales.\n\n" +
+        "• Recuerda: Se requiere el pago del monto total para poder agendar tu pedido en nuestro calendario. ✨"
+    );
+}
 // ==========================================
 // GENERACIÓN DEL PDF NATIVO Y GOOGLE DRIVE
 // ==========================================
