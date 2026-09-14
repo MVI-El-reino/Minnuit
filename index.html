@@ -234,24 +234,6 @@
         </section>
     </main>
 
-    <!-- Módulo de Envío y Pago (Siempre visible en el carrito) -->
-<div style="background: var(--fondo-app, #fdf0f4); padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #fce4ec; font-size: 0.9rem;">
-    <label style="display:block; font-weight: 700; color: #4a3b40; margin-bottom: 5px;">🚚 Método de Entrega:</label>
-    <select id="sel_entrega" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; background: white;">
-        <option value="0">Recoger / Acordar con Minuit</option>
-        <option value="300">Envío Nacional (+$300.00 MXN)</option>
-    </select>
-
-    <label style="display:block; font-weight: 700; color: #4a3b40; margin-bottom: 5px;">💳 Forma de Pago:</label>
-    <select id="sel_pago" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; background: white;">
-        <option value="Transferencia">Transferencia Bancaria (Sin comisión)</option>
-        <option value="Tarjeta">Tarjeta / PayPal (+5% de comisión)</option>
-    </select>
-</div>
-
-<!-- OJO: Reemplaza tu botón actual de "Hacer Pedido" por este nuevo que abre el formulario -->
-<button class="btn-pedido" onclick="abrirModalDatos()" style="width: 100%; margin-top: 10px;">📝 Llenar Datos y Continuar</button>
-
     <div id="fab-carrito" onclick="abrirModal()">
         <span>🛒 Ver Pedido</span>
         <span id="fab-total">$0.00 MXN</span>
@@ -287,7 +269,10 @@
         <input type="email" id="correo_cliente" placeholder=" Correo electrónico" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
         <textarea id="direccion_cliente" rows="3" placeholder=" Dirección completa * (Calle, Colonia, C.P, Ciudad, Referencias)" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box; resize: none;"></textarea>
 
-        <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40;">🚚 Envío:</label>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+    <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40; margin: 0;">🚚 Envío:</label>
+    <button type="button" onclick="mostrarTerminosEnvio()" style="background: #e87b9e; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(232, 123, 158, 0.3);">!</button>
+</div>
         <select id="sel_entrega" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px;">
             <option value="0">Recoger / Acordar con Minuit</option>
             <option value="300">Envío Nacional (+$300.00 MXN)</option>
