@@ -313,7 +313,10 @@
         <span onclick="cerrarModalDireccion()" style="position: absolute; right: 15px; top: 10px; font-size: 24px; color: #e87b9e; cursor: pointer; font-weight: bold;">&times;</span>
         <h3 style="text-align: center; color: #e87b9e; margin-top: 0;"> DIRECCIÓN DE ENVÍO</h3>
         
-        <input type="text" id="dir_calle" placeholder=" Calle y Número *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="text" id="dir_calle" placeholder=" Calle *" style="width: 60%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+            <input type="text" id="dir_numero" placeholder=" Núm. (Casa/Depto) *" style="width: 40%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        </div>
         
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
             <input type="text" id="dir_colonia" placeholder=" Colonia *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
