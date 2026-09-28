@@ -699,30 +699,51 @@ async function procesarPedido() {
         const COLOR_FONDO = [253, 240, 244];
         const COLOR_TEXTO = [74, 59, 64];
 
-        // --- ENCABEZADO Y LOGO ---
+       // --- ENCABEZADO Y LOGO ---
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, 210, 35, "F");
 
+        let logoExitoso = false;
         try {
             const imgLogo = document.querySelector(".logo-principal");
             
-            if (imgLogo && imgLogo.src) {
-                // 1. Descargamos la imagen nativamente en segundo plano
-                const respuestaImg = await fetch(imgLogo.src);
-                const blobImg = await respuestaImg.blob();
+            // 1. Verificamos que la imagen realmente exista, esté cargada y no mida 0 pixeles
+            if (imgLogo && imgLogo.complete && imgLogo.naturalWidth > 0) {
+                const canvasLogo = document.createElement("canvas");
+                canvasLogo.width = imgLogo.naturalWidth;
+                canvasLogo.height = imgLogo.naturalHeight;
+                const ctx = canvasLogo.getContext("2d");
+                ctx.drawImage(imgLogo, 0, 0, canvasLogo.width, canvasLogo.height);
                 
-                // 2. La convertimos a código seguro (Base64) usando un lector nativo
-                const logoBase64 = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.readAsDataURL(blobImg);
-                });
-
-                // 3. Inyectamos la imagen ya procesada al PDF
-                pdf.addImage(logoBase64, "PNG", 65, 5, 80, 24);
+                const logoBase64 = canvasLogo.toDataURL("image/png");
+                
+                // 2. Si el código base64 se generó bien, lo inyectamos
+                if (logoBase64.length > 100) {
+                    pdf.addImage(logoBase64, "PNG", 65, 5, 80, 24);
+                    logoExitoso = true;
+                }
             }
         } catch (error) {
-            console.warn("No se pudo cargar el logo, el PDF se generará sin él para evitar bloqueos.", error);
+            console.warn("El navegador bloqueó la imagen. Activando logo de respaldo.");
+        }
+
+        // --- PLAN B: RESPALDO DE SEGURIDAD ---
+        // Si la imagen falló, usamos el texto bonito que SABEMOS que funciona 100%
+        // Así el pedido se genera sí o sí y el cliente no se queda atascado.
+        if (!logoExitoso) {
+            const canvasTexto = document.createElement("canvas");
+            canvasTexto.width = 500;
+            canvasTexto.height = 150;
+            const ctxT = canvasTexto.getContext("2d");
+            const gradiente = ctxT.createLinearGradient(0, 0, 500, 150);
+            gradiente.addColorStop(0, "#f48fb1");
+            gradiente.addColorStop(1, "#e16b90");
+            ctxT.font = "bold 130px 'Dancing Script', cursive";
+            ctxT.fillStyle = gradiente;
+            ctxT.textAlign = "center";
+            ctxT.textBaseline = "middle";
+            ctxT.fillText("Minuit", 250, 75);
+            pdf.addImage(canvasTexto.toDataURL("image/png"), "PNG", 70, 5, 70, 21);
         }
 
         pdf.setTextColor(158, 127, 138); 
