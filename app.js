@@ -559,7 +559,7 @@ function actualizarVistaCarrito() {
     let advertenciaHTML = "";
     let bloqueado = false;
 
-    if (totalBases > 0 && totalBases < 35) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Bases: Faltan ${35 - totalBases} piezas (Mínimo: 35)</div>`; bloqueado = true; }
+    if (totalBases > 0 && totalBases < 35) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Bases: Faltan ${30 - totalBases} piezas (Mínimo: 30)</div>`; bloqueado = true; }
     if (totalCupcakes > 0 && totalCupcakes < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Cupcakes: Faltan ${30 - totalCupcakes} piezas (Mínimo: 30)</div>`; bloqueado = true; }
     if (totalPasteles > 0 && totalPasteles < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Pastel: Faltan ${30 - totalPasteles} piezas (Mínimo: 30)</div>`; bloqueado = true; }
 
@@ -576,30 +576,22 @@ function actualizarVistaCarrito() {
     if(btnPedido) btnPedido.disabled = bloqueado;
 }
 function abrirModal() {
-    if(carrito.length === 0) return mostrarAlerta("🛍️ Tu carrito está vacío.");
+    if(carrito.length === 0) return mostrarAlerta(" Tu carrito está vacío.");
     document.getElementById("modal-carrito").style.display = "block";
 }
 function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
 function abrirModalDatos() {
-    if(carrito.length === 0) return mostrarAlerta("🛍️ Tu carrito está vacío.");
+    if(carrito.length === 0) return mostrarAlerta("Tu carrito está vacío.");
 
+    // Cargar datos personales
     if (localStorage.getItem("minuit_nombre")) {
         document.getElementById("nombre_cliente").value = localStorage.getItem("minuit_nombre");
         document.getElementById("tel_cliente").value = localStorage.getItem("minuit_tel") || "";
         document.getElementById("correo_cliente").value = localStorage.getItem("minuit_correo") || "";
         document.getElementById("marca_cliente").value = localStorage.getItem("minuit_marca") || "";
         document.getElementById("ig_cliente").value = localStorage.getItem("minuit_ig") || "";
-        
-        // Los nuevos campos de dirección
-        document.getElementById("dir_calle").value = localStorage.getItem("minuit_calle") || "";
-        document.getElementById("dir_colonia").value = localStorage.getItem("minuit_colonia") || "";
-        document.getElementById("dir_cp").value = localStorage.getItem("minuit_cp") || "";
-        document.getElementById("dir_ciudad").value = localStorage.getItem("minuit_ciudad") || "";
-        document.getElementById("dir_estado").value = localStorage.getItem("minuit_estado") || "";
-        document.getElementById("dir_referencias").value = localStorage.getItem("minuit_referencias") || "";
-        
         mostrarAlerta("✨ Cargamos tus datos anteriores.");
     }
     
@@ -609,9 +601,33 @@ function abrirModalDatos() {
 function cerrarModalDatos() {
     document.getElementById("modal-datos").style.display = "none";
 }
+
+// NUEVAS FUNCIONES PARA EL MODAL DE DIRECCIÓN
+function abrirModalDireccion() {
+    // Cerramos el modal de datos temporalmente
+    cerrarModalDatos();
+    
+    // Cargar dirección
+    if (localStorage.getItem("minuit_calle")) {
+        document.getElementById("dir_calle").value = localStorage.getItem("minuit_calle") || "";
+        document.getElementById("dir_colonia").value = localStorage.getItem("minuit_colonia") || "";
+        document.getElementById("dir_cp").value = localStorage.getItem("minuit_cp") || "";
+        document.getElementById("dir_ciudad").value = localStorage.getItem("minuit_ciudad") || "";
+        document.getElementById("dir_estado").value = localStorage.getItem("minuit_estado") || "";
+        document.getElementById("dir_referencias").value = localStorage.getItem("minuit_referencias") || "";
+    }
+
+    document.getElementById("modal-direccion").style.display = "block";
+}
+
+function cerrarModalDireccion() {
+    document.getElementById("modal-direccion").style.display = "none";
+    // Volvemos a abrir el modal principal para que terminen
+    document.getElementById("modal-datos").style.display = "block";
+}
 function mostrarTerminosEnvio() {
     alert(
-        "🚚 TÉRMINOS DE ENVÍO Y ELABORACIÓN 🚚\n\n" +
+        " TÉRMINOS DE ENVÍO Y ELABORACIÓN \n\n" +
         "• El pago de $300 cubre el envío estándar. Si al momento de generar tu guía el sistema marca un costo excedente (zona extendida o sobrepeso), te avisaremos para cubrir la diferencia antes del envío.\n\n" +
         "• Tiempo de elaboración: 2 a 3 semanas.\n" +
         "• Tiempo de trayecto (paquetería): 2 a 3 días hábiles adicionales.\n\n" +
