@@ -700,21 +700,32 @@ async function procesarPedido() {
         const COLOR_TEXTO = [74, 59, 64];
 
         // --- ENCABEZADO Y LOGO ---
-       // --- ENCABEZADO Y LOGO ---
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, 210, 35, "F");
 
         try {
-            // Tomamos el logo real directamente de tu HTML
             const imgLogo = document.querySelector(".logo-principal");
             
             if (imgLogo) {
-                // Lo inyectamos en el PDF. 
-                // Coordenadas: (Posición X, Posición Y, Ancho, Alto)
-                pdf.addImage(imgLogo, "PNG", 65, 5, 80, 24);
+                // 1. Creamos un lienzo invisible temporal
+                const canvasLogo = document.createElement("canvas");
+                
+                // 2. Le damos el tamaño real y exacto de tu PNG
+                canvasLogo.width = imgLogo.naturalWidth || 500;
+                canvasLogo.height = imgLogo.naturalHeight || 150;
+                
+                // 3. "Calcamos" tu logo original en este lienzo
+                const ctx = canvasLogo.getContext("2d");
+                ctx.drawImage(imgLogo, 0, 0, canvasLogo.width, canvasLogo.height);
+                
+                // 4. Lo convertimos a un código seguro que jsPDF sí entiende sin usar internet
+                const logoBase64 = canvasLogo.toDataURL("image/png");
+                
+                // 5. Lo pegamos en el PDF (X, Y, Ancho, Alto)
+                pdf.addImage(logoBase64, "PNG", 65, 5, 80, 24);
             }
         } catch (error) {
-            console.warn("No se pudo cargar la imagen del logo en el PDF.");
+            console.warn("No se pudo cargar la imagen del logo en el PDF.", error);
         }
 
         pdf.setTextColor(158, 127, 138); 
