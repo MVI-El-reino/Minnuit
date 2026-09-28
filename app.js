@@ -610,6 +610,7 @@ function abrirModalDireccion() {
     // Cargar dirección
     if (localStorage.getItem("minuit_calle")) {
         document.getElementById("dir_calle").value = localStorage.getItem("minuit_calle") || "";
+        document.getElementById("dir_numero").value = localStorage.getItem("minuit_numero") || "";
         document.getElementById("dir_colonia").value = localStorage.getItem("minuit_colonia") || "";
         document.getElementById("dir_cp").value = localStorage.getItem("minuit_cp") || "";
         document.getElementById("dir_ciudad").value = localStorage.getItem("minuit_ciudad") || "";
@@ -646,6 +647,7 @@ async function procesarPedido() {
     
     // Extraer la dirección fraccionada
     let dirCalle = document.getElementById("dir_calle").value.trim();
+    let dirNumero = document.getElementById("dir_numero").value.trim();
     let dirColonia = document.getElementById("dir_colonia").value.trim();
     let dirCp = document.getElementById("dir_cp").value.trim();
     let dirCiudad = document.getElementById("dir_ciudad").value.trim();
@@ -653,7 +655,7 @@ async function procesarPedido() {
     let dirReferencias = document.getElementById("dir_referencias").value.trim();
 
     // 1. VALIDACIÓN SUPER ESTRICTA
-    if (!nombreCliente || !telCliente || !dirCalle || !dirColonia || !dirCp || !dirCiudad || !dirEstado) {
+    if (!nombreCliente || !telCliente || !dirCalle || !dirNumero || !dirColonia || !dirCp || !dirCiudad || !dirEstado) {
         abrirModalDatos();
         return mostrarAlerta("⚠️ Por favor llena tus datos y la dirección completa de envío.");
     }
@@ -661,7 +663,7 @@ async function procesarPedido() {
     if (carrito.length === 0) return mostrarAlerta("🛒 Tu carrito está vacío.");
 
     // 2. Unimos todo para pasárselo al PDF y a WhatsApp de forma limpia
-    let direccionCliente = `${dirCalle}, Col. ${dirColonia}, C.P. ${dirCp}, ${dirCiudad}, ${dirEstado}. Ref: ${dirReferencias || "Ninguna"}`;
+   let direccionCliente = `${dirCalle} #${dirNumero}, Col. ${dirColonia}, C.P. ${dirCp}, ${dirCiudad}, ${dirEstado}. Ref: ${dirReferencias || "Ninguna"}`;
 
     // 3. Guardar en memoria
     localStorage.setItem("minuit_nombre", nombreCliente);
@@ -670,6 +672,7 @@ async function procesarPedido() {
     localStorage.setItem("minuit_marca", marcaCliente !== "N/A" ? marcaCliente : "");
     localStorage.setItem("minuit_ig", igCliente !== "N/A" ? igCliente : "");
     localStorage.setItem("minuit_calle", dirCalle);
+    localStorage.setItem("minuit_numero", dirNumero);
     localStorage.setItem("minuit_colonia", dirColonia);
     localStorage.setItem("minuit_cp", dirCp);
     localStorage.setItem("minuit_ciudad", dirCiudad);
@@ -922,6 +925,7 @@ function abrirWhatsAppYLimpiar(textoWhatsApp) {
     document.getElementById("nombre_cliente").value = "";
     document.getElementById("tel_cliente").value = "";
     document.getElementById("dir_calle").value = "";
+    document.getElementById("dir_numero").value = "";
     document.getElementById("dir_colonia").value = "";
     document.getElementById("dir_cp").value = "";
     document.getElementById("dir_ciudad").value = "";
