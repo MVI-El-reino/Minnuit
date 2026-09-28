@@ -1,5 +1,5 @@
 let carrito = [];
-const numeroDueno = "522227125366"; 
+const numeroDueno = "522215836232"; 
 
 // Usa tus variables ofuscadas de Telegram aquí
 const tokenParte1 = "AQUI_TU_NUMERO"; 
