@@ -257,37 +257,29 @@
     </div>
 
 
-<div id="modal-datos" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+<!-- Modal 1: Datos Personales y Configuración Final -->
+<div id="modal-datos" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow: auto;">
     <div style="background: #fff; margin: 10% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 12px; position: relative;">
+        
         <span onclick="cerrarModalDatos()" style="position: absolute; right: 15px; top: 10px; font-size: 24px; color: #e87b9e; cursor: pointer; font-weight: bold;">&times;</span>
-        <h3 style="text-align: center; color: #e87b9e; margin-top: 0;">✨ TUS DATOS ✨</h3>
+        <h3 style="text-align: center; color: #e87b9e; margin-top: 0;"> TUS DATOS </h3>
         
         <input type="text" id="nombre_cliente" placeholder="Nombre completo *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-        <input type="tel" id="tel_cliente" placeholder=" # Telefónico *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        <input type="tel" id="tel_cliente" placeholder="# Telefónico *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
         <input type="text" id="marca_cliente" placeholder=" Nombre de tu marca" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
         <input type="text" id="ig_cliente" placeholder=" Usuario de Instagram" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-        <input type="email" id="correo_cliente" placeholder=" Correo electrónico" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        <input type="email" id="correo_cliente" placeholder=" Correo electrónico" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        
+        <!-- Botón para abrir el Modal de Dirección -->
+        <button type="button" onclick="abrirModalDireccion()" style="width: 100%; padding: 12px; background: #fdf0f4; border: 2px dashed #e87b9e; border-radius: 8px; color: #e87b9e; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 1rem;">
+            📍 Llenar Dirección de Envío
+        </button>
 
-        <!--submenu para la direccion-->
-<div style="font-weight: bold; font-size: 0.85rem; color: #4a3b40; margin-bottom: 5px; margin-top: 10px;">📍 Dirección de Envío:</div>
-        <input type="text" id="dir_calle" placeholder="Calle y Número *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <input type="text" id="dir_colonia" placeholder="Colonia *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-            <input type="text" id="dir_cp" placeholder="C.P. *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-        </div>
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <input type="text" id="dir_ciudad" placeholder="Ciudad *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-            <input type="text" id="dir_estado" placeholder="Estado *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-        </div>
-        
-        <textarea id="dir_referencias" rows="2" placeholder="Indicaciones extra / Referencias" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box; resize: none;"></textarea>
-
-        
+        <!-- AQUÍ VA TU BLOQUE DE ENVÍO CON EL BOTÓN "!" -->
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
-    <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40; margin: 0;">🚚 Envío:</label>
-    <button type="button" onclick="mostrarTerminosEnvio()" style="background: #e87b9e; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(232, 123, 158, 0.3);">!</button>
-</div>
+            <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40; margin: 0;">🚚 Envío:</label>
+            <button type="button" onclick="mostrarTerminosEnvio()" style="background: #e87b9e; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(232, 123, 158, 0.3);">!</button>
+        </div>
         <select id="sel_entrega" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px;">
             <option value="0">Recoger / Acordar con Minuit</option>
             <option value="300">Envío Nacional (+$300.00 MXN)</option>
@@ -299,10 +291,34 @@
             <option value="Tarjeta">Tarjeta / PayPal (+5% de comisión)</option>
         </select>
 
-        <button type="button" onclick="cerrarModalDatos()" style="width: 100%; background: #e87b9e; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">Guardar Datos</button>
+        <!-- Botón final para disparar el PDF y WhatsApp -->
+        <button id="btn_finalizar_pedido" type="button" onclick="procesarPedido()" style="width: 100%; background: #e87b9e; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">✅ Confirmar y Enviar Pedido</button>
     </div>
 </div>
 
+    <!-- Modal 2: Dirección -->
+<div id="modal-direccion" style="display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+    <div style="background: #fff; margin: 10% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 12px; position: relative;">
+        <span onclick="cerrarModalDireccion()" style="position: absolute; right: 15px; top: 10px; font-size: 24px; color: #e87b9e; cursor: pointer; font-weight: bold;">&times;</span>
+        <h3 style="text-align: center; color: #e87b9e; margin-top: 0;"> DIRECCIÓN DE ENVÍO</h3>
+        
+        <input type="text" id="dir_calle" placeholder=" Calle y Número *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="text" id="dir_colonia" placeholder=" Colonia *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+            <input type="text" id="dir_cp" placeholder=" C.P. *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        </div>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input type="text" id="dir_ciudad" placeholder=" Ciudad *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+            <input type="text" id="dir_estado" placeholder=" Estado *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        </div>
+        
+        <textarea id="dir_referencias" rows="2" placeholder=" Indicaciones extra / Referencias" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box; resize: none;"></textarea>
+
+        <button type="button" onclick="cerrarModalDireccion()" style="width: 100%; background: #e87b9e; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">Guardar Dirección</button>
+    </div>
+</div>
     
     <div id="toast-container"></div>
 
