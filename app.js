@@ -699,57 +699,33 @@ async function procesarPedido() {
         const COLOR_FONDO = [253, 240, 244];
         const COLOR_TEXTO = [74, 59, 64];
 
-       // --- ENCABEZADO Y LOGO ---
-        pdf.setFillColor(255, 255, 255);
-        pdf.rect(0, 0, 210, 35, "F");
+       // --- LOGOTIPO Y ENCABEZADO ---
+        pdf.establecercolor de relleno(255, 255, 255);
+        pdf.recto(0, 0, 210, 35, "F");
 
-        let logoExitoso = false;
-        try {
-            const imgLogo = document.querySelector(".logo-principal");
-            
-            // 1. Verificamos que la imagen realmente exista, esté cargada y no mida 0 pixeles
-            if (imgLogo && imgLogo.complete && imgLogo.naturalWidth > 0) {
-                const canvasLogo = document.createElement("canvas");
-                canvasLogo.width = imgLogo.naturalWidth;
-                canvasLogo.height = imgLogo.naturalHeight;
-                const ctx = canvasLogo.getContext("2d");
-                ctx.drawImage(imgLogo, 0, 0, canvasLogo.width, canvasLogo.height);
-                
-                const logoBase64 = canvasLogo.toDataURL("image/png");
-                
-                // 2. Si el código base64 se generó bien, lo inyectamos
-                if (logoBase64.length > 100) {
-                    pdf.addImage(logoBase64, "PNG", 65, 5, 80, 24);
-                    logoExitoso = true;
-                }
-            }
-        } catch (error) {
-            console.warn("El navegador bloqueó la imagen. Activando logo de respaldo.");
-        }
+        const logotipo de lienzo = documento.crear elemento("lienzo");
+        logotipo de lienzo.ancho = 500;
+        logotipo de lienzo.altura = 150;
+        const ctx = logotipo de lienzo.obtener contexto("2d");
+        const gradiente = ctx.crearLinearGradient(0, 0, 500, 150);
+        gradiente.agregarColorStop(0, "#f48fb1");
+        gradiente.agregarColorStop(1, "#e16b90");
+        ctx.fuente = "negrita 'Dancing Script' de 130px, cursiva";
+        ctx.estilo de relleno = gradiente;
+        ctx.alinear texto = "centro";
+        ctx.línea base de texto = "medio";
+        ctx.texto completo("Minuit", 250, 75);
 
-        // --- PLAN B: RESPALDO DE SEGURIDAD ---
-        // Si la imagen falló, usamos el texto bonito que SABEMOS que funciona 100%
-        // Así el pedido se genera sí o sí y el cliente no se queda atascado.
-        if (!logoExitoso) {
-            const canvasTexto = document.createElement("canvas");
-            canvasTexto.width = 500;
-            canvasTexto.height = 150;
-            const ctxT = canvasTexto.getContext("2d");
-            const gradiente = ctxT.createLinearGradient(0, 0, 500, 150);
-            gradiente.addColorStop(0, "#f48fb1");
-            gradiente.addColorStop(1, "#e16b90");
-            ctxT.font = "bold 130px 'Dancing Script', cursive";
-            ctxT.fillStyle = gradiente;
-            ctxT.textAlign = "center";
-            ctxT.textBaseline = "middle";
-            ctxT.fillText("Minuit", 250, 75);
-            pdf.addImage(canvasTexto.toDataURL("image/png"), "PNG", 70, 5, 70, 21);
-        }
+        pdf.agregar imagen(logotipo de lienzo.aDataURL("imagen/png"), "PNG", 70, 5, 70, 21);
 
-        pdf.setTextColor(158, 127, 138); 
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(10);
-        pdf.text("NOTA DE PEDIDO", 105, 32, { align: "center" });
+        pdf.establecercolor de texto(158, 127, 138); 
+        pdf.establecer fuente("helvética", "negrita");
+        pdf.establecer tamaño de fuente(10);
+        pdf.texto(„NOTA DE PEDIDO", 105, 32, { alinear: "centro" });
+
+        pdf.establecerDrawColor(240, 220, 227); 
+        pdf.establecer ancho de línea(0,5);
+        pdf.línea(15, 35, 195, 35);
 
         // --- CAJA DE DATOS DEL CLIENTE AMPLIADA ---
         pdf.setFillColor(...COLOR_FONDO);
