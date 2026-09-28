@@ -559,7 +559,7 @@ function actualizarVistaCarrito() {
     let advertenciaHTML = "";
     let bloqueado = false;
 
-    if (totalBases > 0 && totalBases < 35) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Bases: Faltan ${30 - totalBases} piezas (Mínimo: 30)</div>`; bloqueado = true; }
+    if (totalBases > 0 && totalBases < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Bases: Faltan ${30 - totalBases} piezas (Mínimo: 30)</div>`; bloqueado = true; }
     if (totalCupcakes > 0 && totalCupcakes < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Cupcakes: Faltan ${30 - totalCupcakes} piezas (Mínimo: 30)</div>`; bloqueado = true; }
     if (totalPasteles > 0 && totalPasteles < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Pastel: Faltan ${30 - totalPasteles} piezas (Mínimo: 30)</div>`; bloqueado = true; }
 
