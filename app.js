@@ -700,32 +700,27 @@ async function procesarPedido() {
         const COLOR_TEXTO = [74, 59, 64];
 
         // --- ENCABEZADO Y LOGO ---
+       // --- ENCABEZADO Y LOGO ---
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, 210, 35, "F");
 
-        const canvasLogo = document.createElement("canvas");
-        canvasLogo.width = 500;
-        canvasLogo.height = 150;
-        const ctx = canvasLogo.getContext("2d");
-        const gradiente = ctx.createLinearGradient(0, 0, 500, 150);
-        gradiente.addColorStop(0, "#f48fb1");
-        gradiente.addColorStop(1, "#e16b90");
-        ctx.font = "bold 130px 'Dancing Script', cursive";
-        ctx.fillStyle = gradiente;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("Minuit", 250, 75);
-        
-        pdf.addImage(canvasLogo.toDataURL("image/png"), "PNG", 70, 5, 70, 21);
+        try {
+            // Tomamos el logo real directamente de tu HTML
+            const imgLogo = document.querySelector(".logo-principal");
+            
+            if (imgLogo) {
+                // Lo inyectamos en el PDF. 
+                // Coordenadas: (Posición X, Posición Y, Ancho, Alto)
+                pdf.addImage(imgLogo, "PNG", 65, 5, 80, 24);
+            }
+        } catch (error) {
+            console.warn("No se pudo cargar la imagen del logo en el PDF.");
+        }
 
         pdf.setTextColor(158, 127, 138); 
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(10);
         pdf.text("NOTA DE PEDIDO", 105, 32, { align: "center" });
-
-        pdf.setDrawColor(240, 220, 227); 
-        pdf.setLineWidth(0.5);
-        pdf.line(15, 35, 195, 35);
 
         // --- CAJA DE DATOS DEL CLIENTE AMPLIADA ---
         pdf.setFillColor(...COLOR_FONDO);
