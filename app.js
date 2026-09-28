@@ -706,26 +706,23 @@ async function procesarPedido() {
         try {
             const imgLogo = document.querySelector(".logo-principal");
             
-            if (imgLogo) {
-                // 1. Creamos un lienzo invisible temporal
-                const canvasLogo = document.createElement("canvas");
+            if (imgLogo && imgLogo.src) {
+                // 1. Descargamos la imagen nativamente en segundo plano
+                const respuestaImg = await fetch(imgLogo.src);
+                const blobImg = await respuestaImg.blob();
                 
-                // 2. Le damos el tamaño real y exacto de tu PNG
-                canvasLogo.width = imgLogo.naturalWidth || 500;
-                canvasLogo.height = imgLogo.naturalHeight || 150;
-                
-                // 3. "Calcamos" tu logo original en este lienzo
-                const ctx = canvasLogo.getContext("2d");
-                ctx.drawImage(imgLogo, 0, 0, canvasLogo.width, canvasLogo.height);
-                
-                // 4. Lo convertimos a un código seguro que jsPDF sí entiende sin usar internet
-                const logoBase64 = canvasLogo.toDataURL("image/png");
-                
-                // 5. Lo pegamos en el PDF (X, Y, Ancho, Alto)
+                // 2. La convertimos a código seguro (Base64) usando un lector nativo
+                const logoBase64 = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(blobImg);
+                });
+
+                // 3. Inyectamos la imagen ya procesada al PDF
                 pdf.addImage(logoBase64, "PNG", 65, 5, 80, 24);
             }
         } catch (error) {
-            console.warn("No se pudo cargar la imagen del logo en el PDF.", error);
+            console.warn("No se pudo cargar el logo, el PDF se generará sin él para evitar bloqueos.", error);
         }
 
         pdf.setTextColor(158, 127, 138); 
