@@ -584,6 +584,25 @@ function cerrarModal() {
 }
 function abrirModalDatos() {
     if(carrito.length === 0) return mostrarAlerta("🛍️ Tu carrito está vacío.");
+
+    if (localStorage.getItem("minuit_nombre")) {
+        document.getElementById("nombre_cliente").value = localStorage.getItem("minuit_nombre");
+        document.getElementById("tel_cliente").value = localStorage.getItem("minuit_tel") || "";
+        document.getElementById("correo_cliente").value = localStorage.getItem("minuit_correo") || "";
+        document.getElementById("marca_cliente").value = localStorage.getItem("minuit_marca") || "";
+        document.getElementById("ig_cliente").value = localStorage.getItem("minuit_ig") || "";
+        
+        // Los nuevos campos de dirección
+        document.getElementById("dir_calle").value = localStorage.getItem("minuit_calle") || "";
+        document.getElementById("dir_colonia").value = localStorage.getItem("minuit_colonia") || "";
+        document.getElementById("dir_cp").value = localStorage.getItem("minuit_cp") || "";
+        document.getElementById("dir_ciudad").value = localStorage.getItem("minuit_ciudad") || "";
+        document.getElementById("dir_estado").value = localStorage.getItem("minuit_estado") || "";
+        document.getElementById("dir_referencias").value = localStorage.getItem("minuit_referencias") || "";
+        
+        mostrarAlerta("✨ Cargamos tus datos anteriores.");
+    }
+    
     document.getElementById("modal-datos").style.display = "block";
 }
 
@@ -603,19 +622,43 @@ function mostrarTerminosEnvio() {
 // GENERACIÓN DEL PDF NATIVO Y GOOGLE DRIVE
 // ==========================================
 async function procesarPedido() {
-    // 1. Recolección y validación de datos
     let nombreCliente = document.getElementById("nombre_cliente").value.trim();
     let telCliente = document.getElementById("tel_cliente").value.trim();
     let correoCliente = document.getElementById("correo_cliente").value.trim() || "No especificado";
     let marcaCliente = document.getElementById("marca_cliente").value.trim() || "N/A";
     let igCliente = document.getElementById("ig_cliente").value.trim() || "N/A";
-    let direccionCliente = document.getElementById("direccion_cliente").value.trim();
+    
+    // Extraer la dirección fraccionada
+    let dirCalle = document.getElementById("dir_calle").value.trim();
+    let dirColonia = document.getElementById("dir_colonia").value.trim();
+    let dirCp = document.getElementById("dir_cp").value.trim();
+    let dirCiudad = document.getElementById("dir_ciudad").value.trim();
+    let dirEstado = document.getElementById("dir_estado").value.trim();
+    let dirReferencias = document.getElementById("dir_referencias").value.trim();
 
-    if (!nombreCliente || !telCliente || !direccionCliente) {
+    // 1. VALIDACIÓN SUPER ESTRICTA
+    if (!nombreCliente || !telCliente || !dirCalle || !dirColonia || !dirCp || !dirCiudad || !dirEstado) {
         abrirModalDatos();
-        return mostrarAlerta("⚠️ Por favor llena tus datos antes de enviar.");
+        return mostrarAlerta("⚠️ Por favor llena tus datos y la dirección completa de envío.");
     }
+    
     if (carrito.length === 0) return mostrarAlerta("🛒 Tu carrito está vacío.");
+
+    // 2. Unimos todo para pasárselo al PDF y a WhatsApp de forma limpia
+    let direccionCliente = `${dirCalle}, Col. ${dirColonia}, C.P. ${dirCp}, ${dirCiudad}, ${dirEstado}. Ref: ${dirReferencias || "Ninguna"}`;
+
+    // 3. Guardar en memoria
+    localStorage.setItem("minuit_nombre", nombreCliente);
+    localStorage.setItem("minuit_tel", telCliente);
+    localStorage.setItem("minuit_correo", correoCliente !== "No especificado" ? correoCliente : "");
+    localStorage.setItem("minuit_marca", marcaCliente !== "N/A" ? marcaCliente : "");
+    localStorage.setItem("minuit_ig", igCliente !== "N/A" ? igCliente : "");
+    localStorage.setItem("minuit_calle", dirCalle);
+    localStorage.setItem("minuit_colonia", dirColonia);
+    localStorage.setItem("minuit_cp", dirCp);
+    localStorage.setItem("minuit_ciudad", dirCiudad);
+    localStorage.setItem("minuit_estado", dirEstado);
+    localStorage.setItem("minuit_referencias", dirReferencias);
 
     mostrarAlerta("⏳ Generando nota de pedido...");
     document.querySelector(".btn-pedido").disabled = true;
@@ -630,7 +673,7 @@ async function procesarPedido() {
     let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger/Acordar";
 
     // 2. Plantilla exacta de WhatsApp solicitada por Ely
-    let textoWhatsApp = `Hola chul@ mi nombre es Ely 🫶🏻 y estoy para servirte!! Mil gracias por contactarnos💕✨ Aquí están los datos de mi pedido:\n\n✨ TUS DATOS ✨\n💕 *Nombre completo:* ${nombreCliente}\n💕 *# Telefónico:* ${telCliente}\n💕 *Nombre de tu marca:* ${marcaCliente}\n💕 *Usuario de Instagram:* ${igCliente}\n💕 *Dirección completa:* ${direccionCliente}\n💕 *Correo electrónico:* ${correoCliente}\n\n📦 *ENTREGA:* ${tipoEntrega}\n💳 *PAGO:* ${metodoPagoTexto}\n💰 *TOTAL A PAGAR: ${totalTxt}*\n`;
+    let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n✨ DATOS ✨\n💕 *Nombre completo:* ${nombreCliente}\n💕 *# Telefónico:* ${telCliente}\n💕 *Nombre de tu marca:* ${marcaCliente}\n💕 *Usuario de Instagram:* ${igCliente}\n💕 *Dirección completa:* ${direccionCliente}\n💕 *Correo electrónico:* ${correoCliente}\n\n📦 *ENTREGA:* ${tipoEntrega}\n💳 *PAGO:* ${metodoPagoTexto}\n💰 *TOTAL A PAGAR: ${totalTxt}*\n`;
 
     try {
         const { jsPDF } = window.jspdf;
@@ -858,11 +901,16 @@ function abrirWhatsAppYLimpiar(textoWhatsApp) {
     actualizarVistaCarrito();
     cerrarModal();          // Cierra el carrito
     cerrarModalDatos();     // Cierra el formulario de datos
-    
-    // Limpieza de campos
+
+    //limpieza de casillas
     document.getElementById("nombre_cliente").value = "";
     document.getElementById("tel_cliente").value = "";
-    document.getElementById("direccion_cliente").value = "";
+    document.getElementById("dir_calle").value = "";
+    document.getElementById("dir_colonia").value = "";
+    document.getElementById("dir_cp").value = "";
+    document.getElementById("dir_ciudad").value = "";
+    document.getElementById("dir_estado").value = "";
+    document.getElementById("dir_referencias").value = "";
     
     // Reactivamos el botón por si quieren hacer otro pedido
     if(document.getElementById("btn_finalizar_pedido")) {
