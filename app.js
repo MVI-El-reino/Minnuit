@@ -470,7 +470,7 @@ function agregarPastelConfigAlCarrito() {
     resetearSelect("sel_color_logo_pastel");
     resetearSelect("sel_redes_pastel");
     document.getElementById("detalle_pastel1").value = "";
-    document.getElementById("cant_pastel_config").value = "10"; 
+    document.getElementById("cant_pastel_config").value = "5"; 
     
     // Forzamos la actualización visual
     actualizarVistaCarrito();
@@ -714,7 +714,7 @@ async function procesarPedido() {
     let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger/Acordar";
 
     // 2. Plantilla exacta de WhatsApp solicitada por Ely
-    let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n✨ DATOS ✨\n💕 *Nombre completo:* ${nombreCliente}\n💕 *# Telefónico:* ${telCliente}\n💕 *Nombre de tu marca:* ${marcaCliente}\n💕 *Usuario de Instagram:* ${igCliente}\n💕 *Dirección completa:* ${direccionCliente}\n💕 *Correo electrónico:* ${correoCliente}\n\n📦 *ENTREGA:* ${tipoEntrega}\n💳 *PAGO:* ${metodoPagoTexto}\n💰 *TOTAL A PAGAR: ${totalTxt}*\n`;
+    let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *TOTAL A PAGAR: ${totalTxt}*\n`;
 
     try {
         const { jsPDF } = window.jspdf;
