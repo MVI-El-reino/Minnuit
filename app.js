@@ -24,7 +24,7 @@ const coloresLogotipo = {
     "Premium": ["blanco", "dorado", "negro"]
 };
 
-const cupcakesPreciosBase = { "2": 18, "4": 25, "6": 35 };
+const cupcakesPreciosBase = { "21cm": 18, "31cm": 25 };
 const cupcakesPreciosSoporte = { "Blanco": 0, "Kraft": 0, "Dorado": 5, "Rosa": 5 };
 
 const pastelesData = {
@@ -333,7 +333,7 @@ function agregarCupcakeConfigAlCarrito() {
     
     resetearSelect("sel_tamano_cupcake");
     resetearSelect("sel_color_soporte");
-    document.getElementById("cant_cupcake_config").value = "30"; 
+    document.getElementById("cant_cupcake_config").value = "5";
     actualizarConfiguradorCupcakes();
 
     mostrarAlerta(`🛒 ¡Cajas agregadas!`);
@@ -559,10 +559,21 @@ function actualizarVistaCarrito() {
     let advertenciaHTML = "";
     let bloqueado = false;
 
-    if (totalBases > 0 && totalBases < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Bases: Faltan ${30 - totalBases} piezas (Mínimo: 30)</div>`; bloqueado = true; }
-    if (totalCupcakes > 0 && totalCupcakes < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Cupcakes: Faltan ${30 - totalCupcakes} piezas (Mínimo: 30)</div>`; bloqueado = true; }
-    if (totalPasteles > 0 && totalPasteles < 30) { advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Pastel: Faltan ${30 - totalPasteles} piezas (Mínimo: 30)</div>`; bloqueado = true; }
+    // Sumamos pasteles + cupcakes para el mínimo global de cajas
+    let totalCajas = totalPasteles + totalCupcakes;
 
+    if (totalBases > 0 && totalBases < 30) { 
+        advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Bases: Faltan ${30 - totalBases} piezas (Mínimo: 30)</div>`; 
+        bloqueado = true; 
+    }
+    if (totalCupcakes > 0 && totalCupcakes < 5) { 
+        advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Cupcakes: Faltan ${5 - totalCupcakes} piezas (Mínimo por modelo: 5)</div>`; 
+        bloqueado = true; 
+    }
+    if (totalCajas > 0 && totalCajas < 30) { 
+        advertenciaHTML += `<div class="texto-alerta-rojo">⚠️ Cajas (Pasteles + Cupcakes): Faltan ${30 - totalCajas} piezas para el mínimo global de 30</div>`; 
+        bloqueado = true; 
+    }
     if (!bloqueado && carrito.length > 0) {
         advertenciaHTML += `<div class="texto-valido-verde">✅ Pedido autorizado</div>`;
         if(fabCarrito) fabCarrito.classList.add("carrito-listo");
