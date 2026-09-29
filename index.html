@@ -188,55 +188,58 @@
             </div>
         </section>
 
-         <!-- ==============================
-             SECCIÓN 2: CAJAS CUPCAKE
+        <!-- ==============================
+             SECCIÓN 3: CAJAS CUPCAKE (CORREGIDA)
              ============================== -->
-        
         <section id="cajas_cupcakes" class="categoria-seccion">
             <div class="card-producto card-configurador">
                 <h3>Cajas para Cupcakes, galletas y/o postres.</h3>
-                <p>Mínimo de compra: 30 piezas.</p>
-                <p>Combinalas con cajas para pasteles</p>
+                <p>Mínimo de compra: 5 piezas.</p>
+                <p>Combínalas con cajas para pasteles</p>
 
+                <!-- INICIO DE LA FILA DE PRECIO Y CANTIDAD -->
                 <div class="fila-precio-cantidad">
                     <div class="precio-col">
                         <span class="etiqueta-precio">PRECIO UNITARIO</span>
                         <p id="precio_config_cupcake" class="precio-grande">$18.00 MXN</p>
                     </div>
-                   <div class="cantidad-col">
-    <span class="etiqueta-precio">Cantidad</span>
-    <div class="controles-cantidad">
-        <input type="number" id="cant_cupcake_config" value="5" min="5" onchange="validarManual('cant_cupcake_config', 5); actualizarConfiguradorCupcakes()">
-    </div>
-</div>
+                    <div class="cantidad-col">
+                        <span class="etiqueta-precio">Cantidad</span>
+                        <div class="controles-cantidad">
+                            <!-- El div de abajo ya trae el font-size para iPhone -->
+                            <input type="number" id="cant_cupcake_config" value="5" min="5" style="font-size: 16px;" onchange="validarManual('cant_cupcake_config', 5); actualizarConfiguradorCupcakes()">
+                        </div>
+                    </div>
+                </div> <!-- ESTE DIV CERRADO FUE EL QUE SALVÓ EL DISEÑO -->
 
-<div class="controles-config">
-    <label for="sel_tamano_cupcake">Capacidad:</label>
-    <select id="sel_tamano_cupcake" onchange="actualizarConfiguradorCupcakes()">
-        <option value="21cm">21 x 12 x 7.5 cm</option>
-        <option value="31cm">31 x 12 x 7.5 cm</option>
-    </select>
-</div>
+                <!-- Select capacidad -->
+                <div class="controles-config">
+                    <label for="sel_tamano_cupcake">Capacidad:</label>
+                    <select id="sel_tamano_cupcake" style="font-size: 16px;" onchange="actualizarConfiguradorCupcakes()">
+                        <option value="21cm">21 x 12 x 7.5 cm</option>
+                        <option value="31cm">31 x 12 x 7.5 cm</option>
+                    </select>
+                </div>
 
-<!--¿Quiere soporte? -->
-<div class="controles-config">
-    <label for="sel_tiene_soporte">Soporte para cupcakes:</label>
-    <select id="sel_tiene_soporte" onchange="actualizarConfiguradorCupcakes()">
-        <option value="No">No gracias, Solo la caja</option>
-        <option value="Si">Sí, agregar soporte</option>
-    </select>
-</div>
+                <!-- ¿Quiere soporte? -->
+                <div class="controles-config">
+                    <label for="sel_tiene_soporte">Soporte para cupcakes:</label>
+                    <select id="sel_tiene_soporte" style="font-size: 16px;" onchange="actualizarConfiguradorCupcakes()">
+                        <option value="No">No gracias, Solo la caja</option>
+                        <option value="Si">Sí, agregar soporte</option>
+                    </select>
+                </div>
 
-<!-- MENÚ DE COLOR (Oculto por defecto) -->
-<div class="controles-config" id="contenedor_color_soporte" style="display: none; margin-top: 15px;">
-    <label for="sel_color_soporte">Color del Soporte Interno:</label>
-    <select id="sel_color_soporte" onchange="actualizarConfiguradorCupcakes()">
-        <option value="Blanco">Blanco (Gratis)</option>
-        <option value="Kraft">Kraft Ecológico (Gratis)</option>
-        <option value="Dorado">Dorado Metálico</option>
-        <option value="Rosa">Rosa Minuit</option>
-    </select>
-</div>
+                <!-- MENÚ DE COLOR (Oculto por defecto) -->
+                <div class="controles-config" id="contenedor_color_soporte" style="display: none; margin-top: 15px;">
+                    <label for="sel_color_soporte">Color del Soporte Interno:</label>
+                    <select id="sel_color_soporte" style="font-size: 16px;" onchange="actualizarConfiguradorCupcakes()">
+                        <option value="Blanco">Blanco (Gratis)</option>
+                        <option value="Kraft">Kraft Ecológico (Gratis)</option>
+                        <option value="Dorado">Dorado Metálico</option>
+                        <option value="Rosa">Rosa Minuit</option>
+                    </select>
+                </div>
 
                 <br>
                 <button class="btn-agregar" onclick="agregarCupcakeConfigAlCarrito()">Agregar al Carrito</button>
