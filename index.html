@@ -203,19 +203,18 @@
                         <span class="etiqueta-precio">PRECIO UNITARIO</span>
                         <p id="precio_config_cupcake" class="precio-grande">$18.00 MXN</p>
                     </div>
-                    <div class="cantidad-col">
-                        <span class="etiqueta-precio">Cantidad</span>
-                        <div class="controles-cantidad">
-                            <input type="number" id="cant_cupcake_config" value="1" min="1" onchange="validarManual('cant_cupcake_config', 1); actualizarConfiguradorCupcakes()">
-                        </div>
-                    </div>
-                </div>
-<!--Select capacidad y soporte -->
+                   <div class="cantidad-col">
+    <span class="etiqueta-precio">Cantidad</span>
+    <div class="controles-cantidad">
+        <input type="number" id="cant_cupcake_config" value="5" min="5" onchange="validarManual('cant_cupcake_config', 5); actualizarConfiguradorCupcakes()">
+    </div>
+</div>
+
 <div class="controles-config">
     <label for="sel_tamano_cupcake">Capacidad:</label>
     <select id="sel_tamano_cupcake" onchange="actualizarConfiguradorCupcakes()">
-        <option value="22x12x7.5">22 x 12 x 7.5 de alto</option>
-        <option value="31x12x7.5">31 x 12 x 7.5 de alto</option>
+        <option value="21cm">21 x 12 x 7.5 cm</option>
+        <option value="31cm">31 x 12 x 7.5 cm</option>
     </select>
 </div>
 
