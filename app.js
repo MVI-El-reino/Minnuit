@@ -288,10 +288,21 @@ function actualizarConfiguradorCupcakes() {
         instanciasSelect["sel_tamano_cupcake"].destroy();
     }
     tamanoSelect.innerHTML = "";
+    
+    // Diccionario con los textos completos que pidió Ely
+    const nombresLargosCupcakes = {
+        "21cm": "21 x 12 x 7.5 cm",
+        "31cm": "31 x 12 x 7.5 cm"
+    };
+
     tamanosDisponibles.forEach(val => {
         // Calculamos el precio base + el extra del soporte seleccionado
         let pBase = cupcakesPreciosBase[val] + cupcakesPreciosSoporte[soporteActual];
-        let nuevaOpcion = new Option(`${val} - $${pBase}`, val);
+        
+        // Leemos el texto largo, o usamos el corto si no lo encuentra
+        let textoAmostar = nombresLargosCupcakes[val] || val;
+        
+        let nuevaOpcion = new Option(`${textoAmostar} - $${pBase}`, val);
         if (val === tamanoActual) nuevaOpcion.selected = true;
         tamanoSelect.add(nuevaOpcion);
     });
