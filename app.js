@@ -506,7 +506,7 @@ function actualizarVistaCarrito() {
     // Guardamos los datos desglosados en el "dataset" para que el PDF los lea
     modalTotal.dataset.subtotal = totalDinero.toFixed(2);
     modalTotal.dataset.envio = costoEnvio.toFixed(2);
-    modalTotal.dataset.comision = costoComision.toFixed(2);
+    modalTotal.dataset.sion = costosion.toFixed(2);
     modalTotal.dataset.metodopago = metodoPago === "PayPal" ? "PayPal (+5%)" : "Transferencia Bancaria";
     // ===============================================
 
@@ -696,12 +696,12 @@ async function procesarPedido() {
     mostrarAlerta("⏳ Generando nota de pedido...");
     document.querySelector(".btn-pedido").disabled = true;
 
-    // Rescatamos los cálculos de envío y comisión
+    // Rescatamos los cálculos de envío y sión
     let totalTxt = document.getElementById("modal-total").innerText;
     let datosTotal = document.getElementById("modal-total").dataset;
     let valSubtotal = parseFloat(datosTotal.subtotal || 0);
     let valEnvio = parseFloat(datosTotal.envio || 0);
-    let valComision = parseFloat(datosTotal.comision || 0);
+    let valsion = parseFloat(datosTotal.sion || 0);
     let metodoPagoTexto = datosTotal.metodopago || "Transferencia";
     let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger en taller Minuit / Mandar Uber";
 
@@ -830,7 +830,7 @@ async function procesarPedido() {
         if (y > 220) { pdf.addPage(); y = 30; }
 
         pdf.setFillColor(...COLOR_FONDO);
-        pdf.roundedRect(100, y, 95, valComision > 0 ? 38 : 32, 4, 4, "F");
+        pdf.roundedRect(100, y, 95, valsion > 0 ? 38 : 32, 4, 4, "F");
         
         pdf.setTextColor(...COLOR_TEXTO);
         pdf.setFontSize(10);
@@ -844,9 +844,9 @@ async function procesarPedido() {
         pdf.text("Envío Nacional:", 105, yDesglose);
         pdf.text("$" + valEnvio.toFixed(2), 190, yDesglose, { align: "right" });
         
-        if (valComision > 0) {
+        if (valsion > 0) {
             yDesglose += 7;
-            pdf.text("Comisión Tarjeta (5%):", 105, yDesglose);
+            pdf.text("Comisión Paypal (5%):", 105, yDesglose);
             pdf.text("$" + valComision.toFixed(2), 190, yDesglose, { align: "right" });
         }
 
