@@ -473,9 +473,42 @@ function actualizarVistaCarrito() {
             </li>`;
     });
     
-    document.getElementById("fab-total").innerText = "$" + totalDinero.toFixed(2);
-    document.getElementById("modal-total").innerText = "$" + totalDinero.toFixed(2);
     document.getElementById("lista-carrito").innerHTML = listaHTML;
+
+    // ===== NUEVO: CÁLCULOS DE ENVÍO Y COMISIÓN =====
+    let costoEnvio = 0;
+    let costoComision = 0;
+    
+    // Leemos qué eligieron en el select de envío
+    const selEntrega = document.getElementById("sel_entrega");
+    if (selEntrega) {
+        costoEnvio = parseFloat(selEntrega.value) || 0;
+    }
+    
+    // Leemos qué eligieron en el select de pago
+    const selPago = document.getElementById("sel_pago");
+    let metodoPago = "Transferencia";
+    if (selPago) {
+        metodoPago = selPago.value;
+        if (metodoPago === "Tarjeta") {
+            costoComision = (totalDinero + costoEnvio) * 0.05; // 5% sobre el total
+        }
+    }
+    
+    let granTotal = totalDinero + costoEnvio + costoComision;
+    
+    // Actualizamos los textos visuales de la página
+    document.getElementById("fab-total").innerText = "$" + granTotal.toFixed(2);
+    
+    const modalTotal = document.getElementById("modal-total");
+    modalTotal.innerText = "$" + granTotal.toFixed(2);
+    
+    // Guardamos los datos desglosados en el "dataset" para que el PDF los lea
+    modalTotal.dataset.subtotal = totalDinero.toFixed(2);
+    modalTotal.dataset.envio = costoEnvio.toFixed(2);
+    modalTotal.dataset.comision = costoComision.toFixed(2);
+    modalTotal.dataset.metodopago = metodoPago === "PayPal" ? "PayPal (+5%)" : "Transferencia Bancaria";
+    // ===============================================
 
     // ===== 5. TEXTOS DE MAYOREO ULTRA CORTOS =====
     let bannerMayoreoHTML = "";
