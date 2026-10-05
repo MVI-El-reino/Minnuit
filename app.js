@@ -162,64 +162,36 @@ function actualizarConfiguradorBases() {
     const tamanoSelect = document.getElementById("sel_tamano_base");
     const selectColor = document.getElementById("sel_color_logo_base");
 
-    // 1. Rescatamos los valores que el cliente tiene seleccionados actualmente
     const grosorActual = grosorSelect.value;
     const tamanoActual = tamanoSelect.value;
     const colorActual = selectColor.value;
 
-    // 2. Extraemos los valores puros disponibles (sin los precios viejos)
     const tamanosDisponibles = Array.from(tamanoSelect.options).map(opt => opt.value);
     const grosoresDisponibles = Array.from(grosorSelect.options).map(opt => opt.value);
-
     const precios = (linea === "Basic") ? basesBasicPrecios : basesPremiumPrecios;
 
-    // ================================================================
-    // OPCIÓN NUCLEAR 1: TAMAÑOS
-    // ================================================================
+    // ACTUALIZACIÓN FANTASMA (Sin destruir el menú)
     if (instanciasSelect["sel_tamano_base"]) {
-        instanciasSelect["sel_tamano_base"].destroy();
+        let opcionesTamano = tamanosDisponibles.map(val => ({
+            value: val, label: `${val} - $${precios[grosorActual][val]}`, selected: (val === tamanoActual)
+        }));
+        instanciasSelect["sel_tamano_base"].setChoices(opcionesTamano, 'value', 'label', true);
     }
-    tamanoSelect.innerHTML = "";
-    tamanosDisponibles.forEach(val => {
-        let precio = precios[grosorActual][val];
-        let nuevaOpcion = new Option(`${val} - $${precio}`, val);
-        if (val === tamanoActual) nuevaOpcion.selected = true;
-        tamanoSelect.add(nuevaOpcion);
-    });
-    instanciasSelect["sel_tamano_base"] = new Choices(tamanoSelect, { searchEnabled: false, itemSelectText: '', shouldSort: false, position: 'auto' });
 
-    // ================================================================
-    // OPCIÓN NUCLEAR 2: GROSORES
-    // ================================================================
     if (instanciasSelect["sel_grosor_base"]) {
-        instanciasSelect["sel_grosor_base"].destroy();
+        let opcionesGrosor = grosoresDisponibles.map(val => ({
+            value: val, label: `${val} - $${precios[val][tamanoActual]}`, selected: (val === grosorActual)
+        }));
+        instanciasSelect["sel_grosor_base"].setChoices(opcionesGrosor, 'value', 'label', true);
     }
-    grosorSelect.innerHTML = "";
-    grosoresDisponibles.forEach(val => {
-        let precio = precios[val][tamanoActual];
-        let nuevaOpcion = new Option(`${val} - $${precio}`, val);
-        if (val === grosorActual) nuevaOpcion.selected = true;
-        grosorSelect.add(nuevaOpcion);
-    });
-    instanciasSelect["sel_grosor_base"] = new Choices(grosorSelect, { searchEnabled: false, itemSelectText: '', shouldSort: false, position: 'auto' });
 
-    // ================================================================
-    // OPCIÓN NUCLEAR 3: COLORES DE LOGOTIPO
-    // ================================================================
     if (instanciasSelect["sel_color_logo_base"]) {
-        instanciasSelect["sel_color_logo_base"].destroy();
+        let opcionesColor = coloresLogotipo[linea].map(color => ({
+            value: color, label: color.charAt(0).toUpperCase() + color.slice(1), selected: (color === colorActual)
+        }));
+        instanciasSelect["sel_color_logo_base"].setChoices(opcionesColor, 'value', 'label', true);
     }
-    selectColor.innerHTML = "";
-    coloresLogotipo[linea].forEach(color => {
-        let nuevaOpcion = new Option(color.charAt(0).toUpperCase() + color.slice(1), color);
-        if (color === colorActual) nuevaOpcion.selected = true;
-        selectColor.add(nuevaOpcion);
-    });
-    instanciasSelect["sel_color_logo_base"] = new Choices(selectColor, { searchEnabled: false, itemSelectText: '', shouldSort: false, position: 'auto' });
 
-    // ================================================================
-    // 4. ACTUALIZACIÓN DEL PRECIO MAESTRO EN PANTALLA
-    // ================================================================
     precioBaseActual = precios[grosorActual][tamanoActual];
     document.getElementById("precio_config_base").innerText = `$${precioBaseActual.toFixed(2)} MXN`;
 }
@@ -261,7 +233,7 @@ function actualizarConfiguradorCupcakes() {
     if (!tamanoSelect || !tieneSoporteSelect || !soporteSelect) return; 
 
     // ================================================================
-    // Mostrar u ocultar el menú de colores
+    // Mostrar u ocultar el menú de colores (¡SÍ LO CONSERVAMOS!)
     // ================================================================
     const contenedorColorSoporte = document.getElementById("contenedor_color_soporte");
     if (tieneSoporteSelect.value === "Si") {
@@ -270,60 +242,48 @@ function actualizarConfiguradorCupcakes() {
         contenedorColorSoporte.style.display = "none";
     }
 
-    // ================================================================
-    // EL CÓDIGO QUE ME MANDASTE: Rescate para la opción nuclear
-    // ================================================================
     const tamanoActual = tamanoSelect.value;
-    const tieneSoporteActual = tieneSoporteSelect.value;
-    const colorActual = soporteSelect.value;
     const soporteActual = soporteSelect.value; 
     
     const tamanosDisponibles = Array.from(tamanoSelect.options).map(opt => opt.value);
     const soportesDisponibles = Array.from(soporteSelect.options).map(opt => opt.value);
 
     // ================================================================
-    // OPCIÓN NUCLEAR 1: TAMAÑOS
+    // NUEVA ACTUALIZACIÓN FANTASMA 1: TAMAÑOS Y TEXTOS LARGOS
     // ================================================================
-    if (instanciasSelect["sel_tamano_cupcake"]) {
-        instanciasSelect["sel_tamano_cupcake"].destroy();
-    }
-    tamanoSelect.innerHTML = "";
-    
-    // Diccionario con los textos completos que pidió Ely
+    // Diccionario con los textos completos que pidió Ely (¡SÍ LO CONSERVAMOS!)
     const nombresLargosCupcakes = {
         "21cm": "21 x 12 x 7.5 cm",
         "31cm": "31 x 12 x 7.5 cm"
     };
 
-    tamanosDisponibles.forEach(val => {
-        // Calculamos el precio base + el extra del soporte seleccionado
-        let pBase = cupcakesPreciosBase[val] + cupcakesPreciosSoporte[soporteActual];
-        
-        // Leemos el texto largo, o usamos el corto si no lo encuentra
-        let textoAmostar = nombresLargosCupcakes[val] || val;
-        
-        let nuevaOpcion = new Option(`${textoAmostar} - $${pBase}`, val);
-        if (val === tamanoActual) nuevaOpcion.selected = true;
-        tamanoSelect.add(nuevaOpcion);
-    });
-    instanciasSelect["sel_tamano_cupcake"] = new Choices(tamanoSelect, { searchEnabled: false, itemSelectText: '', shouldSort: false, position: 'auto' });
+    if (instanciasSelect["sel_tamano_cupcake"]) {
+        let opcionesTamano = tamanosDisponibles.map(val => {
+            // Calculamos el precio base + el extra del soporte seleccionado
+            let pBase = cupcakesPreciosBase[val] + cupcakesPreciosSoporte[soporteActual];
+            
+            // Leemos el texto largo, o usamos el corto si no lo encuentra
+            let textoAmostar = nombresLargosCupcakes[val] || val;
+            
+            // Retornamos el objeto limpio para que la librería lo actualice sin parpadear
+            return { value: val, label: `${textoAmostar} - $${pBase}`, selected: (val === tamanoActual) };
+        });
+        instanciasSelect["sel_tamano_cupcake"].setChoices(opcionesTamano, 'value', 'label', true);
+    }
 
     // ================================================================
-    // OPCIÓN NUCLEAR 2: COLORES DE SOPORTE
+    // NUEVA ACTUALIZACIÓN FANTASMA 2: COLORES DE SOPORTE Y PRECIOS
     // ================================================================
     if (instanciasSelect["sel_color_soporte"]) {
-        instanciasSelect["sel_color_soporte"].destroy();
+        let opcionesSoporte = soportesDisponibles.map(val => {
+            // Verificamos si el soporte tiene costo extra o es gratis
+            let pExtra = cupcakesPreciosSoporte[val];
+            let extraTxt = pExtra > 0 ? `(+$${pExtra})` : `(Gratis)`;
+            
+            return { value: val, label: `${val} ${extraTxt}`, selected: (val === soporteActual) };
+        });
+        instanciasSelect["sel_color_soporte"].setChoices(opcionesSoporte, 'value', 'label', true);
     }
-    soporteSelect.innerHTML = "";
-    soportesDisponibles.forEach(val => {
-        // Verificamos si el soporte tiene costo extra o es gratis
-        let pExtra = cupcakesPreciosSoporte[val];
-        let extraTxt = pExtra > 0 ? `(+$${pExtra})` : `(Gratis)`;
-        let nuevaOpcion = new Option(`${val} ${extraTxt}`, val);
-        if (val === soporteActual) nuevaOpcion.selected = true;
-        soporteSelect.add(nuevaOpcion);
-    });
-    instanciasSelect["sel_color_soporte"] = new Choices(soporteSelect, { searchEnabled: false, itemSelectText: '', shouldSort: false, position: 'auto' });
 
     // ================================================================
     // 3. ACTUALIZACIÓN DEL PRECIO MAESTRO EN PANTALLA
@@ -367,7 +327,6 @@ function actualizarConfiguradorPasteles() {
     
     if (!tipoObj || !tamanoObj) return;
 
-    // 1. Matemáticas de Mayoreo
     let totalEnCarrito = carrito.reduce((sum, item) => item.tipoPastel ? sum + item.cantidad : sum, 0);
     const cantidadActual = parseInt(document.getElementById("cant_pastel_config").value) || 1;
     let cantidadTotalEvaluada = totalEnCarrito + cantidadActual;
@@ -380,26 +339,19 @@ function actualizarConfiguradorPasteles() {
     else if (cantidadTotalEvaluada >= 150) { indicePrecio = 3; nivelTexto = "3er Mayoreo (+150 pzas)"; }
 
     const tipo = tipoObj.value;
-
-    // ================================================================
-    // 2. NUEVA LÓGICA: MENÚ DINÁMICO DE REDES SOCIALES
-    // ================================================================
     const redes = document.getElementById("sel_redes_pastel").value;
     const contenedorRedes = document.getElementById("contenedor_redes_medida");
     const medidaRedesObj = document.getElementById("sel_medida_redes");
     
     let costoExtraRedes = 0;
-
     if (redes === "Si") {
-        contenedorRedes.style.display = "block"; // Revelamos el menú
-        costoExtraRedes = parseFloat(medidaRedesObj.value) || 0; // Extraemos el precio del value (5, 6 u 8)
+        contenedorRedes.style.display = "block";
+        costoExtraRedes = parseFloat(medidaRedesObj.value) || 0;
     } else {
-        contenedorRedes.style.display = "none"; // Ocultamos el menú
-        costoExtraRedes = 0; // El costo vuelve a cero
+        contenedorRedes.style.display = "none";
+        costoExtraRedes = 0;
     }
-    // ================================================================
 
-    // 3. Rescatamos el tamaño que el cliente tenía seleccionado
     let tamanoSeleccionado = tamanoObj.value;
     let tamanosDisponibles = Object.keys(pastelesData[tipo]);
 
@@ -407,45 +359,23 @@ function actualizarConfiguradorPasteles() {
         tamanoSeleccionado = tamanosDisponibles[0];
     }
 
-    // 4. OPCIÓN NUCLEAR: Destruimos la librería
+    // ACTUALIZACIÓN FANTASMA
     if (instanciasSelect["sel_tamano_pastel"]) {
-        instanciasSelect["sel_tamano_pastel"].destroy();
+        let opcionesNuevas = tamanosDisponibles.map(tamano => {
+            let precioOpcion = pastelesData[tipo][tamano].precios[indicePrecio] + costoExtraRedes;
+            return { value: tamano, label: `${tamano} - $${precioOpcion}`, selected: (tamano === tamanoSeleccionado) };
+        });
+        instanciasSelect["sel_tamano_pastel"].setChoices(opcionesNuevas, 'value', 'label', true);
     }
 
-    // 5. Limpiamos HTML e inyectamos los nuevos precios
-    tamanoObj.innerHTML = "";
-    tamanosDisponibles.forEach(tamano => {
-        let precioOpcion = pastelesData[tipo][tamano].precios[indicePrecio];
-        
-        // Aquí sumamos el costo dinámico de las redes (será 0 si eligió "No")
-        precioOpcion += costoExtraRedes; 
-        
-        let nuevaOpcion = new Option(`${tamano} - $${precioOpcion}`, tamano);
-        if (tamano === tamanoSeleccionado) {
-            nuevaOpcion.selected = true;
-        }
-        tamanoObj.add(nuevaOpcion);
-    });
-
-    // 6. Revivimos la librería
-    instanciasSelect["sel_tamano_pastel"] = new Choices(tamanoObj, {
-        searchEnabled: false,
-        itemSelectText: '',
-        shouldSort: false,
-        position: 'auto'
-    });
-
-    // 7. Actualizamos el precio principal gigante
     const datosTamano = pastelesData[tipo][tamanoSeleccionado];
-    let precioBase = datosTamano.precios[indicePrecio];
-    
-    precioBase += costoExtraRedes; // Actualizamos el total maestro
-
+    let precioBase = datosTamano.precios[indicePrecio] + costoExtraRedes;
     precioPastelActual = precioBase;
     
     document.getElementById("precio_config_pastel").innerText = `$${precioPastelActual.toFixed(2)} MXN`;
     document.getElementById("indicador_mayoreo").innerText = `Nivel Activo: ${nivelTexto}`;
 }
+
 function agregarPastelConfigAlCarrito() {
     const cantidad = parseInt(document.getElementById("cant_pastel_config").value);
     const tipo = document.getElementById("sel_tipo_pastel").value;
