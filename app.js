@@ -711,7 +711,7 @@ async function procesarPedido() {
     let valEnvio = parseFloat(datosTotal.envio || 0);
     let valComision = parseFloat(datosTotal.comision || 0);
     let metodoPagoTexto = datosTotal.metodopago || "Transferencia";
-    let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger/Acordar";
+    let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger en taller Minuit / Mandar Uber";
 
     // 2. Plantilla exacta de WhatsApp solicitada por Ely
     let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *TOTAL A PAGAR: ${totalTxt}*\n`;
