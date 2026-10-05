@@ -534,6 +534,7 @@ function abrirModal() {
 function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
 }
+
 function abrirModalDatos() {
     if(carrito.length === 0) return mostrarAlerta("Tu carrito está vacío.");
 
@@ -553,7 +554,21 @@ function abrirModalDatos() {
 function cerrarModalDatos() {
     document.getElementById("modal-datos").style.display = "none";
 }
+function alternarModoEntrega() {
+    const metodo = document.getElementById("sel_entrega").value;
+    const bloqueTaller = document.getElementById("bloque_recoger_taller");
+    const bloqueEnvio = document.getElementById("bloque_envio_nacional");
 
+    if (metodo === "300") {
+        // Eligió Envío Nacional: Oculta Taller, Muestra Botón Dirección
+        bloqueTaller.style.display = "none";
+        bloqueEnvio.style.display = "block";
+    } else {
+        // Eligió Recoger: Muestra Taller, Oculta Botón Dirección
+        bloqueTaller.style.display = "block";
+        bloqueEnvio.style.display = "none";
+    }
+}
 // NUEVAS FUNCIONES PARA EL MODAL DE DIRECCIÓN
 function abrirModalDireccion() {
     // Cerramos el modal de datos temporalmente
@@ -584,7 +599,7 @@ function mostrarTerminosEnvio() {
         "• El pago de $300 cubre el envío estándar. Si al momento de generar tu guía el sistema marca un costo excedente (zona extendida o sobrepeso), te avisaremos para cubrir la diferencia antes del envío.\n\n" +
         "• Tiempo de elaboración: 2 a 3 semanas.\n" +
         "• Tiempo de trayecto (paquetería): 2 a 3 días hábiles adicionales.\n\n" +
-        "• Recuerda: Se requiere el pago del monto total para poder agendar tu pedido en nuestro calendario. ✨"
+        "• Recuerda: Se requiere el pago del monto total para poder agendar tu pedido en nuestro calendario."
     );
 }
 // ==========================================
@@ -606,16 +621,30 @@ async function procesarPedido() {
     let dirEstado = document.getElementById("dir_estado").value.trim();
     let dirReferencias = document.getElementById("dir_referencias").value.trim();
 
-    // 1. VALIDACIÓN SUPER ESTRICTA
-    if (!nombreCliente || !telCliente || !dirCalle || !dirNumero || !dirColonia || !dirCp || !dirCiudad || !dirEstado) {
+    // 1. Validar solo lo básico primero
+    if (!nombreCliente || !telCliente) {
         abrirModalDatos();
-        return mostrarAlerta("⚠️ Por favor llena tus datos y la dirección completa de envío.");
+        return mostrarAlerta("⚠️ Por favor llena tu Nombre y Teléfono.");
     }
     
     if (carrito.length === 0) return mostrarAlerta("🛒 Tu carrito está vacío.");
 
-    // 2. Unimos todo para pasárselo al PDF y a WhatsApp de forma limpia
-   let direccionCliente = `${dirCalle} #${dirNumero}, Col. ${dirColonia}, C.P. ${dirCp}, ${dirCiudad}, ${dirEstado}. Ref: ${dirReferencias || "Ninguna"}`;
+    let metodoEnvioSeleccionado = document.getElementById("sel_entrega").value;
+    let direccionCliente = "";
+
+    // 2. Validación Inteligente según el envío
+    if (metodoEnvioSeleccionado === "300") {
+        // Si es foráneo, obligamos a llenar todo
+        if (!dirCalle || !dirNumero || !dirColonia || !dirCp || !dirCiudad || !dirEstado) {
+            abrirModalDireccion();
+            return mostrarAlerta("📍 Por favor completa todos los datos de tu Dirección de Envío.");
+        }
+        // Armamos la dirección completa para el PDF
+        direccionCliente = `${dirCalle} #${dirNumero}, Col. ${dirColonia}, C.P. ${dirCp}, ${dirCiudad}, ${dirEstado}. Ref: ${dirReferencias || "Ninguna"}`;
+    } else {
+        // Si es local, lo dejamos pasar libremente y le ponemos este texto al PDF
+        direccionCliente = "Entrega Local: Recogerá en Taller Minuit.";
+    }
 
     // 3. Guardar en memoria
     localStorage.setItem("minuit_nombre", nombreCliente);
