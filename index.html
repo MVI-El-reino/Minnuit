@@ -289,20 +289,29 @@
         <input type="text" id="ig_cliente" placeholder=" Usuario de Instagram" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
         <input type="email" id="correo_cliente" placeholder=" Correo electrónico" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
         
-        <!-- Botón para abrir el Modal de Dirección -->
-        <button type="button" onclick="abrirModalDireccion()" style="width: 100%; padding: 12px; background: #fdf0f4; border: 2px dashed #e87b9e; border-radius: 8px; color: #e87b9e; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 1rem;">
-            📍 Llenar Dirección de Envío
-        </button>
-
-        <!-- AQUÍ VA TU BLOQUE DE ENVÍO CON EL BOTÓN "!" -->
+       <!-- 1. PRIMERO PREGUNTAMOS EL TIPO DE ENVÍO -->
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
             <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40; margin: 0;">🚚 Envío:</label>
             <button type="button" onclick="mostrarTerminosEnvio()" style="background: #e87b9e; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(232, 123, 158, 0.3);">!</button>
         </div>
-        <select id="sel_entrega" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px;">
+        <!-- Agregamos la función alternarModoEntrega() al onchange -->
+        <select id="sel_entrega" onchange="alternarModoEntrega(); actualizarVistaCarrito()" style="width: 100%; padding: 10px; font-size: 16px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px;">
             <option value="0">Recoger en taller Minuit / Mandar Uber</option>
-            <option value="300">Envío Nacional (+$300.00 man)</option>
+            <option value="300">Envío Nacional (+$300.00 MXN)</option>
         </select>
+
+        <!-- 2. ZONA A: RECOGER EN TALLER (Visible por defecto) -->
+        <div id="bloque_recoger_taller" style="background: #fdf0f4; border: 1px dashed #e87b9e; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: center;">
+            <p style="margin: 0; font-size: 0.9rem; color: #4a3b40; font-weight: bold;">🏪 Recoger en Taller Minuit</p>
+            <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: #e87b9e;">(La dirección exacta y horarios se te enviarán por WhatsApp al confirmar tu pedido).</p>
+        </div>
+
+        <!-- 3. ZONA B: ENVÍO NACIONAL (Oculta por defecto) -->
+        <div id="bloque_envio_nacional" style="display: none; margin-bottom: 15px;">
+            <button type="button" onclick="abrirModalDireccion()" style="width: 100%; padding: 12px; background: #fff; border: 2px dashed #e87b9e; border-radius: 8px; color: #e87b9e; font-weight: bold; cursor: pointer; font-size: 16px;">
+                📍 Llenar Dirección de Envío
+            </button>
+        </div>
         
         <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40;">💳 Pago:</label>
         <select id="sel_pago" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px;">
