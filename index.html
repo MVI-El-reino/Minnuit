@@ -200,8 +200,8 @@
         <section id="cajas_cupcakes" class="categoria-seccion">
             <div class="card-producto card-configurador">
                 <h3>Cajas para Cupcakes, galletas y/o postres.</h3>
-                <p>Mínimo de compra: 5 piezas.</p>
-                <p>Combínalas con cajas para pasteles</p>
+                <p>Mínimo de compra: 30 piezas.</p>
+                <p>Combínalas con cajas para pastel</p>
 
                 <!-- INICIO DE LA FILA DE PRECIO Y CANTIDAD -->
                 <div class="fila-precio-cantidad">
@@ -231,7 +231,7 @@
                 <div class="controles-config">
                     <label for="sel_tiene_soporte">Soporte para cupcakes:</label>
                     <select id="sel_tiene_soporte" style="font-size: 16px;" onchange="actualizarConfiguradorCupcakes()">
-                        <option value="No">No gracias, Solo la caja</option>
+                        <option value="No">No, solo la caja</option>
                         <option value="Si">Sí, agregar soporte</option>
                     </select>
                 </div>
@@ -307,7 +307,7 @@
         <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40;">💳 Pago:</label>
         <select id="sel_pago" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px;">
             <option value="Transferencia">Transferencia Bancaria (Sin comisión)</option>
-            <option value="Tarjeta">Tarjeta / PayPal (+5% de comisión)</option>
+            <option value="Tarjeta">PayPal (+5% de comisión)</option>
         </select>
 
         <!-- Botón final para disparar el PDF y WhatsApp -->
