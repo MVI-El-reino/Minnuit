@@ -897,35 +897,45 @@ async function procesarPedido() {
         const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
 
         // =========================================================
-        // SUBIR A GOOGLE DRIVE 
+        // SUBIR A GOOGLE DRIVE (AHORA BLINDADO CONTRA SATURACIÓN)
         // =========================================================
         const pdfBase64 = pdf.output('datauristring');
         const urlGoogleScript = "https://script.google.com/macros/s/AKfycbw_RFDbSPc0tZNODZ2cltlC26DtKGciqqkkrLvhHSeg-NkyJ-CfpaQiMbfS0ftjHa77-A/exec";
 
-        const respuesta = await fetch(urlGoogleScript, {
-            method: 'POST',
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ nombreArchivo: nombreArchivo, base64: pdfBase64 })
-        });
+        try {
+            // Intentamos conectar a Google Drive
+            const respuesta = await fetch(urlGoogleScript, {
+                method: 'POST',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ nombreArchivo: nombreArchivo, base64: pdfBase64 })
+            });
 
-        const resultado = await respuesta.json();
+            const resultado = await respuesta.json();
 
-        if (resultado.estatus === 'exito') {
-            textoWhatsApp += `\n📁 *Descarga el PDF de registro aquí:*\n👉 ${resultado.urlDrive}`;
-            pdf.save(nombreArchivo); 
-        } else {
-            pdf.save(nombreArchivo); 
+            if (resultado.estatus === 'exito') {
+                textoWhatsApp += `\n📁 *Descarga el PDF de registro aquí:*\n👉 ${resultado.urlDrive}`;
+            }
+        } catch (errorDrive) {
+            // Si Google Drive se satura o tarda mucho, atrapamos el error en silencio
+            // y permitimos que el código continúe para no perder al cliente.
+            console.warn("Google Drive tardó demasiado, saltando guardado en la nube.");
         }
 
+        // =========================================================
+        // CIERRE DE VENTA (ESTO SE EJECUTA SÍ O SÍ)
+        // =========================================================
+        // Sin importar si Drive funcionó o falló, siempre le damos el PDF al cliente 
+        // y lo mandamos a WhatsApp para cerrar su pedido.
+        pdf.save(nombreArchivo); 
         abrirWhatsAppYLimpiar(textoWhatsApp);
 
     } catch (error) {
+        // Este error ya solo saltará si falla la creación del PDF en sí (casi imposible)
         console.error("Error al procesar el pedido:", error);
-        alert("Ocurrió un error general al generar el PDF o conectarse a la nube.");
+        alert("Ocurrió un error al generar la nota. Por favor intenta de nuevo.");
         document.querySelector(".btn-pedido").disabled = false;
     }
 }
-
 function abrirWhatsAppYLimpiar(textoWhatsApp) {
     let textoCodificado = encodeURIComponent(textoWhatsApp);
     let linkWhatsApp = `https://wa.me/${numeroDueno}?text=${textoCodificado}`;
