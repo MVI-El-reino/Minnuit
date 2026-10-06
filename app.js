@@ -735,32 +735,45 @@ async function procesarPedido() {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF("p", "mm", "a4");
 
-        // --- COLORES ACTUALIZADOS (Rosa claro #f48fb1 = 244, 143, 177) ---
+       // --- COLORES ACTUALIZADOS ---
         const COLOR_PRINCIPAL = [244, 143, 177];
         const COLOR_FONDO = [253, 240, 244];
         const COLOR_TEXTO = [74, 59, 64];
 
-        // --- ENCABEZADO Y LOGO REAL DESDE EL REPOSITORIO ---
+        // --- ENCABEZADO Y LOGO (NUEVO MÉTODO ANTI-BLOQUEOS) ---
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, 210, 35, "F");
 
         try {
-            const imgLogo = new Image();
-            // Usamos el mismo archivo que ya tienes en tu barra superior de navegación
-            imgLogo.src = "Logo%20Minuit1.png"; 
-            
-            // Obligamos al código a esperar que la imagen descargue sin romper el PDF
-            await new Promise((resolve, reject) => {
-                imgLogo.onload = resolve;
+            const logoData = await new Promise((resolve, reject) => {
+                const imgLogo = new Image();
+                imgLogo.crossOrigin = "Anonymous"; 
+                
+                // 1. Asignamos instrucciones ANTES de decirle qué cargar
+                imgLogo.onload = () => {
+                    const tempCanvas = document.createElement("canvas");
+                    tempCanvas.width = imgLogo.width;
+                    tempCanvas.height = imgLogo.height;
+                    tempCanvas.getContext("2d").drawImage(imgLogo, 0, 0);
+                    
+                    // Resolvemos entregando la imagen en Base64 puro
+                    resolve({
+                        base64: tempCanvas.toDataURL("image/png"),
+                        proporcion: imgLogo.height / imgLogo.width
+                    });
+                };
+                
                 imgLogo.onerror = reject;
+                
+                // 2. Ahora sí disparamos la carga del logo
+                imgLogo.src = "Logo%20Minuit1.png"; 
             });
-            
-            // Si cargó bien, la insertamos cuidando sus proporciones
-            let proporcion = imgLogo.height / imgLogo.width;
-            pdf.addImage(imgLogo, "PNG", 75, 5, 60, 60 * proporcion);
+
+            // Usamos el Base64 puro para que jsPDF no se congele
+            pdf.addImage(logoData.base64, "PNG", 75, 5, 60, 60 * logoData.proporcion);
+
         } catch (errorImagen) {
-            // Plan de emergencia: Si el internet falla y no carga el logo, 
-            // ponemos texto rosa para que la clienta nunca se quede sin su PDF.
+            // Plan de emergencia si la imagen falla
             pdf.setTextColor(...COLOR_PRINCIPAL);
             pdf.setFont("helvetica", "bold");
             pdf.setFontSize(22);
