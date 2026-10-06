@@ -477,7 +477,7 @@ function actualizarVistaCarrito() {
 
     // ===== NUEVO: CÁLCULOS DE ENVÍO Y COMISIÓN =====
     let costoEnvio = 0;
-    let costoComision = 0;
+    let costoComision = 0; // ¡Debe decir costoComision!
     
     // Leemos qué eligieron en el select de envío
     const selEntrega = document.getElementById("sel_entrega");
@@ -490,12 +490,12 @@ function actualizarVistaCarrito() {
     let metodoPago = "Transferencia";
     if (selPago) {
         metodoPago = selPago.value;
-        if (metodoPago === "Tarjeta") {
+        if (metodoPago === "PayPal") {
             costoComision = (totalDinero + costoEnvio) * 0.05; // 5% sobre el total
         }
     }
     
-    let granTotal = totalDinero + costoEnvio + costoComision;
+    let granTotal = totalDinero + costoEnvio + costoComision; // Todo bien sumado
     
     // Actualizamos los textos visuales de la página
     document.getElementById("fab-total").innerText = "$" + granTotal.toFixed(2);
@@ -506,7 +506,7 @@ function actualizarVistaCarrito() {
     // Guardamos los datos desglosados en el "dataset" para que el PDF los lea
     modalTotal.dataset.subtotal = totalDinero.toFixed(2);
     modalTotal.dataset.envio = costoEnvio.toFixed(2);
-    modalTotal.dataset.sion = costosion.toFixed(2);
+    modalTotal.dataset.comision = costoComision.toFixed(2); // Y aquí también debe decir costoComision
     modalTotal.dataset.metodopago = metodoPago === "PayPal" ? "PayPal (+5%)" : "Transferencia Bancaria";
     // ===============================================
 
