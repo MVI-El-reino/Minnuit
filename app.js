@@ -660,6 +660,8 @@ function mostrarTerminosEnvio() {
 // GENERACIÓN DEL PDF NATIVO Y GOOGLE DRIVE
 // ==========================================
 async function procesarPedido() {
+    // 0. Forzamos una última actualización matemática antes de imprimir el PDF
+    actualizarVistaCarrito();
     let nombreCliente = document.getElementById("nombre_cliente").value.trim();
     let telCliente = document.getElementById("tel_cliente").value.trim();
     let correoCliente = document.getElementById("correo_cliente").value.trim() || "No especificado";
