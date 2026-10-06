@@ -735,28 +735,37 @@ async function procesarPedido() {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF("p", "mm", "a4");
 
-        const COLOR_PRINCIPAL = [232, 123, 158];
+        // --- COLORES ACTUALIZADOS (Rosa claro #f48fb1 = 244, 143, 177) ---
+        const COLOR_PRINCIPAL = [244, 143, 177];
         const COLOR_FONDO = [253, 240, 244];
         const COLOR_TEXTO = [74, 59, 64];
 
-       // --- ENCABEZADO Y LOGO ---
+        // --- ENCABEZADO Y LOGO REAL DESDE EL REPOSITORIO ---
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, 210, 35, "F");
 
-        const canvasLogo = document.createElement("canvas");
-        canvasLogo.width = 500;
-        canvasLogo.height = 150;
-        const ctx = canvasLogo.getContext("2d");
-        const gradiente = ctx.createLinearGradient(0, 0, 500, 150);
-        gradiente.addColorStop(0, "#f48fb1");
-        gradiente.addColorStop(1, "#e16b90");
-        ctx.font = "bold 130px 'Dancing Script', cursive";
-        ctx.fillStyle = gradiente;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("Minuit", 250, 75);
-        
-        pdf.addImage(canvasLogo.toDataURL("image/png"), "PNG", 70, 5, 70, 21);
+        try {
+            const imgLogo = new Image();
+            // Usamos el mismo archivo que ya tienes en tu barra superior de navegación
+            imgLogo.src = "Logo%20Minuit1.png"; 
+            
+            // Obligamos al código a esperar que la imagen descargue sin romper el PDF
+            await new Promise((resolve, reject) => {
+                imgLogo.onload = resolve;
+                imgLogo.onerror = reject;
+            });
+            
+            // Si cargó bien, la insertamos cuidando sus proporciones
+            let proporcion = imgLogo.height / imgLogo.width;
+            pdf.addImage(imgLogo, "PNG", 75, 5, 60, 60 * proporcion);
+        } catch (errorImagen) {
+            // Plan de emergencia: Si el internet falla y no carga el logo, 
+            // ponemos texto rosa para que la clienta nunca se quede sin su PDF.
+            pdf.setTextColor(...COLOR_PRINCIPAL);
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(22);
+            pdf.text("Minuit", 105, 18, { align: "center" });
+        }
 
         pdf.setTextColor(158, 127, 138); 
         pdf.setFont("helvetica", "bold");
