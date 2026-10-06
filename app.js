@@ -207,7 +207,14 @@ function agregarBaseConfigAlCarrito() {
     const nombreCompuesto = `Base ${linea} ${forma} ${grosor} ${tamano}`;
     const detalleCompuesto = `Logo: ${colorLogo}`;
     
-    carrito.push({ nombre: nombreCompuesto, cantidad, detalle: detalleCompuesto, precio: precioBaseActual, subtotal: precioBaseActual * cantidad });
+    // LÓGICA ANTI-DUPLICADOS
+    const index = carrito.findIndex(item => item.nombre === nombreCompuesto && item.detalle === detalleCompuesto);
+    if (index !== -1) {
+        carrito[index].cantidad += cantidad;
+        carrito[index].subtotal = carrito[index].cantidad * precioBaseActual;
+    } else {
+        carrito.push({ nombre: nombreCompuesto, cantidad, detalle: detalleCompuesto, precio: precioBaseActual, subtotal: precioBaseActual * cantidad });
+    }
     
     resetearSelect("sel_linea_base");
     resetearSelect("sel_grosor_base");
@@ -300,7 +307,14 @@ function agregarCupcakeConfigAlCarrito() {
     const nombre = `Caja ${tamano} Cupcakes`;
     const detalle = `Soporte interior: ${soporte}`;
     
-    carrito.push({ nombre, cantidad, detalle, precio: precioCupcakeActual, subtotal: precioCupcakeActual * cantidad });
+    // LÓGICA ANTI-DUPLICADOS
+    const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
+    if (index !== -1) {
+        carrito[index].cantidad += cantidad;
+        carrito[index].subtotal = carrito[index].cantidad * precioCupcakeActual;
+    } else {
+        carrito.push({ nombre, cantidad, detalle, precio: precioCupcakeActual, subtotal: precioCupcakeActual * cantidad });
+    }
     
     resetearSelect("sel_tamano_cupcake");
     resetearSelect("sel_color_soporte");
@@ -388,12 +402,19 @@ function agregarPastelConfigAlCarrito() {
     const detalle = `Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
     
     // IMPORTANTE: Guardamos parámetros ocultos para poder recalcular precios después
-    carrito.push({ 
-        nombre, cantidad, detalle, precio: precioPastelActual, subtotal: precioPastelActual * cantidad,
-        tipoPastel: tipo,
-        tamanoPastel: tamano,
-        redesPastel: redes
-    });
+    // LÓGICA ANTI-DUPLICADOS
+    const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
+    if (index !== -1) {
+        carrito[index].cantidad += cantidad;
+        carrito[index].subtotal = carrito[index].cantidad * precioPastelActual;
+    } else {
+        carrito.push({ 
+            nombre, cantidad, detalle, precio: precioPastelActual, subtotal: precioPastelActual * cantidad,
+            tipoPastel: tipo,
+            tamanoPastel: tamano,
+            redesPastel: redes
+        });
+    }
     
     resetearSelect("sel_tipo_pastel");
     actualizarOpcionesTamanoPastel();
