@@ -736,44 +736,34 @@ async function procesarPedido() {
         const pdf = new jsPDF("p", "mm", "a4");
 
        // --- COLORES ACTUALIZADOS ---
+        // --- COLORES ACTUALIZADOS ---
         const COLOR_PRINCIPAL = [244, 143, 177];
         const COLOR_FONDO = [253, 240, 244];
         const COLOR_TEXTO = [74, 59, 64];
 
-        // --- ENCABEZADO Y LOGO (NUEVO MÉTODO ANTI-BLOQUEOS) ---
+        // --- ENCABEZADO Y LOGO REAL (MÉTODO INVENCIBLE) ---
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, 210, 35, "F");
 
         try {
-            const logoData = await new Promise((resolve, reject) => {
-                const imgLogo = new Image();
-                imgLogo.crossOrigin = "Anonymous"; 
-                
-                // 1. Asignamos instrucciones ANTES de decirle qué cargar
-                imgLogo.onload = () => {
-                    const tempCanvas = document.createElement("canvas");
-                    tempCanvas.width = imgLogo.width;
-                    tempCanvas.height = imgLogo.height;
-                    tempCanvas.getContext("2d").drawImage(imgLogo, 0, 0);
-                    
-                    // Resolvemos entregando la imagen en Base64 puro
-                    resolve({
-                        base64: tempCanvas.toDataURL("image/png"),
-                        proporcion: imgLogo.height / imgLogo.width
-                    });
-                };
-                
-                imgLogo.onerror = reject;
-                
-                // 2. Ahora sí disparamos la carga del logo
-                imgLogo.src = "Logo%20Minuit1.png"; 
+            // 1. Descargamos la imagen en formato crudo (evadiendo el bloqueo del canvas)
+            const respuestaLogo = await fetch("Logo%20Minuit1.png");
+            const blobLogo = await respuestaLogo.blob();
+
+            // 2. La traducimos a código Base64 puro
+            const base64Logo = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blobLogo);
             });
 
-            // Usamos el Base64 puro para que jsPDF no se congele
-            pdf.addImage(logoData.base64, "PNG", 75, 5, 60, 60 * logoData.proporcion);
+            // 3. Pegamos el logo al PDF (60mm de ancho x 22mm de alto)
+            pdf.addImage(base64Logo, "PNG", 75, 5, 60, 22);
 
         } catch (errorImagen) {
-            // Plan de emergencia si la imagen falla
+            console.error("Error forzando el logo:", errorImagen);
+            // Solo entrará aquí si el cliente se queda sin internet en ese microsegundo
             pdf.setTextColor(...COLOR_PRINCIPAL);
             pdf.setFont("helvetica", "bold");
             pdf.setFontSize(22);
