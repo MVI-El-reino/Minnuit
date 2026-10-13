@@ -1,6 +1,11 @@
 let carrito = [];
 const numeroDueno = "522215836232"; 
 
+// Colores del PDF de la nota de pedido (ajústalos a los de tu marca)
+const COLOR_FONDO = [250, 243, 246];
+const COLOR_TEXTO = [60, 50, 55];
+const COLOR_PRINCIPAL = [158, 127, 138];
+
 // Usa tus variables ofuscadas de Telegram aquí
 const tokenParte1 = "AQUI_TU_NUMERO"; 
 const tokenParte2 = "AQUI_TUS_LETRAS"; 
@@ -724,14 +729,14 @@ async function procesarPedido() {
     let datosTotal = document.getElementById("modal-total").dataset;
     let valSubtotal = parseFloat(datosTotal.subtotal || 0);
     let valEnvio = parseFloat(datosTotal.envio || 0);
-    let valsion = parseFloat(datosTotal.sion || 0);
+    let valComision = parseFloat(datosTotal.comision || 0);
     let metodoPagoTexto = datosTotal.metodopago || "Transferencia";
     let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger en taller Minuit / Mandar Uber";
 
     // 2. Plantilla exacta de WhatsApp solicitada por Ely
     let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *TOTAL A PAGAR: ${totalTxt}*\n`;
 
-   try {
+    try {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF("p", "mm", "a4");
 
@@ -856,7 +861,7 @@ async function procesarPedido() {
         if (y > 220) { pdf.addPage(); y = 30; }
 
         pdf.setFillColor(...COLOR_FONDO);
-        pdf.roundedRect(100, y, 95, valsion > 0 ? 38 : 32, 4, 4, "F");
+        pdf.roundedRect(100, y, 95, valComision > 0 ? 38 : 32, 4, 4, "F");
         
         pdf.setTextColor(...COLOR_TEXTO);
         pdf.setFontSize(10);
@@ -870,7 +875,7 @@ async function procesarPedido() {
         pdf.text("Envío Nacional:", 105, yDesglose);
         pdf.text("$" + valEnvio.toFixed(2), 190, yDesglose, { align: "right" });
         
-        if (valsion > 0) {
+        if (valComision > 0) {
             yDesglose += 7;
             pdf.text("Comisión Paypal (5%):", 105, yDesglose);
             pdf.text("$" + valComision.toFixed(2), 190, yDesglose, { align: "right" });
