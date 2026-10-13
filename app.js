@@ -831,7 +831,7 @@ async function procesarPedidoCompleto() {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10);
     pdf.setTextColor(100, 100, 100);
-    pdf.text("Minnuit - Empaques Personalizados", 195, 26, { align: "right" });
+    pdf.text("Minuit", 195, 26, { align: "right" });
 
     // 3. Línea divisoria del encabezado
     pdf.setDrawColor(220, 220, 220);
