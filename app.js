@@ -2,9 +2,9 @@ let carrito = [];
 const numeroDueno = "522215836232"; 
 
 // Colores del PDF de la nota de pedido (ajústalos a los de tu marca)
-const COLOR_FONDO = [250, 243, 246];
+const COLOR_FONDO = [252, 240, 245];
 const COLOR_TEXTO = [60, 50, 55];
-const COLOR_PRINCIPAL = [158, 127, 138];
+const COLOR_PRINCIPAL = [245, 143, 176];
 
 // Usa tus variables ofuscadas de Telegram aquí
 const tokenParte1 = "AQUI_TU_NUMERO"; 
@@ -837,7 +837,7 @@ async function procesarPedidoCompleto() {
     pdf.setDrawColor(220, 220, 220);
     pdf.line(15, 35, 195, 35);
 
-        pdf.setTextColor(158, 127, 138); 
+        pdf.setTextColor(...COLOR_PRINCIPAL); 
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(10);
         pdf.text("NOTA DE PEDIDO", 105, 32, { align: "center" });
