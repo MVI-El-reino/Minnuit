@@ -731,7 +731,7 @@ async function procesarPedido() {
     // 2. Plantilla exacta de WhatsApp solicitada por Ely
     let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *TOTAL A PAGAR: ${totalTxt}*\n`;
 
-    try {
+   try {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF("p", "mm", "a4");
 
@@ -761,25 +761,6 @@ async function procesarPedido() {
     pdf.setDrawColor(220, 220, 220);
     pdf.line(15, 35, 195, 35);
 
-    // --- SECCIÓN DE DATOS DEL CONFIGURADOR ---
-    pdf.setFont("helvetica", "bold");
-    pdf.setTextColor(33, 33, 33);
-    pdf.setFontSize(12);
-    pdf.text("Detalles de Configuración:", 15, 50);
-
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(11);
-    // Estos valores pueden inyectarse de forma dinámica desde los formularios de la web
-    pdf.text("Tipo de Empaque: Caja Autoarmable", 15, 60);
-    pdf.text("Dimensiones: 25x20x10 cm", 15, 67);
-    pdf.text("Cantidad: 150 unidades", 15, 74);
-
-    // --- DESCARGA DEL ARCHIVO ---
-    pdf.save("Pedido_Minnuit.pdf");
-
-} catch (error) {
-    console.error("Error al generar el documento PDF: ", error);
-}
         pdf.setTextColor(158, 127, 138); 
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(10);
