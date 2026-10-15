@@ -62,12 +62,45 @@ const instanciasSelect = {};
 // Copia de las opciones originales de cada selector (se guarda una sola vez al cargar la página)
 const opcionesOriginales = {};
 
-// Reemplaza las opciones de un selector Choices sin acumularlas
+// Configuración única de los menús Choices (la misma al arrancar y al reconstruirlos)
+const CONFIG_MENU = { searchEnabled: false, itemSelectText: "", shouldSort: false, position: "auto" };
+
+// Reemplaza las opciones de un menú. No edita la lista que ya está dibujada: quita el menú anterior,
+// deja el <select> nativo solo con las opciones nuevas y crea el menú otra vez.
+// Así nunca se acumulan opciones ni queda un menú viejo en pantalla.
 function reemplazarOpciones(id, opciones) {
-    const instancia = instanciasSelect[id];
-    if (!instancia) return;
-    if (typeof instancia.clearChoices === "function") instancia.clearChoices();
-    instancia.setChoices(opciones, 'value', 'label', true);
+    // Esperamos un instante para no reconstruir el menú mientras Choices todavía procesa el clic
+    setTimeout(() => {
+        const select = document.getElementById(id);
+        if (!select) return;
+
+        // Lo que el cliente tiene elegido en este momento
+        const valorActual = select.value;
+        const elegido = opciones.find(o => o.value === valorActual) || opciones.find(o => o.selected) || opciones[0];
+
+        // 1. Quitamos el menú anterior de la pantalla
+        if (instanciasSelect[id]) {
+            try {
+                instanciasSelect[id].destroy();
+            } catch (error) {
+                console.warn("No se pudo quitar el menú anterior de " + id, error);
+            }
+            delete instanciasSelect[id];
+        }
+
+        // 2. Dejamos el <select> nativo solo con las opciones nuevas
+        select.innerHTML = "";
+        opciones.forEach(o => {
+            const opcion = document.createElement("option");
+            opcion.value = o.value;
+            opcion.text = o.label;
+            opcion.selected = (o === elegido);
+            select.appendChild(opcion);
+        });
+
+        // 3. Creamos el menú de nuevo a partir de ese <select>
+        instanciasSelect[id] = new Choices(select, CONFIG_MENU);
+    }, 0);
 }
 
 function inicializarTienda() { 
