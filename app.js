@@ -723,6 +723,67 @@ function cargarLogoParaPDF(ruta) {
     });
 }
 
+// =========================================================
+// VALIDACIÓN DE DATOS DEL CLIENTE
+// Revisa que todo esté bien escrito (formato). No confirma que la dirección exista.
+// Devuelve null si todo está bien, o { campo, mensaje } con el primer problema.
+// =========================================================
+function validarDatosPedido(d) {
+    const tieneLetras = (texto) => /[a-zñáéíóúü]/i.test(texto);
+
+    if (d.nombre.split(/\s+/).filter((p) => p.length >= 2).length < 2) {
+        return { campo: "nombre_cliente", mensaje: "Escribe tu nombre completo (nombre y apellido)." };
+    }
+
+    const telefono = d.telefono.replace(/[\s\-().]/g, "");
+    if (!/^\d{10}$/.test(telefono)) {
+        return { campo: "tel_cliente", mensaje: "El teléfono debe tener 10 dígitos, sin +52 y sin letras. Ejemplo: 2711234567." };
+    }
+
+    if (d.correo && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.correo)) {
+        return { campo: "correo_cliente", mensaje: "El correo no parece válido. Debe tener @ y un dominio, por ejemplo nombre@gmail.com." };
+    }
+
+    if (d.envioNacional) {
+        if (d.calle.length < 3 || !tieneLetras(d.calle)) {
+            return { campo: "dir_calle", mensaje: "Revisa el nombre de la calle." };
+        }
+        if (!/\d/.test(d.numero) && !/^s\/?n$/i.test(d.numero)) {
+            return { campo: "dir_numero", mensaje: "Revisa el número. Si la casa no tiene número, escribe S/N." };
+        }
+        if (d.colonia.length < 3 || !tieneLetras(d.colonia)) {
+            return { campo: "dir_colonia", mensaje: "Revisa el nombre de la colonia." };
+        }
+        if (!/^\d{5}$/.test(d.cp)) {
+            return { campo: "dir_cp", mensaje: "El código postal debe tener exactamente 5 números." };
+        }
+        if (d.ciudad.length < 3 || !tieneLetras(d.ciudad)) {
+            return { campo: "dir_ciudad", mensaje: "Escribe la ciudad o municipio." };
+        }
+        if (d.estado.length < 3 || !tieneLetras(d.estado)) {
+            return { campo: "dir_estado", mensaje: "Escribe el estado." };
+        }
+    }
+
+    return null;
+}
+
+// Lleva al cliente al campo con error
+function mostrarCampoConError(idCampo) {
+    const campo = document.getElementById(idCampo);
+    if (!campo) return;
+
+    if (idCampo.startsWith("dir_")) {
+        // Campos de dirección: abrimos su ventana sin borrar lo que el cliente ya escribió
+        document.getElementById("modal-datos").style.display = "none";
+        document.getElementById("modal-direccion").style.display = "block";
+    } else if (document.getElementById("modal-datos").style.display !== "block") {
+        // Si la ventana de datos no está abierta, la abrimos (carga nombre y teléfono guardados)
+        abrirModalDatos();
+    }
+    campo.focus();
+}
+
 async function procesarPedido() {
     // Si falla cualquier paso (incluso antes de crear el PDF), el error se muestra en una alerta
     try {
@@ -753,30 +814,36 @@ async function procesarPedidoCompleto() {
     let dirEstado = document.getElementById("dir_estado").value.trim();
     let dirReferencias = document.getElementById("dir_referencias").value.trim();
 
-    // 1. Validar solo lo básico primero
-    if (!nombreCliente || !telCliente) {
-        abrirModalDatos();
-        return mostrarAlerta("⚠️ Por favor llena tu Nombre y Teléfono.");
-    }
-    
+    // 1. Validamos los datos antes de generar nada
     if (carrito.length === 0) return mostrarAlerta("🛒 Tu carrito está vacío.");
 
     let metodoEnvioSeleccionado = document.getElementById("sel_entrega").value;
-    let direccionCliente = "";
+    let esEnvioNacional = metodoEnvioSeleccionado === "300";
 
-    // 2. Validación Inteligente según el envío
-    if (metodoEnvioSeleccionado === "300") {
-        // Si es foráneo, obligamos a llenar todo
-        if (!dirCalle || !dirNumero || !dirColonia || !dirCp || !dirCiudad || !dirEstado) {
-            abrirModalDireccion();
-            return mostrarAlerta("📍 Por favor completa todos los datos de tu Dirección de Envío.");
-        }
-        // Armamos la dirección completa para el PDF
-        direccionCliente = `${dirCalle} #${dirNumero}, Col. ${dirColonia}, C.P. ${dirCp}, ${dirCiudad}, ${dirEstado}. Ref: ${dirReferencias || "Ninguna"}`;
-    } else {
-        // Si es local, lo dejamos pasar libremente y le ponemos este texto al PDF
-        direccionCliente = "Entrega Local: Recogerá en Taller Minuit.";
+    const problema = validarDatosPedido({
+        nombre: nombreCliente,
+        telefono: telCliente,
+        correo: document.getElementById("correo_cliente").value.trim(),
+        envioNacional: esEnvioNacional,
+        calle: dirCalle,
+        numero: dirNumero,
+        colonia: dirColonia,
+        cp: dirCp,
+        ciudad: dirCiudad,
+        estado: dirEstado
+    });
+    if (problema) {
+        mostrarCampoConError(problema.campo);
+        return alert(problema.mensaje);
     }
+
+    // Dejamos el teléfono solo con números (por ejemplo, "271 117 0530" se guarda como "2711170530")
+    telCliente = telCliente.replace(/[\s\-().]/g, "");
+
+    // 2. Armamos la dirección que aparece en el PDF
+    let direccionCliente = esEnvioNacional
+        ? `${dirCalle} #${dirNumero}, Col. ${dirColonia}, C.P. ${dirCp}, ${dirCiudad}, ${dirEstado}. Ref: ${dirReferencias || "Ninguna"}`
+        : "Entrega Local: Recogerá en Taller Minuit.";
 
     // 3. Guardar en memoria
     localStorage.setItem("minuit_nombre", nombreCliente);
@@ -831,7 +898,7 @@ async function procesarPedidoCompleto() {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10);
     pdf.setTextColor(100, 100, 100);
-    pdf.text("Minuit", 195, 26, { align: "right" });
+    pdf.text("Minnuit - Empaques Personalizados", 195, 26, { align: "right" });
 
     // 3. Línea divisoria del encabezado
     pdf.setDrawColor(220, 220, 220);
