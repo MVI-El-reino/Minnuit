@@ -284,7 +284,7 @@
         <h3 style="text-align: center; color: #e87b9e; margin-top: 0;"> TUS DATOS </h3>
         
         <input type="text" id="nombre_cliente" placeholder="Nombre completo *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-        <input type="tel" id="tel_cliente" placeholder="# Telefónico *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+        <input type="tel" inputmode="numeric" id="tel_cliente" placeholder="# Telefónico *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
         <input type="text" id="marca_cliente" placeholder=" Nombre de tu marca" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
         <input type="text" id="ig_cliente" placeholder=" Usuario de Instagram" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
         <input type="email" id="correo_cliente" placeholder=" Correo electrónico" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
@@ -301,9 +301,13 @@
         </select>
 
         <!-- 2. ZONA A: RECOGER EN TALLER (Visible por defecto) -->
-        <div id="bloque_recoger_taller" style="background: #fdf0f4; border: 1px dashed #e87b9e; border-radius: 8px; padding: 15px; margin-bottom: 15px; text-align: center;">
-            <p style="margin: 0; font-size: 0.9rem; color: #4a3b40; font-weight: bold;">🏪 Recoger en Taller Minuit</p>
-            <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: #e87b9e;">(La dirección exacta y horarios se te enviarán por WhatsApp al confirmar tu pedido).</p>
+        <div id="bloque_recoger_taller" style="background: #fdf0f4; border: 1px dashed #e87b9e; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+            <p style="margin: 0 0 10px 0; font-size: 0.95rem; color: #4a3b40; font-weight: bold; text-align: center;">🏪 Recoger en Taller Minuit</p>
+            <p style="margin: 0 0 6px 0; font-size: 0.85rem; color: #4a3b40;"><strong>Dirección:</strong> Evenecer 23, Fuertes de Guadalupe, 72706 Barrio de Nuevo León, Pue.</p>
+            <p style="margin: 0; font-size: 0.85rem; color: #4a3b40;"><strong>Referencias:</strong> Segundo piso, primera puerta blanca con timbre rosa, arriba de carnicería Dory’s.</p>
+            <a href="https://www.google.com/maps/dir/?api=1&amp;destination=19.0848294,-98.2901741" target="_blank" rel="noopener" style="display: block; margin: 12px 0; background: #e87b9e; color: white; padding: 10px; border-radius: 8px; text-align: center; text-decoration: none; font-weight: bold; font-size: 0.9rem;">📍 Cómo llegar (Google Maps)</a>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.5200262039803!2d-98.2901741!3d19.0848294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85cfc7003cb2ab71%3A0x9b69e0ef225774d9!2sPlaza%20Evenecer!5e0!3m2!1ses-419!2smx!4v1792090407102!5m2!1ses-419!2smx" width="100%" height="220" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            <p style="margin: 8px 0 0 0; font-size: 0.8rem; color: #e87b9e; text-align: center;">Horarios: te los confirmamos por WhatsApp al confirmar tu pedido.</p>
         </div>
 
         <!-- 3. ZONA B: ENVÍO NACIONAL (Oculta por defecto) -->
@@ -337,7 +341,7 @@
         
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
             <input type="text" id="dir_colonia" placeholder=" Colonia *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
-            <input type="text" id="dir_cp" placeholder=" C.P. *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
+            <input type="text" inputmode="numeric" maxlength="5" id="dir_cp" placeholder=" C.P. *" style="width: 50%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
         </div>
         
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
