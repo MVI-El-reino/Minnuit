@@ -59,7 +59,23 @@ let precioPastelActual = 0;
 // === NUEVO: ALMACÉN DE MENÚS ANIMADOS ===
 const instanciasSelect = {};
 
+// Copia de las opciones originales de cada selector (se guarda una sola vez al cargar la página)
+const opcionesOriginales = {};
+
+// Reemplaza las opciones de un selector Choices sin acumularlas
+function reemplazarOpciones(id, opciones) {
+    const instancia = instanciasSelect[id];
+    if (!instancia) return;
+    if (typeof instancia.clearChoices === "function") instancia.clearChoices();
+    instancia.setChoices(opciones, 'value', 'label', true);
+}
+
 function inicializarTienda() { 
+    // Guardamos las opciones originales de todos los selects antes de que Choices los modifique
+    document.querySelectorAll("select").forEach(select => {
+        if (!opcionesOriginales[select.id]) opcionesOriginales[select.id] = Array.from(select.options).map(opt => opt.value);
+    });
+
     // Llenar select de colores de pasteles (Nativo primero)
     const selectColorPastel = document.getElementById("sel_color_logo_pastel");
     if (selectColorPastel) {
@@ -93,7 +109,7 @@ function sincronizarChoice(id) {
         const opciones = Array.from(selectNat.options).map(opt => ({
             value: opt.value, label: opt.text, selected: opt.selected, disabled: opt.disabled
         }));
-        instanciasSelect[id].setChoices(opciones, 'value', 'label', true);
+        reemplazarOpciones(id, opciones);
     }
 }
 
@@ -171,8 +187,8 @@ function actualizarConfiguradorBases() {
     const tamanoActual = tamanoSelect.value;
     const colorActual = selectColor.value;
 
-    const tamanosDisponibles = Array.from(tamanoSelect.options).map(opt => opt.value);
-    const grosoresDisponibles = Array.from(grosorSelect.options).map(opt => opt.value);
+    const tamanosDisponibles = (opcionesOriginales[tamanoSelect.id] || Array.from(tamanoSelect.options).map(opt => opt.value));
+    const grosoresDisponibles = (opcionesOriginales[grosorSelect.id] || Array.from(grosorSelect.options).map(opt => opt.value));
     const precios = (linea === "Basic") ? basesBasicPrecios : basesPremiumPrecios;
 
     // ACTUALIZACIÓN FANTASMA (Sin destruir el menú)
@@ -180,21 +196,21 @@ function actualizarConfiguradorBases() {
         let opcionesTamano = tamanosDisponibles.map(val => ({
             value: val, label: `${val} - $${precios[grosorActual][val]}`, selected: (val === tamanoActual)
         }));
-        instanciasSelect["sel_tamano_base"].setChoices(opcionesTamano, 'value', 'label', true);
+        reemplazarOpciones("sel_tamano_base", opcionesTamano);
     }
 
     if (instanciasSelect["sel_grosor_base"]) {
         let opcionesGrosor = grosoresDisponibles.map(val => ({
             value: val, label: `${val} - $${precios[val][tamanoActual]}`, selected: (val === grosorActual)
         }));
-        instanciasSelect["sel_grosor_base"].setChoices(opcionesGrosor, 'value', 'label', true);
+        reemplazarOpciones("sel_grosor_base", opcionesGrosor);
     }
 
     if (instanciasSelect["sel_color_logo_base"]) {
         let opcionesColor = coloresLogotipo[linea].map(color => ({
             value: color, label: color.charAt(0).toUpperCase() + color.slice(1), selected: (color === colorActual)
         }));
-        instanciasSelect["sel_color_logo_base"].setChoices(opcionesColor, 'value', 'label', true);
+        reemplazarOpciones("sel_color_logo_base", opcionesColor);
     }
 
     precioBaseActual = precios[grosorActual][tamanoActual];
@@ -257,8 +273,8 @@ function actualizarConfiguradorCupcakes() {
     const tamanoActual = tamanoSelect.value;
     const soporteActual = soporteSelect.value; 
     
-    const tamanosDisponibles = Array.from(tamanoSelect.options).map(opt => opt.value);
-    const soportesDisponibles = Array.from(soporteSelect.options).map(opt => opt.value);
+    const tamanosDisponibles = (opcionesOriginales[tamanoSelect.id] || Array.from(tamanoSelect.options).map(opt => opt.value));
+    const soportesDisponibles = (opcionesOriginales[soporteSelect.id] || Array.from(soporteSelect.options).map(opt => opt.value));
 
     // ================================================================
     // NUEVA ACTUALIZACIÓN FANTASMA 1: TAMAÑOS Y TEXTOS LARGOS
@@ -280,7 +296,7 @@ function actualizarConfiguradorCupcakes() {
             // Retornamos el objeto limpio para que la librería lo actualice sin parpadear
             return { value: val, label: `${textoAmostar} - $${pBase}`, selected: (val === tamanoActual) };
         });
-        instanciasSelect["sel_tamano_cupcake"].setChoices(opcionesTamano, 'value', 'label', true);
+        reemplazarOpciones("sel_tamano_cupcake", opcionesTamano);
     }
 
     // ================================================================
@@ -294,7 +310,7 @@ function actualizarConfiguradorCupcakes() {
             
             return { value: val, label: `${val} ${extraTxt}`, selected: (val === soporteActual) };
         });
-        instanciasSelect["sel_color_soporte"].setChoices(opcionesSoporte, 'value', 'label', true);
+        reemplazarOpciones("sel_color_soporte", opcionesSoporte);
     }
 
     // ================================================================
@@ -384,7 +400,7 @@ function actualizarConfiguradorPasteles() {
             let precioOpcion = pastelesData[tipo][tamano].precios[indicePrecio] + costoExtraRedes;
             return { value: tamano, label: `${tamano} - $${precioOpcion}`, selected: (tamano === tamanoSeleccionado) };
         });
-        instanciasSelect["sel_tamano_pastel"].setChoices(opcionesNuevas, 'value', 'label', true);
+        reemplazarOpciones("sel_tamano_pastel", opcionesNuevas);
     }
 
     const datosTamano = pastelesData[tipo][tamanoSeleccionado];
@@ -725,14 +741,13 @@ function cargarLogoParaPDF(ruta) {
 
 // =========================================================
 // VALIDACIÓN DE DATOS DEL CLIENTE
-// Revisa que todo esté bien escrito (formato). No confirma que la dirección exista.
+// Solo se valida el teléfono (10 dígitos) y el código postal (5 números válidos).
+// Los demás campos únicamente se piden que no estén vacíos.
 // Devuelve null si todo está bien, o { campo, mensaje } con el primer problema.
 // =========================================================
 function validarDatosPedido(d) {
-    const tieneLetras = (texto) => /[a-zñáéíóúü]/i.test(texto);
-
-    if (d.nombre.split(/\s+/).filter((p) => p.length >= 2).length < 2) {
-        return { campo: "nombre_cliente", mensaje: "Escribe tu nombre completo (nombre y apellido)." };
+    if (!d.nombre) {
+        return { campo: "nombre_cliente", mensaje: "Escribe tu nombre." };
     }
 
     const telefono = d.telefono.replace(/[\s\-().]/g, "");
@@ -740,28 +755,20 @@ function validarDatosPedido(d) {
         return { campo: "tel_cliente", mensaje: "El teléfono debe tener 10 dígitos, sin +52 y sin letras. Ejemplo: 2711234567." };
     }
 
-    if (d.correo && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.correo)) {
-        return { campo: "correo_cliente", mensaje: "El correo no parece válido. Debe tener @ y un dominio, por ejemplo nombre@gmail.com." };
-    }
-
     if (d.envioNacional) {
-        if (d.calle.length < 3 || !tieneLetras(d.calle)) {
-            return { campo: "dir_calle", mensaje: "Revisa el nombre de la calle." };
+        const obligatorios = [
+            ["dir_calle", d.calle, "la calle"],
+            ["dir_numero", d.numero, "el número (o S/N)"],
+            ["dir_colonia", d.colonia, "la colonia"],
+            ["dir_ciudad", d.ciudad, "la ciudad o municipio"],
+            ["dir_estado", d.estado, "el estado"]
+        ];
+        for (const [campo, valor, descripcion] of obligatorios) {
+            if (!valor) return { campo: campo, mensaje: "Falta " + descripcion + " de tu dirección de envío." };
         }
-        if (!/\d/.test(d.numero) && !/^s\/?n$/i.test(d.numero)) {
-            return { campo: "dir_numero", mensaje: "Revisa el número. Si la casa no tiene número, escribe S/N." };
-        }
-        if (d.colonia.length < 3 || !tieneLetras(d.colonia)) {
-            return { campo: "dir_colonia", mensaje: "Revisa el nombre de la colonia." };
-        }
-        if (!/^\d{5}$/.test(d.cp)) {
-            return { campo: "dir_cp", mensaje: "El código postal debe tener exactamente 5 números." };
-        }
-        if (d.ciudad.length < 3 || !tieneLetras(d.ciudad)) {
-            return { campo: "dir_ciudad", mensaje: "Escribe la ciudad o municipio." };
-        }
-        if (d.estado.length < 3 || !tieneLetras(d.estado)) {
-            return { campo: "dir_estado", mensaje: "Escribe el estado." };
+
+        if (!/^\d{5}$/.test(d.cp) || parseInt(d.cp, 10) < 1000) {
+            return { campo: "dir_cp", mensaje: "El código postal debe tener 5 números válidos (por ejemplo 72000)." };
         }
     }
 
@@ -823,7 +830,6 @@ async function procesarPedidoCompleto() {
     const problema = validarDatosPedido({
         nombre: nombreCliente,
         telefono: telCliente,
-        correo: document.getElementById("correo_cliente").value.trim(),
         envioNacional: esEnvioNacional,
         calle: dirCalle,
         numero: dirNumero,
