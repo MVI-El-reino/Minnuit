@@ -36,6 +36,30 @@
 .tabs:active {
     transform: none !important;
 }
+/* boton de descarga el ultimo archivo de pedido*/
+.btn-descarga-ultimo {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #fff0f5; /* Rosa muy clarito */
+    color: var(--rosa-principal, #f58fb0); /* El color rosa de tu marca para el icono */
+    border: 1px solid #fce4ec; /* Borde súper sutil para enmarcarlo */
+    border-radius: 50%; /* Botón perfectamente redondo */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Sombra levísima */
+    transition: all 0.3s ease;
+    z-index: 10; /* Evita que otras cosas lo tapen */
+}
+
+.btn-descarga-ultimo:hover {
+    background-color: #fce4ec; /* Se oscurece un poquito al pasar el mouse */
+    transform: scale(1.05);
+}
 /* =========================================
    BLOQUEO DE ZOOM AUTOMÁTICO EN IPHONE
    ========================================= */
