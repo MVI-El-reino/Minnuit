@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- REGISTRO DE CAMBIOS (20/10/2026): 1) cupcakes sin selector de color del soporte (color fijo); 2) cupcakes con logotipo y redes como en pasteles; 3) PayPal = "Mercado Pago/PayPal (+5% de comisión)"; 4) envío y pago con menú Choices. Detalle en app.js. -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -236,15 +237,45 @@
                     </select>
                 </div>
 
-                <!-- MENÚ DE COLOR (Oculto por defecto) -->
-                <div class="controles-config" id="contenedor_color_soporte" style="display: none; margin-top: 15px;">
-                    <label for="sel_color_soporte">Color del Soporte Interno:</label>
-                    <select id="sel_color_soporte" style="font-size: 16px;" onchange="actualizarConfiguradorCupcakes()">
-                        <option value="Blanco">Blanco (Gratis)</option>
-                        <option value="Kraft">Kraft Ecológico (Gratis)</option>
-                        <option value="Dorado">Dorado Metálico</option>
-                        <option value="Rosa">Rosa Minuit</option>
+                <!-- CAMBIO 1: Soporte interno con color FIJO (ya no se elige).
+                     Solo aparece si el cliente pide soporte. El color se cambia en app.js (SOPORTE_INTERNO_COLOR). -->
+                <div id="texto_soporte_interno" class="controles-config" style="display: none; margin-top: 15px;">
+                    <p style="margin: 0; font-size: 0.95rem; color: #4a3b40;">
+                        <strong>Color del soporte interno:</strong> <span id="color_soporte_fijo">Blanco</span> (incluido, sin costo)
+                    </p>
+                </div>
+
+                <!-- CAMBIO 2: Color del logotipo (misma lista que en Cajas para Pastel; la llena app.js) -->
+                <div class="controles-config">
+                    <label for="sel_color_logo_cupcake">Color del Logotipo:</label>
+                    <select id="sel_color_logo_cupcake">
+                        <!-- Se llena automáticamente con JS (lista coloresLogotipoPastel) -->
                     </select>
+                </div>
+
+                <!-- CAMBIO 2: Redes sociales (igual que en Cajas para Pastel) -->
+                <div class="controles-config">
+                    <label for="sel_redes_cupcake">Redes Sociales:</label>
+                    <select id="sel_redes_cupcake" onchange="actualizarConfiguradorCupcakes()">
+                        <option value="No">No, gracias</option>
+                        <option value="Si">Sí (+ Costo extra por tamaño)</option>
+                    </select>
+                </div>
+
+                <!-- CAMBIO 2: Medida de redes (aparece solo si elige redes).
+                     El "value" de cada opción es el costo extra que se suma a la caja. -->
+                <div class="controles-config" id="contenedor_redes_medida_cupcake" style="display: none; margin-top: 15px;">
+                    <label for="sel_medida_redes_cupcake">Medida de Redes:</label>
+                    <select id="sel_medida_redes_cupcake" onchange="actualizarConfiguradorCupcakes()">
+                        <option value="6">21 x 12 x 7.5 cm - $6</option>
+                        <option value="8">31 x 12 x 7.5 cm - $8</option>
+                    </select>
+                </div>
+
+                <!-- CAMBIO 2: Notas de redes / observaciones (igual que en pasteles) -->
+                <div class="controles">
+                    <label for="detalle_cupcake1">Anota tus redes / Observaciones:</label>
+                    <input type="text" id="detalle_cupcake1" placeholder="Ej. Insta / Face / Whats / Tiktok">
                 </div>
 
                 <br>
@@ -295,10 +326,13 @@
             <button type="button" onclick="mostrarTerminosEnvio()" style="background: #e87b9e; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(232, 123, 158, 0.3);">!</button>
         </div>
         <!-- Agregamos la función alternarModoEntrega() al onchange -->
+        <!-- CAMBIO 4: menú dibujado con Choices (igual que los de los pedidos) -->
+        <div style="margin-bottom: 15px;">
         <select id="sel_entrega" onchange="alternarModoEntrega(); actualizarVistaCarrito()" style="width: 100%; padding: 10px; font-size: 16px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px;">
             <option value="0">Recoger en taller Minuit / Mandar Uber</option>
             <option value="300">Envío Nacional (+$300.00 MXN)</option>
         </select>
+        </div>
 
         <!-- 2. ZONA A: RECOGER EN TALLER (Visible por defecto) -->
         <div id="bloque_recoger_taller" style="background: #fdf0f4; border: 1px dashed #e87b9e; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
@@ -318,10 +352,13 @@
         </div>
         
         <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40;">💳 Pago:</label>
+        <!-- CAMBIO 4: menú dibujado con Choices (igual que los de los pedidos) -->
+        <div style="margin-bottom: 15px;">
         <select id="sel_pago" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px;">
             <option value="Transferencia">Transferencia Bancaria (Sin comisión)</option>
-            <option value="PayPal">PayPal (+5% de comisión)</option> 
+            <option value="PayPal">Mercado Pago/PayPal (+5% de comisión)</option> 
         </select>
+        </div>
 
         <!-- Botón final para disparar el PDF y WhatsApp -->
         <button id="btn_finalizar_pedido" type="button" onclick="procesarPedido()" style="width: 100%; background: #f48fb1; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">✅ Confirmar y Enviar Pedido</button>
