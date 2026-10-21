@@ -151,7 +151,7 @@ function inicializarTienda() {
 
     // Convertir todos los selects a la capa premium (Versión fluida)
     // CAMBIO 4: dibujamos con Choices los selects de los pedidos Y también los de envío y pago
-    const selectsDeMenu = [...document.querySelectorAll('.controles-config select'), document.getElementById("sel_entrega"), document.getElementById("sel_pago")].filter(Boolean);
+    const selectsDeMenu = [...document.querySelectorAll('.controles-config select'), document.getElementById("sel_entrega"), document.getElementById("sel_pago"), document.getElementById("sel_factura")].filter(Boolean);
     selectsDeMenu.forEach(select => {
         instanciasSelect[select.id] = new Choices(select, {
             searchEnabled: false,
@@ -594,28 +594,34 @@ function actualizarVistaCarrito() {
     
     document.getElementById("lista-carrito").innerHTML = listaHTML;
 
-    // ===== NUEVO: CÁLCULOS DE ENVÍO Y COMISIÓN =====
     let costoEnvio = 0;
-    let costoComision = 0; // ¡Debe decir costoComision!
+    let costoComision = 0; 
+    let costoIVA = 0; // NUEVO
     
     // Leemos qué eligieron en el select de envío
     const selEntrega = document.getElementById("sel_entrega");
-    if (selEntrega) {
-        costoEnvio = parseFloat(selEntrega.value) || 0;
-    }
+    if (selEntrega) { costoEnvio = parseFloat(selEntrega.value) || 0; }
     
     // Leemos qué eligieron en el select de pago
     const selPago = document.getElementById("sel_pago");
     let metodoPago = "Transferencia";
     if (selPago) {
         metodoPago = selPago.value;
-        // CAMBIO 3: el valor interno sigue siendo "PayPal"; el cliente ve "Mercado Pago/PayPal (+5% de comisión)".
         if (metodoPago === "PayPal") {
             costoComision = (totalDinero + costoEnvio) * 0.05; // 5% sobre el total
         }
     }
+
+    // Leemos qué eligieron en el select de factura (NUEVO)
+    const selFactura = document.getElementById("sel_factura");
+    let requiereFactura = selFactura ? selFactura.value : "No";
+
+    let subtotalPrevio = totalDinero + costoEnvio + costoComision;
+    if (requiereFactura === "Si") {
+        costoIVA = subtotalPrevio * 0.16; // 16% sobre todo lo anterior
+    }
     
-    let granTotal = totalDinero + costoEnvio + costoComision; // Todo bien sumado
+    let granTotal = subtotalPrevio + costoIVA; 
     
     // Actualizamos los textos visuales de la página
     document.getElementById("fab-total").innerText = "$" + granTotal.toFixed(2);
@@ -626,7 +632,9 @@ function actualizarVistaCarrito() {
     // Guardamos los datos desglosados en el "dataset" para que el PDF los lea
     modalTotal.dataset.subtotal = totalDinero.toFixed(2);
     modalTotal.dataset.envio = costoEnvio.toFixed(2);
-    modalTotal.dataset.comision = costoComision.toFixed(2); // Y aquí también debe decir costoComision
+    modalTotal.dataset.comision = costoComision.toFixed(2); 
+    modalTotal.dataset.iva = costoIVA.toFixed(2); // NUEVO
+    modalTotal.dataset.factura = requiereFactura; // NUEVO
     modalTotal.dataset.metodopago = metodoPago === "PayPal" ? "Mercado Pago/PayPal (+5% de comisión)" : "Transferencia Bancaria";
     // ===============================================
 
@@ -946,18 +954,20 @@ async function procesarPedidoCompleto() {
     mostrarAlerta("⏳ Generando nota de pedido...");
     document.querySelector(".btn-pedido").disabled = true;
 
-    // Rescatamos los cálculos de envío y sión
+    // Rescatamos los cálculos (Reemplaza este bloque)
     let totalTxt = document.getElementById("modal-total").innerText;
     let datosTotal = document.getElementById("modal-total").dataset;
     let valSubtotal = parseFloat(datosTotal.subtotal || 0);
     let valEnvio = parseFloat(datosTotal.envio || 0);
     let valComision = parseFloat(datosTotal.comision || 0);
+    let valIva = parseFloat(datosTotal.iva || 0); // NUEVO
+    let requiereFactura = datosTotal.factura || "No"; // NUEVO
     let metodoPagoTexto = datosTotal.metodopago || "Transferencia";
     let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger en taller Minuit / Mandar Uber";
 
-    // 2. Plantilla exacta de WhatsApp solicitada por Ely
-    let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *TOTAL A PAGAR: ${totalTxt}*\n`;
-
+    // Modificamos el texto de WhatsApp (NUEVO)
+    let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *FACTURA:* ${requiereFactura}\n *TOTAL A PAGAR: ${totalTxt}*\n`;
+    
     try {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF("p", "mm", "a4");
@@ -1082,8 +1092,13 @@ async function procesarPedidoCompleto() {
         y += 5;
         if (y > 220) { pdf.addPage(); y = 30; }
 
+        // Ajustamos la altura de la caja dependiendo de cuántos cobros extra haya
+        let alturaCajaDesglose = 32;
+        if (valComision > 0) alturaCajaDesglose += 6;
+        if (valIva > 0) alturaCajaDesglose += 6;
+
         pdf.setFillColor(...COLOR_FONDO);
-        pdf.roundedRect(100, y, 95, valComision > 0 ? 38 : 32, 4, 4, "F");
+        pdf.roundedRect(100, y, 95, alturaCajaDesglose, 4, 4, "F");
         
         pdf.setTextColor(...COLOR_TEXTO);
         pdf.setFontSize(10);
@@ -1101,6 +1116,13 @@ async function procesarPedidoCompleto() {
             yDesglose += 7;
             pdf.text("Comisión Mercado Pago/PayPal (5%):", 105, yDesglose);
             pdf.text("$" + valComision.toFixed(2), 190, yDesglose, { align: "right" });
+        }
+
+        // Agregamos el texto del IVA en el PDF (NUEVO)
+        if (valIva > 0) {
+            yDesglose += 7;
+            pdf.text("IVA (16%):", 105, yDesglose);
+            pdf.text("$" + valIva.toFixed(2), 190, yDesglose, { align: "right" });
         }
 
         yDesglose += 9;
@@ -1201,10 +1223,10 @@ function abrirWhatsAppYLimpiar(textoWhatsApp) {
 
     carrito = [];
     actualizarVistaCarrito();
-    cerrarModal();          // Cierra el carrito
-    cerrarModalDatos();     // Cierra el formulario de datos
+    cerrarModal();          
+    cerrarModalDatos();     
 
-    //limpieza de casillas
+    // limpieza de casillas
     document.getElementById("nombre_cliente").value = "";
     document.getElementById("tel_cliente").value = "";
     document.getElementById("dir_calle").value = "";
@@ -1215,10 +1237,13 @@ function abrirWhatsAppYLimpiar(textoWhatsApp) {
     document.getElementById("dir_estado").value = "";
     document.getElementById("dir_referencias").value = "";
     
-    // Reactivamos el botón por si quieren hacer otro pedido
     if(document.getElementById("btn_finalizar_pedido")) {
         document.getElementById("btn_finalizar_pedido").disabled = false;
     }
 
-    window.location.href = linkWhatsApp;
+    // EL TRUCO PARA EVITAR QUE SE CANCELE LA DESCARGA
+    // Le damos 2 segundos al navegador para procesar el PDF antes de sacarlo de la página
+    setTimeout(() => {
+        window.location.href = linkWhatsApp;
+    }, 2000);
 }
