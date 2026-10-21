@@ -1172,9 +1172,16 @@ async function procesarPedidoCompleto() {
         const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
 
         // =========================================================
-        // SUBIR A GOOGLE DRIVE (AHORA BLINDADO CONTRA SATURACIÓN)
+        // SUBIR A GOOGLE DRIVE Y GUARDAR COPIA LOCAL (MODIFICADO)
         // =========================================================
         const pdfBase64 = pdf.output('datauristring');
+        
+        // NUEVO: Guardar una copia de seguridad en el teléfono/computadora del cliente
+        try {
+            localStorage.setItem("minuit_ultimo_pdf", pdfBase64);
+        } catch (e) {
+            console.warn("No se pudo guardar la copia de seguridad localmente.", e);
+        }
         const urlGoogleScript = "https://script.google.com/macros/s/AKfycbw_RFDbSPc0tZNODZ2cltlC26DtKGciqqkkrLvhHSeg-NkyJ-CfpaQiMbfS0ftjHa77-A/exec";
 
         // Intentamos guardar una copia en Drive, pero sin esperar más de 8 segundos
@@ -1217,6 +1224,29 @@ async function procesarPedidoCompleto() {
         document.querySelector(".btn-pedido").disabled = false;
     }
 }
+
+// ==========================================
+// RECUPERAR ÚLTIMO PEDIDO
+// ==========================================
+function descargarUltimoPedido() {
+    const pdfBase64 = localStorage.getItem("minuit_ultimo_pdf");
+    
+    if (!pdfBase64) {
+        mostrarAlerta("⚠️ No tienes pedidos recientes guardados en este dispositivo.");
+        return;
+    }
+    
+    mostrarAlerta("📥 Descargando tu último pedido...");
+    
+    // Crear un enlace invisible y forzar el clic para descargarlo
+    const enlace = document.createElement("a");
+    enlace.href = pdfBase64;
+    enlace.download = "Mi_Ultimo_Pedido_Minuit.pdf";
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+}
+
 function abrirWhatsAppYLimpiar(textoWhatsApp) {
     let textoCodificado = encodeURIComponent(textoWhatsApp);
     let linkWhatsApp = `https://wa.me/${numeroDueno}?text=${textoCodificado}`;
