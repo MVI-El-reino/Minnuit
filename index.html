@@ -370,13 +370,13 @@
             <option value="PayPal">Mercado Pago/PayPal (+5% de comisión)</option> 
         </select>
         </div>
-        <div class="grupo-input">
-    <label>¿Requiere Factura? (+16% IVA)</label>
-    <select id="sel_factura" onchange="actualizarVistaCarrito()">
-        <option value="No">No requiero factura</option>
-        <option value="Si">Sí, requiero factura (+16%)</option>
-    </select>
-</div>
+        <div class="grupo-input" style="margin-bottom: 25px;">
+            <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40;">¿Requiere Factura? (+16% IVA)</label>
+            <select id="sel_factura" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px;">
+            <option value="No">No requiero factura</option>
+            <option value="Si">Sí, requiero factura (+16%)</option>
+         </select>
+        </div>    
 
         <!-- Botón final para disparar el PDF y WhatsApp -->
         <button id="btn_finalizar_pedido" type="button" onclick="procesarPedido()" style="width: 100%; background: #f48fb1; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">✅ Confirmar y Enviar Pedido</button>
