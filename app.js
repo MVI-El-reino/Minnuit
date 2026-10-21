@@ -1,3 +1,15 @@
+// ==========================================================================
+// REGISTRO DE CAMBIOS (20/10/2026)
+// 1. CUPCAKES - Soporte interno: se quitó el selector "Color del Soporte Interno".
+//    Ahora el color es fijo (constante SOPORTE_INTERNO_COLOR) y se le muestra al cliente
+//    solo si pide soporte. Si el cliente elige "No", el carrito dice "Soporte interior: No".
+// 2. CUPCAKES - Logotipo y redes: se agregaron "Color del Logotipo", "Redes Sociales",
+//    "Medida de Redes" y "Anota tus redes / Observaciones", igual que en Cajas para Pastel.
+// 3. PAGO - PayPal ahora se muestra como "Mercado Pago/PayPal (+5% de comisión)" en el menú
+//    y en el PDF (campo Pago y etiqueta de la comisión). El valor interno sigue siendo "PayPal".
+// 4. ENVÍO Y PAGO - Estos menús se dibujan con Choices, igual que los de los pedidos.
+// ==========================================================================
+
 let carrito = [];
 const numeroDueno = "522215836232"; 
 
@@ -30,7 +42,13 @@ const coloresLogotipo = {
 };
 
 const cupcakesPreciosBase = { "21cm": 18, "31cm": 25 };
-const cupcakesPreciosSoporte = { "Blanco": 0, "Kraft": 0, "Dorado": 5, "Rosa": 5 };
+// ==========================================
+// SOPORTE INTERNO DE CUPCAKES (CAMBIO 1)
+// La dueña ya no deja elegir el color: el cliente ve el color fijo y su costo.
+// Para cambiar el color o el precio, modifica SOLO estas dos líneas.
+// ==========================================
+const SOPORTE_INTERNO_COLOR = "Blanco";   // Color que se incluye cuando el cliente pide soporte
+const SOPORTE_INTERNO_PRECIO = 0;         // Costo extra del soporte (0 = gratis)
 
 const pastelesData = {
     "Petite": {
@@ -120,8 +138,21 @@ function inicializarTienda() {
         });
     }
 
+    // CAMBIO 2: el color del logotipo de cupcakes usa la misma lista que pasteles
+    const selectColorCupcake = document.getElementById("sel_color_logo_cupcake");
+    if (selectColorCupcake) {
+        selectColorCupcake.innerHTML = "";
+        coloresLogotipoPastel.forEach(color => {
+            const option = document.createElement("option");
+            option.value = color; option.text = color;
+            selectColorCupcake.add(option);
+        });
+    }
+
     // Convertir todos los selects a la capa premium (Versión fluida)
-    document.querySelectorAll('.controles-config select').forEach(select => {
+    // CAMBIO 4: dibujamos con Choices los selects de los pedidos Y también los de envío y pago
+    const selectsDeMenu = [...document.querySelectorAll('.controles-config select'), document.getElementById("sel_entrega"), document.getElementById("sel_pago")].filter(Boolean);
+    selectsDeMenu.forEach(select => {
         instanciasSelect[select.id] = new Choices(select, {
             searchEnabled: false,
             itemSelectText: '',
@@ -286,82 +317,92 @@ function agregarBaseConfigAlCarrito() {
 // LÓGICA DE CAJAS CUPCAKES
 // ==========================================
 function actualizarConfiguradorCupcakes() {
-    
+    // CAJAS DE CUPCAKES: calcula el precio con capacidad, soporte y redes.
+    // Se vuelve a ejecutar cada vez que el cliente cambia un menú de cupcakes.
     const tamanoSelect = document.getElementById("sel_tamano_cupcake");
-    const tieneSoporteSelect = document.getElementById("sel_tiene_soporte"); // El nuevo interruptor
-    const soporteSelect = document.getElementById("sel_color_soporte"); // El menú de colores
+    const tieneSoporteSelect = document.getElementById("sel_tiene_soporte");
+    const redesSelect = document.getElementById("sel_redes_cupcake");
+    const medidaRedesSelect = document.getElementById("sel_medida_redes_cupcake");
 
-    if (!tamanoSelect || !tieneSoporteSelect || !soporteSelect) return; 
+    if (!tamanoSelect || !tieneSoporteSelect || !redesSelect || !medidaRedesSelect) return;
 
-    // ================================================================
-    // Mostrar u ocultar el menú de colores (¡SÍ LO CONSERVAMOS!)
-    // ================================================================
-    const contenedorColorSoporte = document.getElementById("contenedor_color_soporte");
-    if (tieneSoporteSelect.value === "Si") {
-        contenedorColorSoporte.style.display = "block";
+    // ----------------------------------------------------------
+    // 1. SOPORTE INTERNO (CAMBIO 1)
+    // El color ya no se elige: solo se muestra el color fijo si el cliente pide soporte.
+    // El color y el precio se cambian en SOPORTE_INTERNO_COLOR y SOPORTE_INTERNO_PRECIO (arriba).
+    // ----------------------------------------------------------
+    const tieneSoporte = tieneSoporteSelect.value === "Si";
+    const textoSoporte = document.getElementById("texto_soporte_interno");
+    if (textoSoporte) textoSoporte.style.display = tieneSoporte ? "block" : "none";
+
+    const spanColorSoporte = document.getElementById("color_soporte_fijo");
+    if (spanColorSoporte) spanColorSoporte.innerText = SOPORTE_INTERNO_COLOR;
+
+    const extraSoporte = tieneSoporte ? SOPORTE_INTERNO_PRECIO : 0;
+
+    // ----------------------------------------------------------
+    // 2. REDES SOCIALES (CAMBIO 2)
+    // Igual que en Cajas para Pastel: si el cliente elige redes, aparece "Medida de Redes"
+    // y su costo (el "value" de la opción) se suma al precio de la caja.
+    // ----------------------------------------------------------
+    const contenedorRedes = document.getElementById("contenedor_redes_medida_cupcake");
+    let costoExtraRedes = 0;
+    if (redesSelect.value === "Si") {
+        contenedorRedes.style.display = "block";
+        costoExtraRedes = parseFloat(medidaRedesSelect.value) || 0;
     } else {
-        contenedorColorSoporte.style.display = "none";
+        contenedorRedes.style.display = "none";
+        costoExtraRedes = 0;
     }
 
+    // ----------------------------------------------------------
+    // 3. PRECIOS DE LAS CAPACIDADES (menú "Capacidad")
+    // ----------------------------------------------------------
     const tamanoActual = tamanoSelect.value;
-    const soporteActual = soporteSelect.value; 
-    
     const tamanosDisponibles = (opcionesOriginales[tamanoSelect.id] || Array.from(tamanoSelect.options).map(opt => opt.value));
-    const soportesDisponibles = (opcionesOriginales[soporteSelect.id] || Array.from(soporteSelect.options).map(opt => opt.value));
 
-    // ================================================================
-    // NUEVA ACTUALIZACIÓN FANTASMA 1: TAMAÑOS Y TEXTOS LARGOS
-    // ================================================================
-    // Diccionario con los textos completos que pidió Ely (¡SÍ LO CONSERVAMOS!)
+    // Textos largos que ve el cliente en el menú de capacidad
     const nombresLargosCupcakes = {
         "21cm": "21 x 12 x 7.5 cm",
         "31cm": "31 x 12 x 7.5 cm"
     };
 
     if (instanciasSelect["sel_tamano_cupcake"]) {
-        let opcionesTamano = tamanosDisponibles.map(val => {
-            // Calculamos el precio base + el extra del soporte seleccionado
-            let pBase = cupcakesPreciosBase[val] + cupcakesPreciosSoporte[soporteActual];
-            
-            // Leemos el texto largo, o usamos el corto si no lo encuentra
-            let textoAmostar = nombresLargosCupcakes[val] || val;
-            
-            // Retornamos el objeto limpio para que la librería lo actualice sin parpadear
+        const opcionesTamano = tamanosDisponibles.map(val => {
+            // Precio que se muestra = base de la capacidad + soporte (si lo pide) + redes (si las elige)
+            const pBase = cupcakesPreciosBase[val] + extraSoporte + costoExtraRedes;
+            const textoAmostar = nombresLargosCupcakes[val] || val;
             return { value: val, label: `${textoAmostar} - $${pBase}`, selected: (val === tamanoActual) };
         });
         reemplazarOpciones("sel_tamano_cupcake", opcionesTamano);
     }
 
-    // ================================================================
-    // NUEVA ACTUALIZACIÓN FANTASMA 2: COLORES DE SOPORTE Y PRECIOS
-    // ================================================================
-    if (instanciasSelect["sel_color_soporte"]) {
-        let opcionesSoporte = soportesDisponibles.map(val => {
-            // Verificamos si el soporte tiene costo extra o es gratis
-            let pExtra = cupcakesPreciosSoporte[val];
-            let extraTxt = pExtra > 0 ? `(+$${pExtra})` : `(Gratis)`;
-            
-            return { value: val, label: `${val} ${extraTxt}`, selected: (val === soporteActual) };
-        });
-        reemplazarOpciones("sel_color_soporte", opcionesSoporte);
-    }
-
-    // ================================================================
-    // 3. ACTUALIZACIÓN DEL PRECIO MAESTRO EN PANTALLA
-    // ================================================================
-    precioCupcakeActual = cupcakesPreciosBase[tamanoActual] + cupcakesPreciosSoporte[soporteActual];
+    // ----------------------------------------------------------
+    // 4. PRECIO MAESTRO: el que se guarda al agregar la caja al carrito
+    // ----------------------------------------------------------
+    precioCupcakeActual = cupcakesPreciosBase[tamanoActual] + extraSoporte + costoExtraRedes;
     document.getElementById("precio_config_cupcake").innerText = `$${precioCupcakeActual.toFixed(2)} MXN`;
 }
 
+// ==========================================
+// AGREGAR UNA CAJA DE CUPCAKES AL CARRITO (CAMBIOS 1 y 2)
+// El nombre sigue incluyendo "Cupcake", así el carrito cuenta bien los mínimos.
+// El detalle guarda soporte, color del logotipo, redes y notas, igual que las cajas de pastel.
+// ==========================================
 function agregarCupcakeConfigAlCarrito() {
     const cantidad = parseInt(document.getElementById("cant_cupcake_config").value);
     const tamano = document.getElementById("sel_tamano_cupcake").value;
-    const soporte = document.getElementById("sel_color_soporte").value;
-    
+    const tieneSoporte = document.getElementById("sel_tiene_soporte").value === "Si";
+    const colorLogo = document.getElementById("sel_color_logo_cupcake").value;
+    const redes = document.getElementById("sel_redes_cupcake").value;
+    const extraInfo = document.getElementById("detalle_cupcake1").value || "Sin notas extra";
+
     const nombre = `Caja ${tamano} Cupcakes`;
-    const detalle = `Soporte interior: ${soporte}`;
-    
-    // LÓGICA ANTI-DUPLICADOS
+    // Antes siempre salía el color del soporte, aunque el cliente eligiera "No". Ahora dice "No" cuando no lo pide.
+    const soporteTexto = tieneSoporte ? `${SOPORTE_INTERNO_COLOR} (incluido)` : "No";
+    const detalle = `Soporte interior: ${soporteTexto} | Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
+
+    // LÓGICA ANTI-DUPLICADOS (igual que en pasteles): misma configuración = solo se suman piezas
     const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
     if (index !== -1) {
         carrito[index].cantidad += cantidad;
@@ -369,9 +410,12 @@ function agregarCupcakeConfigAlCarrito() {
     } else {
         carrito.push({ nombre, cantidad, detalle, precio: precioCupcakeActual, subtotal: precioCupcakeActual * cantidad });
     }
-    
+
+    // Regresamos los menús a su opción inicial para la siguiente caja
     resetearSelect("sel_tamano_cupcake");
-    resetearSelect("sel_color_soporte");
+    resetearSelect("sel_color_logo_cupcake");
+    resetearSelect("sel_redes_cupcake");
+    document.getElementById("detalle_cupcake1").value = "";
     document.getElementById("cant_cupcake_config").value = "5";
     actualizarConfiguradorCupcakes();
 
@@ -565,6 +609,7 @@ function actualizarVistaCarrito() {
     let metodoPago = "Transferencia";
     if (selPago) {
         metodoPago = selPago.value;
+        // CAMBIO 3: el valor interno sigue siendo "PayPal"; el cliente ve "Mercado Pago/PayPal (+5% de comisión)".
         if (metodoPago === "PayPal") {
             costoComision = (totalDinero + costoEnvio) * 0.05; // 5% sobre el total
         }
@@ -582,7 +627,7 @@ function actualizarVistaCarrito() {
     modalTotal.dataset.subtotal = totalDinero.toFixed(2);
     modalTotal.dataset.envio = costoEnvio.toFixed(2);
     modalTotal.dataset.comision = costoComision.toFixed(2); // Y aquí también debe decir costoComision
-    modalTotal.dataset.metodopago = metodoPago === "PayPal" ? "PayPal (+5%)" : "Transferencia Bancaria";
+    modalTotal.dataset.metodopago = metodoPago === "PayPal" ? "Mercado Pago/PayPal (+5% de comisión)" : "Transferencia Bancaria";
     // ===============================================
 
     // ===== 5. TEXTOS DE MAYOREO ULTRA CORTOS =====
@@ -1054,7 +1099,7 @@ async function procesarPedidoCompleto() {
         
         if (valComision > 0) {
             yDesglose += 7;
-            pdf.text("Comisión Paypal (5%):", 105, yDesglose);
+            pdf.text("Comisión Mercado Pago/PayPal (5%):", 105, yDesglose);
             pdf.text("$" + valComision.toFixed(2), 190, yDesglose, { align: "right" });
         }
 
