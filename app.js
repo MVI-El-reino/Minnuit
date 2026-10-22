@@ -769,8 +769,7 @@ function mostrarTerminosEnvio() {
 function mostrarTerminosComision() {
     alert(
         "💳 COMISIÓN POR USO DE PLATAFORMA\n\n" +
-        "Los pagos realizados mediante tarjeta de crédito (Mercado Pago o PayPal) generan un cargo extra del 5% sobre el total de tu pedido debido a las comisiones de la plataforma.\n\n" +
-        "💡 Tip: Si eliges 'Transferencia Bancaria', no se te cobrará ninguna comisión extra."
+        "Los pagos realizados mediante tarjeta de crédito (Mercado Pago o PayPal) generan un cargo extra del 5% sobre el total de tu pedido debido a las comisiones de la plataforma.\n"
     );
 }
 
