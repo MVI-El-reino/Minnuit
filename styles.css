@@ -146,31 +146,38 @@ select,
 
 /* Etiqueta de IVA para el configurador */
 .etiqueta-iva {
-    background-color: #ffffff;
-    color: #ff1469; /* Rosa fuerte vibrante */
+    color: #ff1469; 
     font-size: 0.65rem;
     font-weight: 800;
     padding: 2px 8px;
     border-radius: 12px;
-    margin: 4px auto; /* Lo centra horizontalmente y da espacio arriba/abajo */
+    /* Cero margen y altura de línea justa para evitar espacios invisibles */
+    margin: 0 !important; 
+    line-height: 1.2;
     display: inline-block;
     letter-spacing: 0.5px;
     text-transform: uppercase;
 }
 
-/* Asegura que la columna del precio centre todo su contenido */
+/* Asegura que la columna del precio junte todo su contenido */
 .precio-col {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 2px; /* Define un espacio milimétrico exacto entre los tres elementos */
 }
 
-/* Quitamos márgenes extra al precio grande para que se vea compacto como en la foto */
+/* Quitamos márgenes por defecto a los textos superior e inferior */
+.etiqueta-precio {
+    margin-bottom: 0 !important;
+    line-height: 1 !important;
+}
+
 .precio-grande {
-    margin: 4px 0 0 0 !important;
+    margin: 0 !important;
+    line-height: 1 !important;
 }
-
 /* =========================================
    Reset y Tipografía General
    ========================================= */
