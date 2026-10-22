@@ -366,15 +366,19 @@
         <!-- CAMBIO 4: menú dibujado con Choices (igual que los de los pedidos) -->
         <div style="margin-bottom: 15px;">
         <select id="sel_pago" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px;">
-            <option value="Transferencia">Transferencia Bancaria (Sin comisión)</option>
-            <option value="PayPal">Mercado Pago/PayPal (+5% de comisión)</option> 
+            <option value="Transferencia">Transferencia Bancaria</option>
+            <option value="PayPal">Tarjeta de credito (link mercado Pago)</option>
+            <button type="button" onclick="mostrarTerminosComision()" style="background: #e87b9e; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(232, 123, 158, 0.3);">!</button>
+
+            
         </select>
         </div>
         <div class="grupo-input" style="margin-bottom: 25px;">
-            <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40;">¿Requiere Factura? (+16% IVA)</label>
+            <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40;"> Factura (Nuestros precios no incluyen IVA) </label>
+            <button type="button" onclick="mostrarTerminosIVA()" style="background: #e87b9e; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(232, 123, 158, 0.3);">!</button>
             <select id="sel_factura" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px;">
-            <option value="No">No requiero factura</option>
-            <option value="Si">Sí, requiero factura (+16%)</option>
+            <option value="No">No</option>
+            <option value="Si">Sí</option>
          </select>
         </div>    
 
