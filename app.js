@@ -363,8 +363,8 @@ function actualizarConfiguradorCupcakes() {
 
     // Textos largos que ve el cliente en el menú de capacidad
     const nombresLargosCupcakes = {
-        "21cm": "21 x 12 x 7.5 cm",
-        "31cm": "31 x 12 x 7.5 cm"
+        "21cm": "2 cupcakes - 21x12x7.5 cm",
+        "31cm": "4 cupcakes - 31 x 12 x 7.5 cm"
     };
 
     if (instanciasSelect["sel_tamano_cupcake"]) {
@@ -581,7 +581,7 @@ function actualizarVistaCarrito() {
         let nombreCorto = item.nombre.replace('Caja Pastel ', '');
         
         // 1. Filtramos y armamos el texto perfecto según el tipo de producto
-let prefijo = nombreCorto.includes('Base') ? 'Pzas' : 'Cajas';
+let prefijo = nombreCorto.includes('Base') ? ' ' : 'Cajas';
 let nombreLimpio = nombreCorto;
 
 // Si detecta que es un cupcake, reordena las palabras a tu gusto
@@ -786,8 +786,8 @@ function mostrarTerminosEnvio() {
  */
 function mostrarTerminosIVA() {
     alert(
-        "🧾 INFORMACIÓN SOBRE FACTURACIÓN (IVA)\n\n" +
-        "Si requieres factura selecciona la opcion Si.\n\n" +
+        "FACTURACIÓN\n\n" +
+        "Si requieres factura selecciona la opcion SI.\n\n" +
         "Al confirmar tu pedido por WhatsApp, adjunta tu constancia de Situación fiscal."
     );
 }
