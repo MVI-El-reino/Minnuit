@@ -522,7 +522,7 @@ function agregarPastelConfigAlCarrito() {
     document.getElementById("cant_pastel_config").value = "5"; 
     
     // Forzamos la actualización visual
-    actualizarVistaCarrito();
+    actualizarCarrito();
     actualizarConfiguradorPasteles();
 
     mostrarAlerta(`🛒 ¡Cajas de Pastel agregadas!`);
@@ -535,7 +535,7 @@ function agregarPastelConfigAlCarrito() {
 function eliminarDelCarrito(index) {
     carrito.splice(index, 1);
     mostrarAlerta("❌ Artículo eliminado");
-    actualizarVistaCarrito();
+    actualizarCarrito();
     if(carrito.length === 0) { cerrarModal(); }
 }
 
@@ -581,53 +581,46 @@ function actualizarVistaCarrito() {
         let nombreCorto = item.nombre.replace('Caja Pastel ', '');
         
         // 1. Filtramos y armamos el texto perfecto según el tipo de producto
-let prefijo = nombreCorto.includes('Base') ? ' ' : 'Cajas';
-let nombreLimpio = nombreCorto;
+        let prefijo = nombreCorto.includes('Base') ? ' ' : 'Cajas';
+        let nombreLimpio = nombreCorto;
 
-// Si detecta que es un cupcake, reordena las palabras a tu gusto
-if (nombreCorto.includes('Cupcake')) {
-    let medida = nombreCorto.includes('31cm') ? '31cm' : '21cm';
-    nombreLimpio = `Cupcakes ${medida}`;
-}
+        // Si detecta que es un cupcake, reordena las palabras a tu gusto
+        if (nombreCorto.includes('Cupcake')) {
+            let medida = nombreCorto.includes('31cm') ? '31cm' : '21cm';
+            nombreLimpio = `Cupcakes ${medida}`;
+        }
 
-// 2. Imprimimos el elemento en el carrito
-listaHTML += `
-    <li style="position: relative;">
-        <button class="btn-eliminar-item" style="position: absolute; right: 0; top: 10px;" onclick="eliminarDelCarrito(${index})">&times;</button>
-        <div style="font-weight: 700; font-size: 0.95rem; color: var(--texto-oscuro); width: 90%;">
-            ${item.cantidad} - ${prefijo} ${nombreLimpio} <span style="color: var(--rosa-principal)">$${item.subtotal.toFixed(2)}</span>
-        </div>
-        <div style="font-size: 0.8rem; color: var(--texto-secundario); margin-top: 3px; line-height: 1.2; width: 90%;">
-            Ref: ${item.detalle}
-        </div>
-    </li>`;
+        // 2. Imprimimos el elemento en el carrito
+        listaHTML += `
+            <li style="position: relative;">
+                <button class="btn-eliminar-item" style="position: absolute; right: 0; top: 10px;" onclick="eliminarDelCarrito(${index})">&times;</button>
+                <div style="font-weight: 700; font-size: 0.95rem; color: var(--texto-oscuro); width: 90%;">
+                    ${item.cantidad} - ${prefijo} ${nombreLimpio} <span style="color: var(--rosa-principal)">$${item.subtotal.toFixed(2)}</span>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--texto-secundario); margin-top: 3px; line-height: 1.2; width: 90%;">
+                    Ref: ${item.detalle}
+                </div>
+            </li>`;
     });
     
     document.getElementById("lista-carrito").innerHTML = listaHTML;
 
     let costoEnvio = 0;
     let costoComision = 0; 
-    let costoIVA = 0; // NUEVO
+    let costoIVA = 0; 
     
     // Leemos qué eligieron en el select de envío
     const selEntrega = document.getElementById("sel_entrega");
     if (selEntrega) { costoEnvio = parseFloat(selEntrega.value) || 0; }
     
-    // Leemos qué eligieron en el select de pago
+    // Leemos qué eligieron en el select de pago (Solo una vez)
     const selPago = document.getElementById("sel_pago");
     let metodoPago = "Transferencia";
     if (selPago) {
         metodoPago = selPago.value;
     }
 
-  // 1. Leemos qué eligieron en el select de pago
-    const selPago = document.getElementById("sel_pago");
-    let metodoPago = "Transferencia";
-    if (selPago) {
-        metodoPago = selPago.value;
-    }
-
-    // 2. Leemos qué eligieron en el select de factura
+    // Leemos qué eligieron en el select de factura
     const selFactura = document.getElementById("sel_factura");
     let requiereFactura = selFactura ? selFactura.value : "No";
 
@@ -695,8 +688,8 @@ listaHTML += `
     modalTotal.dataset.subtotal = totalDinero.toFixed(2);
     modalTotal.dataset.envio = costoEnvio.toFixed(2);
     modalTotal.dataset.comision = costoComision.toFixed(2); 
-    modalTotal.dataset.iva = costoIVA.toFixed(2); // NUEVO
-    modalTotal.dataset.factura = requiereFactura; // NUEVO
+    modalTotal.dataset.iva = costoIVA.toFixed(2); 
+    modalTotal.dataset.factura = requiereFactura; 
     modalTotal.dataset.metodopago = metodoPago === "PayPal" ? "Tarjeta de credito (link Mercado Pago)" : "Transferencia Bancaria";
     // ===============================================
 
@@ -750,6 +743,7 @@ listaHTML += `
     if(alertaPiezas) alertaPiezas.innerHTML = bannerMayoreoHTML + advertenciaHTML;
     if(btnPedido) btnPedido.disabled = bloqueado;
 }
+
 function abrirModal() {
     if(carrito.length === 0) return mostrarAlerta(" Tu carrito está vacío.");
     document.getElementById("modal-carrito").style.display = "block";
