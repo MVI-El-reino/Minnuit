@@ -1074,7 +1074,6 @@ async function procesarPedidoCompleto(soloDescargar) {
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(10);
         pdf.setTextColor(100, 100, 100);
-        pdf.text("Minuit", 195, 26, { align: "right" });
 
         pdf.setDrawColor(220, 220, 220);
         pdf.line(15, 35, 195, 35);
