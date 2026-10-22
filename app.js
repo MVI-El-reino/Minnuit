@@ -1135,7 +1135,7 @@ async function procesarPedidoCompleto() {
         
         if (valComision > 0) {
             yDesglose += 7;
-            pdf.text("Comisión Mercado Pago/PayPal (5%):", 105, yDesglose);
+            pdf.text("Tarjeta de Credito (link Mercado Pago)", 105, yDesglose);
             pdf.text("$" + valComision.toFixed(2), 190, yDesglose, { align: "right" });
         }
 
