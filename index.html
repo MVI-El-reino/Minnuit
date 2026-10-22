@@ -45,7 +45,7 @@
         <img src="Logo%20Minuit1.png" alt="Logo Minuit" class="logo-principal">
         
         <!-- Aquí va el botón -->
-        <button onclick="descargarUltimoPedido()" title="Descargar último pedido" class="btn-descarga-ultimo">
+        <!--<button onclick="descargarUltimoPedido()" title="Descargar último pedido" class="btn-descarga-ultimo">-->
             <!-- Icono de descarga en SVG -->
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -400,9 +400,13 @@
             </select>
         </div>    
 
-        <!-- Botón final -->
-        <button id="btn_finalizar_pedido" type="button" onclick="procesarPedido()" style="width: 100%; background: #f48fb1; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">✅ Confirmar y Enviar Pedido</button>
-    </div>
+        <!-- Botón principal (WhatsApp + PDF) -->
+        <button id="btn_finalizar_pedido" type="button" onclick="procesarPedido(false)" style="width: 100%; background: #f48fb1; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-bottom: 12px;">✅ Confirmar y Enviar Pedido</button>
+        
+        <!-- Botón secundario (Solo Descargar) -->
+        <button id="btn_solo_descarga" type="button" onclick="procesarPedido(true)" style="width: 100%; background: #f48fb1; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">Descargar nota de pedido</button>
+
+        </div>
 </div>
 
     <!-- Modal 2: Dirección -->
