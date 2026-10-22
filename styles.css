@@ -78,7 +78,7 @@ select,
 .fila-precio-cantidad {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end; /* Alinea ambas columnas desde el piso */
+    align-items: stretch; /* EL SECRETO: Obliga a ambas columnas a medir lo mismo de alto */
     background: var(--rosa-claro);
     padding: 15px 15px 20px 15px; 
     border-radius: 12px;
@@ -90,6 +90,7 @@ select,
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between; /* Empuja los títulos al techo y los valores al piso */
     width: 48%;
 }
 
@@ -98,12 +99,28 @@ select,
     text-transform: uppercase;
     color: var(--texto-secundario);
     font-weight: 700;
-    margin: 0 0 10px 0 !important; 
+    margin: 0 !important; /* Limpiamos los márgenes conflictivos */
+    line-height: 1 !important;
+    text-align: center;
+}
+
+/* Etiqueta de IVA para el configurador */
+.etiqueta-iva {
+    background-color: #ffffff;
+    color: #FF6B96; 
+    font-size: 0.55rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin: 4px 0 !important; /* Espacio para que no se pegue al título ni al precio */
+    line-height: 1.2;
+    display: inline-block;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 /* El texto del precio */
 .precio-grande {
-    /* clamp(mínimo, ideal, máximo) encoge la letra automáticamente en Androids angostos */
     font-size: clamp(1.1rem, 4.5vw, 1.4rem) !important; 
     font-weight: 800;
     color: var(--rosa-principal);
@@ -113,7 +130,7 @@ select,
     line-height: 44px !important; 
     text-align: center;
     display: block; 
-    white-space: nowrap !important; /* EL SECRETO: Prohíbe terminantemente que el texto baje de línea */
+    white-space: nowrap !important;
 }
 
 /* El recuadro blanco */
@@ -121,7 +138,7 @@ select,
     background: var(--blanco);
     border-radius: 10px;
     margin: 0 !important; 
-    padding: 0 !important; /* CERO relleno para no desfasar el texto */
+    padding: 0 !important;
     border: 1px solid var(--borde-suave);
     height: 44px; /* Misma altura maestra que el precio */
     width: 100%;
@@ -131,7 +148,7 @@ select,
 /* El número adentro del recuadro */
 .controles-cantidad input {
     width: 100%;
-    height: 100% !important; /* Obliga al input a medir los mismos 44px */
+    height: 100% !important;
     border: none;
     background: transparent;
     font-family: 'Poppins', sans-serif;
@@ -139,44 +156,9 @@ select,
     font-size: 1.25rem; 
     color: var(--texto-oscuro);
     text-align: center;
-    padding: 0 !important; /* Destruye rellenos que estorben */
+    padding: 0 !important;
     margin: 0 !important;
-    line-height: 44px !important; /* Mismo secreto de centrado que el precio */
-}
-
-/* Etiqueta de IVA para el configurador */
-.etiqueta-iva {
-    color: #FF6B96; 
-    font-size: 0.55rem;
-    font-weight: 800;
-    padding: 2px 8px;
-    border-radius: 12px;
-    /* Cero margen y altura de línea justa para evitar espacios invisibles */
-    margin: 0 !important; 
-    line-height: 1.2;
-    display: inline-block;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-
-/* Asegura que la columna del precio junte todo su contenido */
-.precio-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px; /* Define un espacio milimétrico exacto entre los tres elementos */
-}
-
-/* Quitamos márgenes por defecto a los textos superior e inferior */
-.etiqueta-precio {
-    margin-bottom: 0 !important;
-    line-height: 1 !important;
-}
-
-.precio-grande {
-    margin: 0 !important;
-    line-height: 1 !important;
+    line-height: 44px !important;
 }
 /* =========================================
    Reset y Tipografía General
