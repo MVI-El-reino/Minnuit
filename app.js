@@ -656,14 +656,28 @@ function actualizarVistaCarrito() {
                     <p style="margin: 0;"><strong>No° de tarjeta (Oxxo):</strong> 5204 1662 4268 9190</p>
                 `;
             } else {
-                // Imagen 1 (Santander - Elizabeth Ramirez)
+                // Imágenes 1 y 2 (Santander y Mercado Pago en un carrusel deslizable)
                 cajaBancos.innerHTML = `
-                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">Datos Bancarios</p>
-                    <p style="margin: 0 0 3px 0;"><strong>Banco:</strong> SANTANDER</p>
-                    <p style="margin: 0 0 3px 0;"><strong>Nombre:</strong> Elizabeth Ramirez Ramirez</p>
-                    <p style="margin: 0 0 3px 0;"><strong>No° de cuenta:</strong> 1402 4074 580</p>
-                    <p style="margin: 0 0 3px 0;"><strong>No° de clabe:</strong> 0146 5014 0240 7458 03</p>
-                    <p style="margin: 0;"><strong>No° de tarjeta (Oxxo):</strong> 5579 0870 1226 6216</p>
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">
+                        Datos Bancarios <span style="font-size: 0.75rem; color: #a39599; font-weight: normal;">(Mercado pago ->)</span>
+                    </p>
+                    <div style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; padding-bottom: 5px;">
+                        <!-- Tarjeta 1: Santander -->
+                        <div style="flex: 0 0 100%; scroll-snap-align: center; box-sizing: border-box; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fce4ec;">
+                            <p style="margin: 0 0 5px 0; font-weight: bold; color: #4a3b40;">🏦 Opción 1: SANTANDER</p>
+                            <p style="margin: 0 0 3px 0;"><strong>Nombre:</strong> Elizabeth Ramirez Ramirez</p>
+                            <p style="margin: 0 0 3px 0;"><strong>No° cuenta:</strong> 1402 4074 580</p>
+                            <p style="margin: 0 0 3px 0;"><strong>CLABE:</strong> 0146 5014 0240 7458 03</p>
+                            <p style="margin: 0;"><strong>Tarjeta (Oxxo):</strong> 5579 0870 1226 6216</p>
+                        </div>
+                        <!-- Tarjeta 2: Mercado Pago -->
+                        <div style="flex: 0 0 100%; scroll-snap-align: center; box-sizing: border-box; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fce4ec;">
+                            <p style="margin: 0 0 5px 0; font-weight: bold; color: #4a3b40;">💳 Opción 2: MERCADO PAGO</p>
+                            <p style="margin: 0 0 3px 0;"><strong>Nombre:</strong> Elizabeth Ramírez Ramírez</p>
+                            <p style="margin: 0 0 3px 0;"><strong>CLABE:</strong> 722 969 070 993 840 205</p>
+                            <p style="margin: 0; font-size: 0.8rem; color: #a39599;">(Transferencia directa a cuenta)</p>
+                        </div>
+                    </div>
                 `;
             }
         }
@@ -1047,13 +1061,46 @@ async function procesarPedidoCompleto(soloDescargar) {
     let datosTotal = document.getElementById("modal-total").dataset;
     let valSubtotal = parseFloat(datosTotal.subtotal || 0);
     let valEnvio = parseFloat(datosTotal.envio || 0);
-    let valComision = parseFloat(datosTotal.comision || 0);
+    let valComision = 0; // Ya no hay comisión extra
     let valIva = parseFloat(datosTotal.iva || 0); 
     let requiereFactura = datosTotal.factura || "No"; 
     let metodoPagoTexto = datosTotal.metodopago || "Transferencia";
     let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger en taller Minuit / Mandar Uber";
 
-    let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *FACTURA:* ${requiereFactura}\n *TOTAL A PAGAR: ${totalTxt}*\n`;
+    let metodoPagoSeleccionado = document.getElementById("sel_pago") ? document.getElementById("sel_pago").value : "Transferencia";
+
+    // --- NUEVO: DEFINIR QUÉ DATOS BANCARIOS MOSTRAR ---
+    let datosBancariosMensaje = "";
+    let datosBancariosPDF = [];
+
+    if (requiereFactura === "Si") {
+        datosBancariosMensaje = "\n🏦 *DATOS DE PAGO (FACTURA)*\nBanco: BANAMEX\nNombre: Daniel Bonilla Rodriguez\nNo. de cuenta: 886 5665 / Sucursal 7012\nCLABE: 0026 5070 1288 6566 51\nTarjeta (Oxxo): 5204 1662 4268 9190\n\n📌 *Importante:* Al confirmar tu pedido envía tu Constancia de Situación Fiscal y Uso de CFDI.";
+        datosBancariosPDF = [
+            "DATOS PARA PAGO (CON FACTURA):",
+            "Banco: BANAMEX | Nombre: Daniel Bonilla Rodriguez",
+            "Cuenta: 886 5665 Suc. 7012 | CLABE: 0026 5070 1288 6566 51",
+            "Tarjeta (Oxxo): 5204 1662 4268 9190"
+        ];
+    } else {
+        if (metodoPagoSeleccionado === "PayPal") { 
+            datosBancariosMensaje = "\n💳 *PAGO CON TARJETA*\nTe enviaremos tu link de pago seguro (Mercado Pago) por este medio.\n*(No aplica cobro extra de comisión)*";
+            datosBancariosPDF = [
+                "PAGO CON TARJETA DE CRÉDITO:",
+                "Te enviaremos tu link de Mercado Pago por WhatsApp."
+            ];
+        } else { 
+            datosBancariosMensaje = "\n🏦 *DATOS DE PAGO (Elige una opción)*\n\n*Opción 1: SANTANDER*\nNombre: Elizabeth Ramirez Ramirez\nNo. de cuenta: 1402 4074 580\nCLABE: 0146 5014 0240 7458 03\nTarjeta (Oxxo): 5579 0870 1226 6216\n\n*Opción 2: MERCADO PAGO*\nNombre: Elizabeth Ramírez Ramírez\nCLABE: 722 969 070 993 840 205";
+            datosBancariosPDF = [
+                "DATOS PARA PAGO (Elige una opción):",
+                "Opción 1 (SANTANDER): Elizabeth Ramirez Ramirez",
+                "Cuenta: 1402 4074 580 | CLABE: 0146 5014 0240 7458 03 | Oxxo: 5579 0870 1226 6216",
+                "Opción 2 (MERCADO PAGO): Elizabeth Ramírez Ramírez | CLABE: 722 969 070 993 840 205"
+            ];
+        }
+    }
+
+    // Le inyectamos los datos bancarios al mensaje final de WhatsApp
+    let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *FACTURA:* ${requiereFactura}\n *TOTAL A PAGAR: ${totalTxt}*\n${datosBancariosMensaje}\n`;
     
     try {
         const { jsPDF } = window.jspdf;
@@ -1208,8 +1255,20 @@ async function procesarPedidoCompleto(soloDescargar) {
         pdf.setFontSize(14);
         pdf.text(totalTxt, 190, yDesglose, { align: "right" });
 
-        // --- TÉRMINOS Y CONDICIONES ---
+        // --- NUEVO: IMPRIMIR DATOS BANCARIOS EN EL PDF ---
         let yTerminos = y + 10;
+        pdf.setTextColor(...COLOR_TEXTO);
+        pdf.setFontSize(8.5);
+        pdf.setFont("helvetica", "bold");
+        
+        datosBancariosPDF.forEach((linea, index) => {
+            if(index > 0) pdf.setFont("helvetica", "normal");
+            pdf.text(linea, 15, yTerminos);
+            yTerminos += 4;
+        });
+
+        yTerminos += 4; // Damos un pequeño respiro antes de los términos
+        // --- TÉRMINOS Y CONDICIONES ---
         pdf.setTextColor(120, 120, 120);
         pdf.setFontSize(8);
         pdf.setFont("helvetica", "bold");
