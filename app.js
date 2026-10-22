@@ -905,19 +905,25 @@ function mostrarCampoConError(idCampo) {
     campo.focus();
 }
 
-async function procesarPedido() {
-    // Si falla cualquier paso (incluso antes de crear el PDF), el error se muestra en una alerta
+async function procesarPedido(soloDescargar = false) {
     try {
-        await procesarPedidoCompleto();
+        // Deshabilitamos ambos botones para evitar clics dobles
+        if(document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = true;
+        if(document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = true;
+
+        await procesarPedidoCompleto(soloDescargar);
+        
     } catch (error) {
         console.error("Error al procesar el pedido:", error);
         alert("Ocurrió un error al generar la nota: " + error.message + ". Por favor intenta de nuevo.");
-        const botonPedido = document.querySelector(".btn-pedido");
-        if (botonPedido) botonPedido.disabled = false;
+        
+        // Reactivamos los botones si hubo error
+        if(document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
+        if(document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
     }
 }
 
-async function procesarPedidoCompleto() {
+async function procesarPedidoCompleto(soloDescargar) {
     // 0. Forzamos una última actualización matemática antes de imprimir el PDF
     actualizarVistaCarrito();
     let nombreCliente = document.getElementById("nombre_cliente").value.trim();
@@ -1205,20 +1211,21 @@ async function procesarPedidoCompleto() {
         const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
 
         // =========================================================
-        // SUBIR A GOOGLE DRIVE Y GUARDAR COPIA LOCAL (MODIFICADO)
+        // GUARDAR COPIA LOCAL (Bóveda del navegador)
         // =========================================================
         const pdfBase64 = pdf.output('datauristring');
-        
-        // NUEVO: Guardar una copia de seguridad en el teléfono/computadora del cliente
         try {
             localStorage.setItem("minuit_ultimo_pdf", pdfBase64);
         } catch (e) {
             console.warn("No se pudo guardar la copia de seguridad localmente.", e);
         }
+
+        // =========================================================
+        // SUBIR A GOOGLE DRIVE (AHORA SE HACE SIEMPRE PARA LLEVAR REGISTRO)
+        // =========================================================
         const urlGoogleScript = "https://script.google.com/macros/s/AKfycbw_RFDbSPc0tZNODZ2cltlC26DtKGciqqkkrLvhHSeg-NkyJ-CfpaQiMbfS0ftjHa77-A/exec";
 
-        // Intentamos guardar una copia en Drive, pero sin esperar más de 8 segundos
-        mostrarAlerta("📤 Enviando tu pedido, un momento...");
+        mostrarAlerta("📤 Procesando tu pedido, un momento...");
         const controlador = new AbortController();
         const tiempoLimite = setTimeout(() => controlador.abort(), 8000);
 
@@ -1236,28 +1243,38 @@ async function procesarPedidoCompleto() {
                 textoWhatsApp += `\n📁 *Descarga el PDF de registro aquí:*\n👉 ${resultado.urlDrive}`;
             }
         } catch (errorDrive) {
-            // Si Drive tarda más de 8 segundos o falla, seguimos para no perder al cliente
             console.warn("Google Drive no respondió a tiempo, se continúa sin guardar en la nube.", errorDrive);
         } finally {
             clearTimeout(tiempoLimite);
         }
 
         // =========================================================
-        // CIERRE DE VENTA (ESTO SE EJECUTA SÍ O SÍ)
+        // INTERCEPTOR PARA EL BOTÓN DE "SOLO DESCARGAR"
         // =========================================================
-        // Sin importar si Drive funcionó o falló, siempre le damos el PDF al cliente 
-        // y lo mandamos a WhatsApp para cerrar su pedido.
+        if (soloDescargar) {
+            pdf.save(nombreArchivo); // Descarga el PDF en el teléfono
+            mostrarAlerta("📥 Nota descargada. ¡Recuerda enviarla por WhatsApp!");
+            
+            // Reactivamos los botones por si quieren presionar el otro después
+            if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
+            if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
+            
+            return; // 🛑 Termina la función aquí: Se guardó en Drive, pero no abre WhatsApp ni limpia el carrito
+        }
+
+        // =========================================================
+        // CIERRE DE VENTA (ESTO SE EJECUTA SI PRESIONAN "ENVIAR PEDIDO")
+        // =========================================================
         pdf.save(nombreArchivo); 
         abrirWhatsAppYLimpiar(textoWhatsApp);
 
     } catch (error) {
-        // Este error ya solo saltará si falla la creación del PDF en sí (casi imposible)
         console.error("Error al procesar el pedido:", error);
         alert("Ocurrió un error al generar la nota: " + error.message + ". Por favor intenta de nuevo.");
-        document.querySelector(".btn-pedido").disabled = false;
+        if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
+        if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
     }
 }
-
 // ==========================================
 // RECUPERAR ÚLTIMO PEDIDO
 // ==========================================
