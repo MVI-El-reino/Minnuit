@@ -26,9 +26,22 @@
 <link rel="icon" type="image/png" href="Logo%20Minuit.png">
     <!-- SEGURO DEFINITIVO ANTI-ZOOM PARA IPHONE -->
     <style>
-        input, select, textarea {
-            font-size: 16px !important;
-        }
+        <style>
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+    
+    /* Simula un mayor grosor en imágenes PNG transparentes */
+    .logo-principal {
+    filter: drop-shadow(0.5px 0 0 #000) 
+            drop-shadow(-0.5px 0 0 #000) 
+            drop-shadow(0 0.5px 0 #000) 
+            drop-shadow(0 -0.5px 0 #000);
+            
+    /* NUEVO: Mueve el logo hacia abajo. Aumenta o disminuye los 12px según lo necesites */
+    margin-top: 12px; 
+    }
+</style>
     </style>
     
 </head>
@@ -331,21 +344,21 @@
         <input type="text" id="ig_cliente" placeholder=" Usuario de Instagram" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
         <input type="email" id="correo_cliente" placeholder=" Correo electrónico" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
         
-       <!-- 1. PRIMERO PREGUNTAMOS EL TIPO DE ENVÍO -->
+       <!-- ========================================== -->
+        <!-- 1. SECCIÓN ENVÍO                           -->
+        <!-- ========================================== -->
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
             <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40; margin: 0;">🚚 Envío:</label>
             <button type="button" onclick="mostrarTerminosEnvio()" style="background: #e87b9e; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(232, 123, 158, 0.3);">!</button>
         </div>
-        <!-- Agregamos la función alternarModoEntrega() al onchange -->
-        <!-- CAMBIO 4: menú dibujado con Choices (igual que los de los pedidos) -->
         <div style="margin-bottom: 15px;">
-        <select id="sel_entrega" onchange="alternarModoEntrega(); actualizarVistaCarrito()" style="width: 100%; padding: 10px; font-size: 16px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px;">
-            <option value="0">Recoger en taller Minuit / Mandar Uber</option>
-            <option value="300">Envío Nacional (+$300.00 MXN)</option>
-        </select>
+            <select id="sel_entrega" onchange="alternarModoEntrega(); actualizarVistaCarrito()" style="width: 100%; padding: 10px; font-size: 16px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px;">
+                <option value="0">Recoger en taller Minuit / Mandar Uber</option>
+                <option value="300">Envío Nacional (+$300.00 MXN)</option>
+            </select>
         </div>
 
-        <!-- 2. ZONA A: RECOGER EN TALLER (Visible por defecto) -->
+        <!-- ZONA A: RECOGER EN TALLER -->
         <div id="bloque_recoger_taller" style="background: #fdf0f4; border: 1px dashed #e87b9e; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
             <p style="margin: 0 0 10px 0; font-size: 0.95rem; color: #4a3b40; font-weight: bold; text-align: center;">🏪 Recoger en Taller Minuit</p>
             <p style="margin: 0 0 6px 0; font-size: 0.85rem; color: #4a3b40;"><strong>Dirección:</strong> Evenecer 23, Fuertes de Guadalupe, 72706 Barrio de Nuevo León, Pue.</p>
@@ -355,34 +368,42 @@
             <p style="margin: 8px 0 0 0; font-size: 0.8rem; color: #e87b9e; text-align: center;">Horarios: te los confirmamos por WhatsApp al confirmar tu pedido.</p>
         </div>
 
-        <!-- 3. ZONA B: ENVÍO NACIONAL (Oculta por defecto) -->
+        <!-- ZONA B: ENVÍO NACIONAL -->
         <div id="bloque_envio_nacional" style="display: none; margin-bottom: 15px;">
             <button type="button" onclick="abrirModalDireccion()" style="width: 100%; padding: 12px; background: #fff; border: 2px dashed #e87b9e; border-radius: 8px; color: #e87b9e; font-weight: bold; cursor: pointer; font-size: 16px;">
                 📍 Llenar Dirección de Envío
             </button>
         </div>
         
-        <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40;">💳 Pago:</label>
-        <!-- CAMBIO 4: menú dibujado con Choices (igual que los de los pedidos) -->
-        <div style="margin-bottom: 15px;">
-        <select id="sel_pago" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #f48fb1; border-radius: 8px;">
-            <option value="Transferencia">Transferencia Bancaria</option>
-            <option value="PayPal">Tarjeta de credito (link mercado Pago)</option>
+        <!-- ========================================== -->
+        <!-- 2. SECCIÓN PAGO Y COMISIÓN                 -->
+        <!-- ========================================== -->
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+            <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40; margin: 0;">💳 Pago:</label>
             <button type="button" onclick="mostrarTerminosComision()" style="background: #e87b9e; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(232, 123, 158, 0.3);">!</button>
-
-            
-        </select>
         </div>
+        <div style="margin-bottom: 15px;">
+            <select id="sel_pago" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px;">
+                <option value="Transferencia">Transferencia Bancaria</option>
+                <option value="PayPal">Tarjeta de crédito (link Mercado Pago)</option>
+            </select>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- 3. SECCIÓN FACTURA E IVA                   -->
+        <!-- ========================================== -->
         <div class="grupo-input" style="margin-bottom: 25px;">
-            <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40;"> Factura (Nuestros precios no incluyen IVA) </label>
-            <button type="button" onclick="mostrarTerminosIVA()" style="background: #e87b9e; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(232, 123, 158, 0.3);">!</button>
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                <label style="font-weight: bold; font-size: 0.85rem; color: #4a3b40; margin: 0;">🧾 Factura (No incluye IVA):</label>
+                <button type="button" onclick="mostrarTerminosIVA()" style="background: #e87b9e; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(232, 123, 158, 0.3);">!</button>
+            </div>
             <select id="sel_factura" onchange="actualizarVistaCarrito()" style="width: 100%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px;">
-            <option value="No">No</option>
-            <option value="Si">Sí</option>
-         </select>
+                <option value="No">No</option>
+                <option value="Si">Sí</option>
+            </select>
         </div>    
 
-        <!-- Botón final para disparar el PDF y WhatsApp -->
+        <!-- Botón final -->
         <button id="btn_finalizar_pedido" type="button" onclick="procesarPedido()" style="width: 100%; background: #f48fb1; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">✅ Confirmar y Enviar Pedido</button>
     </div>
 </div>
