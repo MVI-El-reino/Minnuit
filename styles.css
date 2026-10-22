@@ -143,6 +143,34 @@ select,
     margin: 0 !important;
     line-height: 44px !important; /* Mismo secreto de centrado que el precio */
 }
+
+/* Etiqueta de IVA para el configurador */
+.etiqueta-iva {
+    background-color: #ffffff;
+    color: #ff1469; /* Rosa fuerte vibrante */
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin: 4px auto; /* Lo centra horizontalmente y da espacio arriba/abajo */
+    display: inline-block;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Asegura que la columna del precio centre todo su contenido */
+.precio-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Quitamos márgenes extra al precio grande para que se vea compacto como en la foto */
+.precio-grande {
+    margin: 4px 0 0 0 !important;
+}
+
 /* =========================================
    Reset y Tipografía General
    ========================================= */
