@@ -1102,18 +1102,23 @@ async function procesarPedidoCompleto() {
             pdf.setFont("helvetica", "normal");
             pdf.setFontSize(8);
             let lineasDetalle = pdf.splitTextToSize(String(item.detalle || ""), 90); 
-            pdf.text(lineasDetalle, 20, y + 4);
+            
+            // Bajamos el texto a y+4.5 para darle un poco más de respiro bajo el nombre del producto
+            pdf.text(lineasDetalle, 20, y + 4.5);
 
             pdf.setFontSize(10);
             pdf.text(String(item.cantidad), 130, y, { align: "center" });
             pdf.text("$" + item.subtotal.toFixed(2), 185, y, { align: "right" });
 
-            let alturaExtra = lineasDetalle.length * 3;
-            y += Math.max(10, alturaExtra + 4);
+            // EL TRUCO: Cada renglón extra ocupa unos 3.5 puntos de altura. 
+            let altoTotalDetalle = lineasDetalle.length * 3.5;
 
+            // Dibujamos la línea tomando en cuenta 'y', un margen base de 6, y el alto del texto
             pdf.setDrawColor(240, 220, 227);
-            pdf.line(20, y - 3, 190, y - 3);
-            y += 5;
+            pdf.line(20, y + 6 + altoTotalDetalle, 190, y + 6 + altoTotalDetalle);
+            
+            // Empujamos la 'y' para el siguiente producto (12 de margen base + el alto del texto)
+            y += 12 + altoTotalDetalle;
         });
 
         // --- CÁLCULOS FINALES Y DESGLOSE ---
