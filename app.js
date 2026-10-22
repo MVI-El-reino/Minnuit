@@ -635,7 +635,7 @@ function actualizarVistaCarrito() {
     modalTotal.dataset.comision = costoComision.toFixed(2); 
     modalTotal.dataset.iva = costoIVA.toFixed(2); // NUEVO
     modalTotal.dataset.factura = requiereFactura; // NUEVO
-    modalTotal.dataset.metodopago = metodoPago === "PayPal" ? "Mercado Pago/PayPal (+5% de comisión)" : "Transferencia Bancaria";
+    modalTotal.dataset.metodopago = metodoPago === "PayPal" ? "Tarjeta de credito (link Mercado Pago)" : "Transferencia Bancaria";
     // ===============================================
 
     // ===== 5. TEXTOS DE MAYOREO ULTRA CORTOS =====
