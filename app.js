@@ -620,16 +620,70 @@ listaHTML += `
         metodoPago = selPago.value;
     }
 
-    // Leemos qué eligieron en el select de factura (NUEVO)
+  // 1. Leemos qué eligieron en el select de pago
+    const selPago = document.getElementById("sel_pago");
+    let metodoPago = "Transferencia";
+    if (selPago) {
+        metodoPago = selPago.value;
+    }
+
+    // 2. Leemos qué eligieron en el select de factura
     const selFactura = document.getElementById("sel_factura");
     let requiereFactura = selFactura ? selFactura.value : "No";
 
+    // ========================================================
+    // ACTUALIZAR EL RECUADRO DE DATOS BANCARIOS VISUALES
+    // ========================================================
+    const cajaBancos = document.getElementById("caja_datos_bancarios");
+    if (cajaBancos) {
+        if (metodoPago === "PayPal") {
+            // --- ELIGIÓ TARJETA DE CRÉDITO (LINK MERCADO PAGO) ---
+            if (requiereFactura === "Si") {
+                cajaBancos.innerHTML = `
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">💳 Pago con Tarjeta + Factura</p>
+                    <p style="margin: 0 0 6px 0;">Al confirmar tu pedido, te enviaremos por WhatsApp tu <strong>link de pago seguro</strong> (Mercado Pago).</p>
+                    <p style="margin: 0; font-size: 0.8rem; color: #d81b60;">* Recuerda tener a la mano tu Constancia de Situación Fiscal.</p>
+                `;
+            } else {
+                cajaBancos.innerHTML = `
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">💳 Pago con Tarjeta</p>
+                    <p style="margin: 0;">Al confirmar tu pedido, te enviaremos por WhatsApp tu <strong>link de pago seguro</strong> (Mercado Pago) para que pagues cómodamente.</p>
+                `;
+            }
+        } else {
+            // --- ELIGIÓ TRANSFERENCIA BANCARIA ---
+            if (requiereFactura === "Si") {
+                // Imagen 3 (Banamex - Daniel Bonilla)
+                cajaBancos.innerHTML = `
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">Datos Bancarios</p>
+                    <p style="margin: 0 0 3px 0;"><strong>Banco:</strong> BANAMEX</p>
+                    <p style="margin: 0 0 3px 0;"><strong>Nombre:</strong> Daniel Bonilla Rodriguez</p>
+                    <p style="margin: 0 0 3px 0;"><strong>No° de cuenta:</strong> 886 5665 / Sucursal 7012</p>
+                    <p style="margin: 0 0 3px 0;"><strong>No° de clabe:</strong> 0026 5070 1288 6566 51</p>
+                    <p style="margin: 0;"><strong>No° de tarjeta (Oxxo):</strong> 5204 1662 4268 9190</p>
+                `;
+            } else {
+                // Imagen 1 (Santander - Elizabeth Ramirez)
+                cajaBancos.innerHTML = `
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">Datos Bancarios</p>
+                    <p style="margin: 0 0 3px 0;"><strong>Banco:</strong> SANTANDER</p>
+                    <p style="margin: 0 0 3px 0;"><strong>Nombre:</strong> Elizabeth Ramirez Ramirez</p>
+                    <p style="margin: 0 0 3px 0;"><strong>No° de cuenta:</strong> 1402 4074 580</p>
+                    <p style="margin: 0 0 3px 0;"><strong>No° de clabe:</strong> 0146 5014 0240 7458 03</p>
+                    <p style="margin: 0;"><strong>No° de tarjeta (Oxxo):</strong> 5579 0870 1226 6216</p>
+                `;
+            }
+        }
+    }
+    // ========================================================
+
+    // TU MATEMÁTICA INTACTA
     let subtotalPrevio = totalDinero + costoEnvio + costoComision;
     if (requiereFactura === "Si") {
         costoIVA = subtotalPrevio * 0.16; // 16% sobre todo lo anterior
     }
     
-    let granTotal = subtotalPrevio + costoIVA; 
+    let granTotal = subtotalPrevio + costoIVA;
     
     // Actualizamos los textos visuales de la página
     document.getElementById("fab-total").innerText = "$" + granTotal.toFixed(2);
