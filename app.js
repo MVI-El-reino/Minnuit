@@ -1211,25 +1211,52 @@ async function procesarPedidoCompleto(soloDescargar) {
         const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
 
         // =========================================================
-        // GUARDAR COPIA LOCAL (Bóveda del navegador)
+        // 1. GUARDAR COPIA LOCAL (Bóveda del navegador)
         // =========================================================
         const pdfBase64 = pdf.output('datauristring');
         try {
             localStorage.setItem("minuit_ultimo_pdf", pdfBase64);
         } catch (e) {
-            console.warn("No se pudo guardar la copia de seguridad localmente.", e);
+            console.warn("No se pudo guardar la copia local.", e);
         }
 
         // =========================================================
-        // SUBIR A GOOGLE DRIVE (AHORA SE HACE SIEMPRE PARA LLEVAR REGISTRO)
+        // 2. ¡DESCARGAR INMEDIATAMENTE! (El secreto para Safari/iPhone)
+        // =========================================================
+        // Al ejecutar la descarga ANTES de subir a Drive, el iPhone
+        // reconoce que fue un clic directo del usuario y NO lo bloquea.
+        pdf.save(nombreArchivo); 
+
+        // =========================================================
+        // 3. INTERCEPTOR PARA EL BOTÓN DE "SOLO DESCARGAR"
         // =========================================================
         const urlGoogleScript = "https://script.google.com/macros/s/AKfycbw_RFDbSPc0tZNODZ2cltlC26DtKGciqqkkrLvhHSeg-NkyJ-CfpaQiMbfS0ftjHa77-A/exec";
 
-        mostrarAlerta("📤 Procesando tu pedido, un momento...");
+        if (soloDescargar) {
+            mostrarAlerta("✅ ¡Nota descargada! Subiendo copia a tu registro...");
+            
+            // Subimos a Drive "en silencio" sin bloquear la pantalla del usuario
+            fetch(urlGoogleScript, {
+                method: 'POST',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ nombreArchivo: nombreArchivo, base64: pdfBase64 })
+            }).catch(e => console.warn(e));
+
+            // Reactivamos los botones y terminamos la función aquí
+            if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
+            if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
+            return; 
+        }
+
+        // =========================================================
+        // 4. SI PRESIONÓ "ENVIAR", SUBIMOS A DRIVE Y VAMOS A WHATSAPP
+        // =========================================================
+        mostrarAlerta("📤 Generando link de Drive y abriendo WhatsApp...");
         const controlador = new AbortController();
         const tiempoLimite = setTimeout(() => controlador.abort(), 8000);
 
         try {
+            // Como la descarga ya inició arriba, aquí podemos esperar a Drive sin problemas
             const respuesta = await fetch(urlGoogleScript, {
                 method: 'POST',
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -1238,34 +1265,15 @@ async function procesarPedidoCompleto(soloDescargar) {
             });
 
             const resultado = await respuesta.json();
-
             if (resultado.estatus === 'exito') {
                 textoWhatsApp += `\n📁 *Descarga el PDF de registro aquí:*\n👉 ${resultado.urlDrive}`;
             }
         } catch (errorDrive) {
-            console.warn("Google Drive no respondió a tiempo, se continúa sin guardar en la nube.", errorDrive);
+            console.warn("Drive falló o tardó mucho, seguimos sin link.", errorDrive);
         } finally {
             clearTimeout(tiempoLimite);
         }
 
-        // =========================================================
-        // INTERCEPTOR PARA EL BOTÓN DE "SOLO DESCARGAR"
-        // =========================================================
-        if (soloDescargar) {
-            pdf.save(nombreArchivo); // Descarga el PDF en el teléfono
-            mostrarAlerta("📥 Nota descargada. ¡Recuerda enviarla por WhatsApp!");
-            
-            // Reactivamos los botones por si quieren presionar el otro después
-            if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
-            if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
-            
-            return; // 🛑 Termina la función aquí: Se guardó en Drive, pero no abre WhatsApp ni limpia el carrito
-        }
-
-        // =========================================================
-        // CIERRE DE VENTA (ESTO SE EJECUTA SI PRESIONAN "ENVIAR PEDIDO")
-        // =========================================================
-        pdf.save(nombreArchivo); 
         abrirWhatsAppYLimpiar(textoWhatsApp);
 
     } catch (error) {
