@@ -942,7 +942,11 @@ async function procesarPedidoCompleto(soloDescargar) {
     let dirReferencias = document.getElementById("dir_referencias").value.trim();
 
     // 1. Validamos los datos antes de generar nada
-    if (carrito.length === 0) return mostrarAlerta("🛒 Tu carrito está vacío.");
+    if (carrito.length === 0) {
+        if(document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
+        if(document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
+        return mostrarAlerta("🛒 Tu carrito está vacío.");
+    }
 
     let metodoEnvioSeleccionado = document.getElementById("sel_entrega").value;
     let esEnvioNacional = metodoEnvioSeleccionado === "300";
@@ -958,8 +962,11 @@ async function procesarPedidoCompleto(soloDescargar) {
         ciudad: dirCiudad,
         estado: dirEstado
     });
+
     if (problema) {
         mostrarCampoConError(problema.campo);
+        if(document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
+        if(document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
         return alert(problema.mensaje);
     }
 
@@ -986,51 +993,43 @@ async function procesarPedidoCompleto(soloDescargar) {
     localStorage.setItem("minuit_referencias", dirReferencias);
 
     mostrarAlerta("⏳ Generando nota de pedido...");
-    document.querySelector(".btn-pedido").disabled = true;
-
-    // Rescatamos los cálculos (Reemplaza este bloque)
+    
+    // Rescatamos los cálculos
     let totalTxt = document.getElementById("modal-total").innerText;
     let datosTotal = document.getElementById("modal-total").dataset;
     let valSubtotal = parseFloat(datosTotal.subtotal || 0);
     let valEnvio = parseFloat(datosTotal.envio || 0);
     let valComision = parseFloat(datosTotal.comision || 0);
-    let valIva = parseFloat(datosTotal.iva || 0); // NUEVO
-    let requiereFactura = datosTotal.factura || "No"; // NUEVO
+    let valIva = parseFloat(datosTotal.iva || 0); 
+    let requiereFactura = datosTotal.factura || "No"; 
     let metodoPagoTexto = datosTotal.metodopago || "Transferencia";
     let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger en taller Minuit / Mandar Uber";
 
-    // Modificamos el texto de WhatsApp (NUEVO)
     let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *FACTURA:* ${requiereFactura}\n *TOTAL A PAGAR: ${totalTxt}*\n`;
     
     try {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF("p", "mm", "a4");
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("p", "mm", "a4");
 
-    // --- ENCABEZADO CON EL LOGO ORIGINAL ---
-    pdf.setFillColor(255, 255, 255);
-    pdf.rect(0, 0, 210, 35, "F");
+        // --- ENCABEZADO CON EL LOGO ORIGINAL ---
+        pdf.setFillColor(255, 255, 255);
+        pdf.rect(0, 0, 210, 35, "F");
 
+        const logo = await cargarLogoParaPDF(RUTA_LOGO);
+        if (logo) pdf.addImage(logo.datos, "JPEG", 15, 10, logo.ancho, logo.alto);
 
-    // 1. Insertar el logo en el PDF
-    // Parámetros: (imagen, formato, x, y, ancho, alto)
-    // Esperamos a que el logo esté listo. Si no existe, el pedido se genera igual, sin logo.
-    const logo = await cargarLogoParaPDF(RUTA_LOGO);
-    if (logo) pdf.addImage(logo.datos, "JPEG", 15, 10, logo.ancho, logo.alto);
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(16);
+        pdf.setTextColor(33, 33, 33);
+        pdf.text("Resumen de Pedido", 195, 20, { align: "right" });
 
-    // 2. Título y meta-datos del documento
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(16);
-    pdf.setTextColor(33, 33, 33);
-    pdf.text("Resumen de Pedido", 195, 20, { align: "right" });
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text("Minuit", 195, 26, { align: "right" });
 
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(10);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text("Minuit", 195, 26, { align: "right" });
-
-    // 3. Línea divisoria del encabezado
-    pdf.setDrawColor(220, 220, 220);
-    pdf.line(15, 35, 195, 35);
+        pdf.setDrawColor(220, 220, 220);
+        pdf.line(15, 35, 195, 35);
 
         pdf.setTextColor(...COLOR_PRINCIPAL); 
         pdf.setFont("helvetica", "bold");
@@ -1041,13 +1040,12 @@ async function procesarPedidoCompleto(soloDescargar) {
         pdf.setLineWidth(0.5);
         pdf.line(15, 35, 195, 35);
 
-        // --- CAJA DE DATOS DEL CLIENTE AMPLIADA ---
+        // --- CAJA DE DATOS DEL CLIENTE ---
         pdf.setFillColor(...COLOR_FONDO);
-        pdf.roundedRect(15, 38, 180, 32, 4, 4, "F"); // Caja más alta
+        pdf.roundedRect(15, 38, 180, 32, 4, 4, "F"); 
         pdf.setTextColor(...COLOR_TEXTO);
         pdf.setFontSize(9);
         
-        // Columna 1
         pdf.setFont("helvetica", "bold"); pdf.text("Cliente:", 20, 44);
         pdf.setFont("helvetica", "normal"); pdf.text(nombreCliente, 40, 44);
         
@@ -1057,7 +1055,6 @@ async function procesarPedidoCompleto(soloDescargar) {
         pdf.setFont("helvetica", "bold"); pdf.text("Marca/IG:", 20, 54);
         pdf.setFont("helvetica", "normal"); pdf.text(`${marcaCliente} | ${igCliente}`, 40, 54);
         
-        // Columna 2
         pdf.setFont("helvetica", "bold"); pdf.text("Fecha:", 115, 44);
         pdf.setFont("helvetica", "normal"); pdf.text(new Date().toLocaleDateString("es-MX"), 135, 44);
         
@@ -1067,14 +1064,13 @@ async function procesarPedidoCompleto(soloDescargar) {
         pdf.setFont("helvetica", "bold"); pdf.text("Pago:", 115, 54);
         pdf.setFont("helvetica", "normal"); pdf.text(metodoPagoTexto, 135, 54);
 
-        // Dirección abarcando el ancho inferior de la caja
         pdf.setFont("helvetica", "bold"); pdf.text("Dirección:", 20, 61);
         pdf.setFont("helvetica", "normal");
         let lineasDir = pdf.splitTextToSize(direccionCliente, 150);
         pdf.text(lineasDir, 40, 61);
 
         // --- TABLA DE PRODUCTOS ---
-        let y = 76; // Bajamos el inicio de la tabla
+        let y = 76; 
         pdf.setFillColor(...COLOR_PRINCIPAL);
         pdf.rect(15, y, 180, 10, "F");
         pdf.setTextColor(255, 255, 255);
@@ -1109,21 +1105,16 @@ async function procesarPedidoCompleto(soloDescargar) {
             pdf.setFontSize(8);
             let lineasDetalle = pdf.splitTextToSize(String(item.detalle || ""), 90); 
             
-            // Bajamos el texto a y+4.5 para darle un poco más de respiro bajo el nombre del producto
             pdf.text(lineasDetalle, 20, y + 4.5);
 
             pdf.setFontSize(10);
             pdf.text(String(item.cantidad), 130, y, { align: "center" });
             pdf.text("$" + item.subtotal.toFixed(2), 185, y, { align: "right" });
 
-            // EL TRUCO: Cada renglón extra ocupa unos 3.5 puntos de altura. 
             let altoTotalDetalle = lineasDetalle.length * 3.5;
-
-            // Dibujamos la línea tomando en cuenta 'y', un margen base de 6, y el alto del texto
             pdf.setDrawColor(240, 220, 227);
             pdf.line(20, y + 6 + altoTotalDetalle, 190, y + 6 + altoTotalDetalle);
             
-            // Empujamos la 'y' para el siguiente producto (12 de margen base + el alto del texto)
             y += 12 + altoTotalDetalle;
         });
 
@@ -1131,7 +1122,6 @@ async function procesarPedidoCompleto(soloDescargar) {
         y += 5;
         if (y > 220) { pdf.addPage(); y = 30; }
 
-        // Ajustamos la altura de la caja dependiendo de cuántos cobros extra haya
         let alturaCajaDesglose = 32;
         if (valComision > 0) alturaCajaDesglose += 6;
         if (valIva > 0) alturaCajaDesglose += 6;
@@ -1153,11 +1143,10 @@ async function procesarPedidoCompleto(soloDescargar) {
         
         if (valComision > 0) {
             yDesglose += 7;
-            pdf.text("Tarjeta de Credito (link Mercado Pago)", 105, yDesglose);
+            pdf.text("Tarjeta de Crédito", 105, yDesglose);
             pdf.text("$" + valComision.toFixed(2), 190, yDesglose, { align: "right" });
         }
 
-        // Agregamos el texto del IVA en el PDF (NUEVO)
         if (valIva > 0) {
             yDesglose += 7;
             pdf.text("IVA (16%):", 105, yDesglose);
@@ -1172,7 +1161,7 @@ async function procesarPedidoCompleto(soloDescargar) {
         pdf.setFontSize(14);
         pdf.text(totalTxt, 190, yDesglose, { align: "right" });
 
-        // --- TÉRMINOS Y CONDICIONES (Las reglas de Ely) ---
+        // --- TÉRMINOS Y CONDICIONES ---
         let yTerminos = y + 10;
         pdf.setTextColor(120, 120, 120);
         pdf.setFontSize(8);
@@ -1183,8 +1172,8 @@ async function procesarPedidoCompleto(soloDescargar) {
         let terminos = [
             "• Se requiere el pago del monto total para poder agendar tu pedido.",
             "• Tiempo de elaboración: 2 a 3 semanas + 2 a 3 días de envío.",
-            "• Si el envío marca un costo excedente al generar la guía, se notificará para cubrir la diferencia.",
-            "• Precios no incluyen IVA. Si deseas factura, se agregará el impuesto correspondiente."
+            "• Si el envío marca un costo excedente al generar la guía, se notificará.",
+            "• Precios no incluyen IVA. Si deseas factura, se agregará el impuesto."
         ];
         
         terminos.forEach(linea => {
@@ -1221,10 +1210,8 @@ async function procesarPedidoCompleto(soloDescargar) {
         }
 
         // =========================================================
-        // 2. ¡DESCARGAR INMEDIATAMENTE! (El secreto para Safari/iPhone)
+        // 2. ¡DESCARGAR INMEDIATAMENTE!
         // =========================================================
-        // Al ejecutar la descarga ANTES de subir a Drive, el iPhone
-        // reconoce que fue un clic directo del usuario y NO lo bloquea.
         pdf.save(nombreArchivo); 
 
         // =========================================================
@@ -1235,14 +1222,12 @@ async function procesarPedidoCompleto(soloDescargar) {
         if (soloDescargar) {
             mostrarAlerta("✅ ¡Nota descargada! Subiendo copia a tu registro...");
             
-            // Subimos a Drive "en silencio" sin bloquear la pantalla del usuario
             fetch(urlGoogleScript, {
                 method: 'POST',
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ nombreArchivo: nombreArchivo, base64: pdfBase64 })
             }).catch(e => console.warn(e));
 
-            // Reactivamos los botones y terminamos la función aquí
             if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
             if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
             return; 
@@ -1256,7 +1241,6 @@ async function procesarPedidoCompleto(soloDescargar) {
         const tiempoLimite = setTimeout(() => controlador.abort(), 8000);
 
         try {
-            // Como la descarga ya inició arriba, aquí podemos esperar a Drive sin problemas
             const respuesta = await fetch(urlGoogleScript, {
                 method: 'POST',
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
