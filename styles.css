@@ -146,8 +146,8 @@ select,
 
 /* Etiqueta de IVA para el configurador */
 .etiqueta-iva {
-    color: #ff1469; 
-    font-size: 0.65rem;
+    color: #f2b0ba; 
+    font-size: 0.55rem;
     font-weight: 800;
     padding: 2px 8px;
     border-radius: 12px;
