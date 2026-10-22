@@ -186,7 +186,7 @@ header {
    DOMANDO EL LOGO GIGANTE
    ========================================= */
 header img.logo-principal {
-    max-width: 220px !important; /* El candado estricto de tamaño */
+    max-width: 240px !important; /* El candado estricto de tamaño */
     width: 100% !important;
     height: auto !important;
     display: block !important;
