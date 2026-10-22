@@ -522,7 +522,7 @@ function agregarPastelConfigAlCarrito() {
     document.getElementById("cant_pastel_config").value = "5"; 
     
     // Forzamos la actualización visual
-    actualizarCarrito();
+    actualizarVistaCarrito();
     actualizarConfiguradorPasteles();
 
     mostrarAlerta(`🛒 ¡Cajas de Pastel agregadas!`);
