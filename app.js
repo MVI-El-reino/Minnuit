@@ -584,7 +584,7 @@ function actualizarVistaCarrito() {
             <li style="position: relative;">
                 <button class="btn-eliminar-item" style="position: absolute; right: 0; top: 10px;" onclick="eliminarDelCarrito(${index})">&times;</button>
                 <div style="font-weight: 700; font-size: 0.95rem; color: var(--texto-oscuro); width: 90%;">
-                    ${item.cantidad} Cajas ${nombreCorto} <span style="color: var(--rosa-principal)">$${item.subtotal.toFixed(2)}</span>
+                    ${item.cantidad} ${nombreCorto.includes('Base') ? '-' : '- Cajas'} ${nombreCorto} <span style="color: var(--rosa-principal)">$${item.subtotal.toFixed(2)}</span>
                 </div>
                 <div style="font-size: 0.8rem; color: var(--texto-secundario); margin-top: 3px; line-height: 1.2; width: 90%;">
                     Ref: ${item.detalle}
