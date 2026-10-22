@@ -577,19 +577,30 @@ function actualizarVistaCarrito() {
         totalDinero += item.subtotal;
         
         // ===== DISEÑO SIMPLIFICADO A 2 LÍNEAS =====
-        // Quitamos la palabra "Caja Pastel" para no repetir y ahorrar espacio
+       
         let nombreCorto = item.nombre.replace('Caja Pastel ', '');
         
-        listaHTML += `
-            <li style="position: relative;">
-                <button class="btn-eliminar-item" style="position: absolute; right: 0; top: 10px;" onclick="eliminarDelCarrito(${index})">&times;</button>
-                <div style="font-weight: 700; font-size: 0.95rem; color: var(--texto-oscuro); width: 90%;">
-                    ${item.cantidad} ${nombreCorto.includes('Base') ? '-' : '- Cajas'} ${nombreCorto} <span style="color: var(--rosa-principal)">$${item.subtotal.toFixed(2)}</span>
-                </div>
-                <div style="font-size: 0.8rem; color: var(--texto-secundario); margin-top: 3px; line-height: 1.2; width: 90%;">
-                    Ref: ${item.detalle}
-                </div>
-            </li>`;
+        // 1. Filtramos y armamos el texto perfecto según el tipo de producto
+let prefijo = nombreCorto.includes('Base') ? 'Pzas' : 'Cajas';
+let nombreLimpio = nombreCorto;
+
+// Si detecta que es un cupcake, reordena las palabras a tu gusto
+if (nombreCorto.includes('Cupcake')) {
+    let medida = nombreCorto.includes('31cm') ? '31cm' : '21cm';
+    nombreLimpio = `Cupcakes ${medida}`;
+}
+
+// 2. Imprimimos el elemento en el carrito
+listaHTML += `
+    <li style="position: relative;">
+        <button class="btn-eliminar-item" style="position: absolute; right: 0; top: 10px;" onclick="eliminarDelCarrito(${index})">&times;</button>
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--texto-oscuro); width: 90%;">
+            ${item.cantidad} - ${prefijo} ${nombreLimpio} <span style="color: var(--rosa-principal)">$${item.subtotal.toFixed(2)}</span>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--texto-secundario); margin-top: 3px; line-height: 1.2; width: 90%;">
+            Ref: ${item.detalle}
+        </div>
+    </li>`;
     });
     
     document.getElementById("lista-carrito").innerHTML = listaHTML;
@@ -607,9 +618,6 @@ function actualizarVistaCarrito() {
     let metodoPago = "Transferencia";
     if (selPago) {
         metodoPago = selPago.value;
-        if (metodoPago === "PayPal") {
-            costoComision = (totalDinero + costoEnvio) * 0.05; // 5% sobre el total
-        }
     }
 
     // Leemos qué eligieron en el select de factura (NUEVO)
@@ -759,19 +767,19 @@ function mostrarTerminosEnvio() {
         " TÉRMINOS DE ENVÍO Y ELABORACIÓN \n\n" +
         "• El pago de $300 cubre el envío estándar. Si al momento de generar tu guía el sistema marca un costo excedente (zona extendida o sobrepeso), te avisaremos para cubrir la diferencia antes del envío.\n\n" +
         "• Tiempo de elaboración: 2 a 3 semanas.\n" +
-        "• Tiempo de trayecto (paquetería): 2 a 3 días hábiles adicionales.\n\n" +
-        "• Recuerda: Se requiere el pago del monto total para poder agendar tu pedido en nuestro calendario."
+        "• Envío (paquetería) 2-5 días hábiles adicionales dependiendo tu zona.\n\n" +
+        "• Recuerda: Se requiere el pago del monto total para poder agendar tu pedido."
     );
 }
 /**
  * Muestra las condiciones del cobro de comisión por uso de terminal/plataforma.
  */
-function mostrarTerminosComision() {
+/*function mostrarTerminosComision() {
     alert(
         "💳 COMISIÓN POR USO DE PLATAFORMA\n\n" +
         "Los pagos realizados mediante tarjeta de crédito (Mercado Pago o PayPal) generan un cargo extra del 5% sobre el total de tu pedido debido a las comisiones de la plataforma.\n"
     );
-}
+}*/
 
 /**
  * Muestra las condiciones sobre el desglose de impuestos (IVA).
@@ -779,8 +787,8 @@ function mostrarTerminosComision() {
 function mostrarTerminosIVA() {
     alert(
         "🧾 INFORMACIÓN SOBRE FACTURACIÓN (IVA)\n\n" +
-        "Los precios mostrados en nuestro catálogo no incluyen IVA.\n\n" +
-        "Si requieres factura fiscal, por favor selecciona 'Sí'. El sistema sumará el 16% de IVA al total de tu compra. Al confirmar tu pedido, te solicitaremos tu Constancia de Situación Fiscal por WhatsApp."
+        "Si requieres factura selecciona la opcion Si.\n\n" +
+        "Al confirmar tu pedido por WhatsApp, adjunta tu constancia de Situación fiscal."
     );
 }
 // ==========================================
@@ -1012,7 +1020,7 @@ async function procesarPedidoCompleto() {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10);
     pdf.setTextColor(100, 100, 100);
-    pdf.text("Minnuit - Empaques Personalizados", 195, 26, { align: "right" });
+    pdf.text("Minuit", 195, 26, { align: "right" });
 
     // 3. Línea divisoria del encabezado
     pdf.setDrawColor(220, 220, 220);
