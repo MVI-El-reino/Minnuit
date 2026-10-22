@@ -763,6 +763,27 @@ function mostrarTerminosEnvio() {
         "• Recuerda: Se requiere el pago del monto total para poder agendar tu pedido en nuestro calendario."
     );
 }
+/**
+ * Muestra las condiciones del cobro de comisión por uso de terminal/plataforma.
+ */
+function mostrarTerminosComision() {
+    alert(
+        "💳 COMISIÓN POR USO DE PLATAFORMA\n\n" +
+        "Los pagos realizados mediante tarjeta de crédito (Mercado Pago o PayPal) generan un cargo extra del 5% sobre el total de tu pedido debido a las comisiones de la plataforma.\n\n" +
+        "💡 Tip: Si eliges 'Transferencia Bancaria', no se te cobrará ninguna comisión extra."
+    );
+}
+
+/**
+ * Muestra las condiciones sobre el desglose de impuestos (IVA).
+ */
+function mostrarTerminosIVA() {
+    alert(
+        "🧾 INFORMACIÓN SOBRE FACTURACIÓN (IVA)\n\n" +
+        "Los precios mostrados en nuestro catálogo no incluyen IVA.\n\n" +
+        "Si requieres factura fiscal, por favor selecciona 'Sí'. El sistema sumará el 16% de IVA al total de tu compra. Al confirmar tu pedido, te solicitaremos tu Constancia de Situación Fiscal por WhatsApp."
+    );
+}
 // ==========================================
 // GENERACIÓN DEL PDF NATIVO Y GOOGLE DRIVE
 // ==========================================
