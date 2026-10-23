@@ -829,7 +829,7 @@ function mostrarTerminosEnvio() {
         " TÉRMINOS DE ENVÍO Y ELABORACIÓN \n\n" +
         "• El pago de $300 cubre el envío estándar. Si al momento de generar tu guía el sistema marca un costo excedente (zona extendida o sobrepeso), te avisaremos para cubrir la diferencia antes del envío.\n\n" +
         "• Tiempo de elaboración: 2 a 3 semanas.\n" +
-        "• Envío (paquetería) 2-5 días hábiles adicionales dependiendo tu zona.\n\n" +
+        "• Envío (paquetería): 2-5 días hábiles adicionales dependiendo tu zona.\n\n" +
         "• Recuerda: Se requiere el pago del monto total para poder agendar tu pedido."
     );
 }
@@ -849,7 +849,7 @@ function mostrarTerminosEnvio() {
 function mostrarTerminosIVA() {
     alert(
         "FACTURACIÓN\n\n" +
-        "Si requieres factura selecciona la opcion SI.\n\n" +
+        "Si requieres factura selecciona la opcion "SI".\n\n" +
         "Al confirmar tu pedido por WhatsApp, adjunta tu constancia de Situación fiscal."
     );
 }
