@@ -177,7 +177,7 @@ function sincronizarChoice(id) {
     }
 }
 
-// Helper para resetear los menús tras agregar al 
+// Helper para resetear los menús tras agregar al carrito
 function resetearSelect(id, indice = 0) {
     const select = document.getElementById(id);
     if(select && select.options.length > 0) {
@@ -227,12 +227,12 @@ function cambiarCantidad(inputId, cambio, minimo) {
     else { mostrarAlerta(`⚠️ La cantidad mínima permitida es ${minimo}.`); }
 }
 
-function animarBotón() {
-    const fab = document.getElementById("fab-");
-    if(!fab) return;
-    fab.classList.remove('con-items');
-    void fab.offsetWidth;
-    fab.classList.add('con-items');
+function animarBotónCarrito() {
+    const fabCarrito = document.getElementById("fab-carrito");
+    if(!fabCarrito) return;
+    fabCarrito.classList.remove('con-items');
+    void fabCarrito.offsetWidth;
+    fabCarrito.classList.add('con-items');
 }
 
 // ==========================================
@@ -281,7 +281,7 @@ function actualizarConfiguradorBases() {
     document.getElementById("precio_config_base").innerText = `$${precioBaseActual.toFixed(2)} MXN`;
 }
 
-function agregarBaseConfigAl() {
+function agregarBaseConfigAlCarrito() {
     const linea = document.getElementById("sel_linea_base").value;
     const grosor = document.getElementById("sel_grosor_base").value;
     const tamano = document.getElementById("sel_tamano_base").value;
@@ -293,12 +293,12 @@ function agregarBaseConfigAl() {
     const detalleCompuesto = `Logo: ${colorLogo}`;
     
     // LÓGICA ANTI-DUPLICADOS
-    const index = .findIndex(item => item.nombre === nombreCompuesto && item.detalle === detalleCompuesto);
+    const index = carrito.findIndex(item => item.nombre === nombreCompuesto && item.detalle === detalleCompuesto);
     if (index !== -1) {
-        [index].cantidad += cantidad;
-        [index].subtotal = [index].cantidad * precioBaseActual;
+        carrito[index].cantidad += cantidad;
+        carrito[index].subtotal = carrito[index].cantidad * precioBaseActual;
     } else {
-        .push({ nombre: nombreCompuesto, cantidad, detalle: detalleCompuesto, precio: precioBaseActual, subtotal: precioBaseActual * cantidad });
+        carrito.push({ nombre: nombreCompuesto, cantidad, detalle: detalleCompuesto, precio: precioBaseActual, subtotal: precioBaseActual * cantidad });
     }
     
     resetearSelect("sel_linea_base");
@@ -308,9 +308,9 @@ function agregarBaseConfigAl() {
     document.getElementById("cant_base_config").value = "1"; 
     actualizarConfiguradorBases();
 
-    mostrarAlerta(`🛒 ¡Agregado al !`);
-    actualizarVista();
-    animarBotón();
+    mostrarAlerta(`🛒 ¡Agregado al carrito!`);
+    actualizarVistaCarrito();
+    animarBotónCarrito();
 }
 
 // ==========================================
@@ -378,18 +378,18 @@ function actualizarConfiguradorCupcakes() {
     }
 
     // ----------------------------------------------------------
-    // 4. PRECIO MAESTRO: el que se guarda al agregar la caja al 
+    // 4. PRECIO MAESTRO: el que se guarda al agregar la caja al carrito
     // ----------------------------------------------------------
     precioCupcakeActual = cupcakesPreciosBase[tamanoActual] + extraSoporte + costoExtraRedes;
     document.getElementById("precio_config_cupcake").innerText = `$${precioCupcakeActual.toFixed(2)} MXN`;
 }
 
 // ==========================================
-// AGREGAR UNA CAJA DE CUPCAKES AL  (CAMBIOS 1 y 2)
-// El nombre sigue incluyendo "Cupcake", así el  cuenta bien los mínimos.
+// AGREGAR UNA CAJA DE CUPCAKES AL CARRITO (CAMBIOS 1 y 2)
+// El nombre sigue incluyendo "Cupcake", así el carrito cuenta bien los mínimos.
 // El detalle guarda soporte, color del logotipo, redes y notas, igual que las cajas de pastel.
 // ==========================================
-function agregarCupcakeConfigAl() {
+function agregarCupcakeConfigAlCarrito() {
     const cantidad = parseInt(document.getElementById("cant_cupcake_config").value);
     const tamano = document.getElementById("sel_tamano_cupcake").value;
     const tieneSoporte = document.getElementById("sel_tiene_soporte").value === "Si";
@@ -403,12 +403,12 @@ function agregarCupcakeConfigAl() {
     const detalle = `Soporte interior: ${soporteTexto} | Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
 
     // LÓGICA ANTI-DUPLICADOS (igual que en pasteles): misma configuración = solo se suman piezas
-    const index = .findIndex(item => item.nombre === nombre && item.detalle === detalle);
+    const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
     if (index !== -1) {
-        [index].cantidad += cantidad;
-        [index].subtotal = [index].cantidad * precioCupcakeActual;
+        carrito[index].cantidad += cantidad;
+        carrito[index].subtotal = carrito[index].cantidad * precioCupcakeActual;
     } else {
-        .push({ nombre, cantidad, detalle, precio: precioCupcakeActual, subtotal: precioCupcakeActual * cantidad });
+        carrito.push({ nombre, cantidad, detalle, precio: precioCupcakeActual, subtotal: precioCupcakeActual * cantidad });
     }
 
     // Regresamos los menús a su opción inicial para la siguiente caja
@@ -420,8 +420,8 @@ function agregarCupcakeConfigAl() {
     actualizarConfiguradorCupcakes();
 
     mostrarAlerta(`🛒 ¡Cajas agregadas!`);
-    actualizarVista();
-    animarBotón();
+    actualizarVistaCarrito();
+    animarBotónCarrito();
 }
 
 // ==========================================
@@ -439,9 +439,9 @@ function actualizarConfiguradorPasteles() {
     
     if (!tipoObj || !tamanoObj) return;
 
-    let totalEn = .reduce((sum, item) => item.tipoPastel ? sum + item.cantidad : sum, 0);
+    let totalEnCarrito = carrito.reduce((sum, item) => item.tipoPastel ? sum + item.cantidad : sum, 0);
     const cantidadActual = parseInt(document.getElementById("cant_pastel_config").value) || 1;
-    let cantidadTotalEvaluada = totalEn + cantidadActual;
+    let cantidadTotalEvaluada = totalEnCarrito + cantidadActual;
 
     let indicePrecio = 0; 
     let nivelTexto = "Menudeo (10-39 pzas)";
@@ -488,7 +488,7 @@ function actualizarConfiguradorPasteles() {
     document.getElementById("indicador_mayoreo").innerText = `Nivel Activo: ${nivelTexto}`;
 }
 
-function agregarPastelConfigAl() {
+function agregarPastelConfigAlCarrito() {
     const cantidad = parseInt(document.getElementById("cant_pastel_config").value);
     const tipo = document.getElementById("sel_tipo_pastel").value;
     const tamano = document.getElementById("sel_tamano_pastel").value;
@@ -501,12 +501,12 @@ function agregarPastelConfigAl() {
     
     // IMPORTANTE: Guardamos parámetros ocultos para poder recalcular precios después
     // LÓGICA ANTI-DUPLICADOS
-    const index = .findIndex(item => item.nombre === nombre && item.detalle === detalle);
+    const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
     if (index !== -1) {
-        [index].cantidad += cantidad;
-        [index].subtotal = [index].cantidad * precioPastelActual;
+        carrito[index].cantidad += cantidad;
+        carrito[index].subtotal = carrito[index].cantidad * precioPastelActual;
     } else {
-        .push({ 
+        carrito.push({ 
             nombre, cantidad, detalle, precio: precioPastelActual, subtotal: precioPastelActual * cantidad,
             tipoPastel: tipo,
             tamanoPastel: tamano,
@@ -522,20 +522,20 @@ function agregarPastelConfigAl() {
     document.getElementById("cant_pastel_config").value = "5"; 
     
     // Forzamos la actualización visual
-    actualizarVista();
+    actualizarVistaCarrito();
     actualizarConfiguradorPasteles();
 
     mostrarAlerta(`🛒 ¡Cajas de Pastel agregadas!`);
-    animarBotón();
+    animarBotónCarrito();
 }
 
 // ==========================================
-// CONTROL DEL 
+// CONTROL DEL CARRITO
 // ==========================================
-function eliminarDel(index) {
-    .splice(index, 1);
+function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
     mostrarAlerta("❌ Artículo eliminado");
-    actualizar();
+    actualizarCarrito();
     if(carrito.length === 0) { cerrarModal(); }
 }
 
@@ -576,20 +576,18 @@ function actualizarVistaCarrito() {
     carrito.forEach((item, index) => {
         totalDinero += item.subtotal;
         
-       // ===== DISEÑO SIMPLIFICADO A 2 LÍNEAS =====
+        // ===== DISEÑO SIMPLIFICADO A 2 LÍNEAS =====
        
         let nombreCorto = item.nombre.replace('Caja Pastel ', '');
         
         // 1. Filtramos y armamos el texto perfecto según el tipo de producto
-        let prefijo = nombreCorto.includes('Bases') ? ' ' : 'Cajas';
+        let prefijo = nombreCorto.includes('Base') ? ' ' : 'Cajas';
         let nombreLimpio = nombreCorto;
 
         // Si detecta que es un cupcake, reordena las palabras a tu gusto
         if (nombreCorto.includes('Cupcake')) {
             let medida = nombreCorto.includes('31cm') ? '31cm' : '21cm';
-            let capacidadText = medida === '31cm' ? '(4 cupcakes)' : '(2 cupcakes)';
-            nombreLimpio = `${capacidadText} ${medida}`;
-            prefijo = 'Cajas';
+            nombreLimpio = `Cupcakes ${medida}`;
         }
 
         // 2. Imprimimos el elemento en el carrito
