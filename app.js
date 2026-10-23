@@ -807,21 +807,7 @@ function abrirModalDireccion() {
     // Cerramos el modal de datos temporalmente
     cerrarModalDatos();
     
-    // Si hay una dirección guardada en el celular, mostramos el botón. Si no, se queda oculto.
-    const btnCargar = document.getElementById("btn_cargar_direccion");
-    if (btnCargar) {
-        if (localStorage.getItem("minuit_calle")) {
-            btnCargar.style.display = "block";
-        } else {
-            btnCargar.style.display = "none";
-        }
-    }
-
-    document.getElementById("modal-direccion").style.display = "block";
-}
-
-function cargarDireccionGuardada() {
-    // Rellenamos los campos con la bóveda local del navegador
+    // Cargar dirección
     if (localStorage.getItem("minuit_calle")) {
         document.getElementById("dir_calle").value = localStorage.getItem("minuit_calle") || "";
         document.getElementById("dir_numero").value = localStorage.getItem("minuit_numero") || "";
@@ -830,12 +816,9 @@ function cargarDireccionGuardada() {
         document.getElementById("dir_ciudad").value = localStorage.getItem("minuit_ciudad") || "";
         document.getElementById("dir_estado").value = localStorage.getItem("minuit_estado") || "";
         document.getElementById("dir_referencias").value = localStorage.getItem("minuit_referencias") || "";
-        
-        mostrarAlerta("✨ Dirección cargada exitosamente.");
-        
-        // Ocultamos el botón después de usarlo para que se vea limpio
-        document.getElementById("btn_cargar_direccion").style.display = "none";
     }
+
+    document.getElementById("modal-direccion").style.display = "block";
 }
 
 function cerrarModalDireccion() {
@@ -843,7 +826,6 @@ function cerrarModalDireccion() {
     // Volvemos a abrir el modal principal para que terminen
     document.getElementById("modal-datos").style.display = "block";
 }
-
 function mostrarTerminosEnvio() {
     alert(
         " TÉRMINOS DE ENVÍO Y ELABORACIÓN \n\n" +
