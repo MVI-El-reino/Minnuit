@@ -86,23 +86,51 @@ select,
     border: 1px solid var(--borde-suave);
 }
 
+/* 1. Volvemos a alinear los títulos arriba y los números abajo */
 .precio-col, .cantidad-col {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end; /* Empuja todo hacia abajo eliminando huecos */
-    gap: 4px; /* Separación fija y muy pequeña entre títulos y números */
+    justify-content: space-between; 
     width: 48%;
 }
 
+/* 2. Forzamos el centrado perfecto horizontal de los títulos */
 .etiqueta-precio {
     font-size: 0.75rem;
     text-transform: uppercase;
     color: var(--texto-secundario);
     font-weight: 700;
-    margin: 0 !important; /* Limpiamos los márgenes conflictivos */
+    margin: 0 !important; 
     line-height: 1 !important;
     text-align: center;
+    width: 100%; /* Esto obliga a CANTIDAD a centrarse con la caja de abajo */
+}
+
+/* 3. Eliminamos el margen invisible gigante del precio */
+.precio-grande {
+    font-size: clamp(1.1rem, 4.5vw, 1.4rem) !important; 
+    font-weight: 800;
+    color: var(--rosa-principal);
+    margin: 5px 0 0 0 !important;  /* <-- Adiós al espacio en blanco */
+    padding: 0 !important;
+    height: 44px; 
+    line-height: 44px !important; 
+    text-align: center;
+    display: block; 
+    white-space: nowrap !important;
+}
+
+/* 4. Eliminamos el margen de la caja blanca y la empujamos para cuadrar con el precio */
+.controles-cantidad {
+    background: var(--blanco);
+    border-radius: 10px;
+    margin: auto 0 0 0 !important; /* <-- El 'auto' la cuadra perfectamente con el precio */
+    padding: 0 !important;
+    border: 1px solid var(--borde-suave);
+    height: 44px; 
+    width: 100%;
+    display: block;
 }
 
 /* Etiqueta de IVA para el configurador */
@@ -117,32 +145,6 @@ select,
     display: inline-block;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-}
-
-/* El texto del precio */
-.precio-grande {
-    font-size: clamp(1.1rem, 4.5vw, 1.4rem) !important; 
-    font-weight: 800;
-    color: var(--rosa-principal);
-    margin: 0 !important; 
-    padding: 0 !important;
-    height: 44px; 
-    line-height: 44px !important; 
-    text-align: center;
-    display: block; 
-    white-space: nowrap !important;
-}
-
-/* El recuadro blanco */
-.controles-cantidad {
-    background: var(--blanco);
-    border-radius: 10px;
-    margin: 0 !important; 
-    padding: 0 !important;
-    border: 1px solid var(--borde-suave);
-    height: 44px; /* Misma altura maestra que el precio */
-    width: 100%;
-    display: block;
 }
 
 /* El número adentro del recuadro */
