@@ -569,19 +569,16 @@ function actualizarVistaCarrito() {
         }
     });
 
-    // 4. Renderizar el HTML y sumar el dinero final
+   // 4. Renderizar el HTML y sumar el dinero final
     let totalDinero = 0;
     let listaHTML = "";
     
     carrito.forEach((item, index) => {
         totalDinero += item.subtotal;
         
-       // ===== DISEÑO SIMPLIFICADO A 2 LÍNEAS =====
-       
         let nombreCorto = item.nombre.replace('Caja Pastel ', '');
         
-        // 1. Filtramos y armamos el texto perfecto según el tipo de producto
-        let prefijo = nombreCorto.includes('Bases') ? ' ' : 'Cajas';
+        let prefijo = nombreCorto.includes('Base') ? ' ' : 'Cajas';
         let nombreLimpio = nombreCorto;
 
         // Si detecta que es un cupcake, reordena las palabras a tu gusto
