@@ -397,12 +397,15 @@ function agregarCupcakeConfigAlCarrito() {
     const redes = document.getElementById("sel_redes_cupcake").value;
     const extraInfo = document.getElementById("detalle_cupcake1").value || "Sin notas extra";
 
-    const nombre = `Caja ${tamano} Cupcakes`;
+    // --- NUEVO FORMATO DEL NOMBRE PARA CUPCAKES ---
+    const cantidadCupcakes = tamano === "31cm" ? "4" : "2";
+    const nombre = `Caja (${cantidadCupcakes} Cupcakes) ${tamano}`;
+    
     // Antes siempre salía el color del soporte, aunque el cliente eligiera "No". Ahora dice "No" cuando no lo pide.
     const soporteTexto = tieneSoporte ? `${SOPORTE_INTERNO_COLOR} (incluido)` : "No";
     const detalle = `Soporte interior: ${soporteTexto} | Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
 
-    // LÓGICA ANTI-DUPLICADOS (igual que en pasteles): misma configuración = solo se suman piezas
+    // LÓGICA ANTI-DUPLICADOS
     const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
     if (index !== -1) {
         carrito[index].cantidad += cantidad;
