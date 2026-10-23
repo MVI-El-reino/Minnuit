@@ -78,9 +78,9 @@ select,
 .fila-precio-cantidad {
     display: flex;
     justify-content: space-between;
-    align-items: stretch; /* EL SECRETO: Obliga a ambas columnas a medir lo mismo de alto */
+    align-items: stretch;
     background: var(--rosa-claro);
-    padding: 15px 15px 20px 15px; 
+    padding: 12px 15px 15px 15px; /* Menos espacio de relleno arriba y abajo */
     border-radius: 12px;
     margin: 15px 0 25px;
     border: 1px solid var(--borde-suave);
@@ -90,7 +90,8 @@ select,
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between; /* Empuja los títulos al techo y los valores al piso */
+    justify-content: flex-end; /* Empuja todo hacia abajo eliminando huecos */
+    gap: 4px; /* Separación fija y muy pequeña entre títulos y números */
     width: 48%;
 }
 
@@ -109,9 +110,9 @@ select,
     color: #FF6B96; 
     font-size: 0.55rem;
     font-weight: 800;
-    padding: 2px 8px;
+    padding: 0px 8px;
     border-radius: 12px;
-    margin: 4px 0 !important; /* Espacio para que no se pegue al título ni al precio */
+    margin: 0 !important; /* Eliminamos el margen que empujaba el precio hacia abajo */
     line-height: 1.2;
     display: inline-block;
     letter-spacing: 0.5px;
