@@ -849,7 +849,7 @@ function mostrarTerminosEnvio() {
 function mostrarTerminosIVA() {
     alert(
         "FACTURACIÓN\n\n" +
-        "Si requieres factura selecciona la opcion "SI".\n\n" +
+        "Si requieres factura selecciona la opcion 'SI'.\n\n" +
         "Al confirmar tu pedido por WhatsApp, adjunta tu constancia de Situación fiscal."
     );
 }
