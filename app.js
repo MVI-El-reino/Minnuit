@@ -1077,8 +1077,9 @@ async function procesarPedidoCompleto(soloDescargar) {
         datosBancariosMensaje = "\n🏦 *DATOS DE PAGO (FACTURA)*\nBanco: BANAMEX\nNombre: Daniel Bonilla Rodriguez\nNo. de cuenta: 886 5665 / Sucursal 7012\nCLABE: 0026 5070 1288 6566 51\nTarjeta (Oxxo): 5204 1662 4268 9190\n\n📌 *Importante:* Al confirmar tu pedido envía tu Constancia de Situación Fiscal y Uso de CFDI.";
         datosBancariosPDF = [
             "DATOS PARA PAGO (CON FACTURA):",
-            "Banco: BANAMEX | Nombre: Daniel Bonilla Rodriguez",
-            "Cuenta: 886 5665 Suc. 7012 | CLABE: 0026 5070 1288 6566 51",
+            "Banco: BANAMEX | Daniel Bonilla Rodriguez",
+            "Cuenta: 886 5665 Suc. 7012",
+            "CLABE: 0026 5070 1288 6566 51",
             "Tarjeta (Oxxo): 5204 1662 4268 9190"
         ];
     } else {
@@ -1086,15 +1087,19 @@ async function procesarPedidoCompleto(soloDescargar) {
             datosBancariosMensaje = "\n💳 *PAGO CON TARJETA*\nTe enviaremos tu link de pago seguro (Mercado Pago) por este medio.\n*(No aplica cobro extra de comisión)*";
             datosBancariosPDF = [
                 "PAGO CON TARJETA DE CRÉDITO:",
-                "Te enviaremos tu link de Mercado Pago por WhatsApp."
+                "Te enviaremos tu link de Mercado Pago",
+                "por WhatsApp para que pagues de forma segura."
             ];
         } else { 
             datosBancariosMensaje = "\n🏦 *DATOS DE PAGO (Elige una opción)*\n\n*Opción 1: SANTANDER*\nNombre: Elizabeth Ramirez Ramirez\nNo. de cuenta: 1402 4074 580\nCLABE: 0146 5014 0240 7458 03\nTarjeta (Oxxo): 5579 0870 1226 6216\n\n*Opción 2: MERCADO PAGO*\nNombre: Elizabeth Ramírez Ramírez\nCLABE: 722 969 070 993 840 205";
             datosBancariosPDF = [
                 "DATOS PARA PAGO (Elige una opción):",
-                "Opción 1 (SANTANDER): Elizabeth Ramirez Ramirez",
-                "Cuenta: 1402 4074 580 | CLABE: 0146 5014 0240 7458 03 | Oxxo: 5579 0870 1226 6216",
-                "Opción 2 (MERCADO PAGO): Elizabeth Ramírez Ramírez | CLABE: 722 969 070 993 840 205"
+                "Opción 1 (SANTANDER): Elizabeth Ramirez",
+                "Cta: 1402 4074 580 | CLABE: 0146 5014 0240 7458 03",
+                "Tarjeta (Oxxo): 5579 0870 1226 6216",
+                "", 
+                "Opción 2 (MERCADO PAGO): Elizabeth Ramírez",
+                "CLABE: 722 969 070 993 840 205"
             ];
         }
     }
@@ -1255,19 +1260,30 @@ async function procesarPedidoCompleto(soloDescargar) {
         pdf.setFontSize(14);
         pdf.text(totalTxt, 190, yDesglose, { align: "right" });
 
-        // --- NUEVO: IMPRIMIR DATOS BANCARIOS EN EL PDF ---
-        let yTerminos = y + 10;
+        // --- IMPRIMIR DATOS BANCARIOS EN EL PDF ---
+        let yTerminos = y + 7; // Alineamos con el inicio del recuadro de totales
         pdf.setTextColor(...COLOR_TEXTO);
-        pdf.setFontSize(8.5);
+        pdf.setFontSize(8); // Letra un poco más pequeña para que quepa bien
         pdf.setFont("helvetica", "bold");
         
         datosBancariosPDF.forEach((linea, index) => {
-            if(index > 0) pdf.setFont("helvetica", "normal");
-            pdf.text(linea, 15, yTerminos);
-            yTerminos += 4;
+            if (linea === "") {
+                yTerminos += 1.5; // Espacio chiquito extra entre Opción 1 y Opción 2
+            } else {
+                if(index > 0) pdf.setFont("helvetica", "normal");
+                pdf.text(linea, 15, yTerminos);
+                yTerminos += 3.8;
+            }
         });
 
-        yTerminos += 4; // Damos un pequeño respiro antes de los términos
+        // TRUCO: Asegurarnos de que los términos vayan ABAJO de todo (ya sea del cuadro rosa o de los bancos)
+        let finDelCuadroRosa = y + alturaCajaDesglose + 6;
+        if (yTerminos < finDelCuadroRosa) {
+            yTerminos = finDelCuadroRosa; 
+        } else {
+            yTerminos += 4; 
+        }
+
         // --- TÉRMINOS Y CONDICIONES ---
         pdf.setTextColor(120, 120, 120);
         pdf.setFontSize(8);
@@ -1283,7 +1299,7 @@ async function procesarPedidoCompleto(soloDescargar) {
         ];
         
         terminos.forEach(linea => {
-            yTerminos += 5;
+            yTerminos += 4.5;
             let textoDividido = pdf.splitTextToSize(linea, 80); 
             pdf.text(textoDividido, 15, yTerminos);
             yTerminos += (textoDividido.length - 1) * 4; 
