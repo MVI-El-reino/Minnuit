@@ -569,16 +569,19 @@ function actualizarVistaCarrito() {
         }
     });
 
-   // 4. Renderizar el HTML y sumar el dinero final
+    // 4. Renderizar el HTML y sumar el dinero final
     let totalDinero = 0;
     let listaHTML = "";
     
     carrito.forEach((item, index) => {
         totalDinero += item.subtotal;
         
+       // ===== DISEÑO SIMPLIFICADO A 2 LÍNEAS =====
+       
         let nombreCorto = item.nombre.replace('Caja Pastel ', '');
         
-        let prefijo = nombreCorto.includes('Base') ? ' ' : 'Cajas';
+        // 1. Filtramos y armamos el texto perfecto según el tipo de producto
+        let prefijo = nombreCorto.includes('Bases') ? ' ' : 'Cajas';
         let nombreLimpio = nombreCorto;
 
         // Si detecta que es un cupcake, reordena las palabras a tu gusto
@@ -804,7 +807,21 @@ function abrirModalDireccion() {
     // Cerramos el modal de datos temporalmente
     cerrarModalDatos();
     
-    // Cargar dirección
+    // Si hay una dirección guardada en el celular, mostramos el botón. Si no, se queda oculto.
+    const btnCargar = document.getElementById("btn_cargar_direccion");
+    if (btnCargar) {
+        if (localStorage.getItem("minuit_calle")) {
+            btnCargar.style.display = "block";
+        } else {
+            btnCargar.style.display = "none";
+        }
+    }
+
+    document.getElementById("modal-direccion").style.display = "block";
+}
+
+function cargarDireccionGuardada() {
+    // Rellenamos los campos con la bóveda local del navegador
     if (localStorage.getItem("minuit_calle")) {
         document.getElementById("dir_calle").value = localStorage.getItem("minuit_calle") || "";
         document.getElementById("dir_numero").value = localStorage.getItem("minuit_numero") || "";
@@ -813,9 +830,12 @@ function abrirModalDireccion() {
         document.getElementById("dir_ciudad").value = localStorage.getItem("minuit_ciudad") || "";
         document.getElementById("dir_estado").value = localStorage.getItem("minuit_estado") || "";
         document.getElementById("dir_referencias").value = localStorage.getItem("minuit_referencias") || "";
+        
+        mostrarAlerta("✨ Dirección cargada exitosamente.");
+        
+        // Ocultamos el botón después de usarlo para que se vea limpio
+        document.getElementById("btn_cargar_direccion").style.display = "none";
     }
-
-    document.getElementById("modal-direccion").style.display = "block";
 }
 
 function cerrarModalDireccion() {
@@ -823,6 +843,7 @@ function cerrarModalDireccion() {
     // Volvemos a abrir el modal principal para que terminen
     document.getElementById("modal-datos").style.display = "block";
 }
+
 function mostrarTerminosEnvio() {
     alert(
         " TÉRMINOS DE ENVÍO Y ELABORACIÓN \n\n" +
