@@ -581,7 +581,7 @@ function actualizarVistaCarrito() {
         let nombreCorto = item.nombre.replace('Caja Pastel ', '');
         
         // 1. Filtramos y armamos el texto perfecto según el tipo de producto
-        let prefijo = nombreCorto.includes('Base') ? ' ' : 'Cajas';
+        let prefijo = nombreCorto.includes('Bases') ? ' ' : 'Cajas';
         let nombreLimpio = nombreCorto;
 
         // Si detecta que es un cupcake, reordena las palabras a tu gusto
