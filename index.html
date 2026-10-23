@@ -411,6 +411,11 @@
         <span onclick="cerrarModalDireccion()" style="position: absolute; right: 15px; top: 10px; font-size: 24px; color: #e87b9e; cursor: pointer; font-weight: bold;">&times;</span>
         <h3 style="text-align: center; color: #e87b9e; margin-top: 0;"> DIRECCIÓN DE ENVÍO</h3>
         
+        <!-- NUEVO: BOTÓN DE AUTOGUARDADO (Inicia oculto) -->
+        <button type="button" id="btn_cargar_direccion" onclick="cargarDireccionGuardada()" style="display: none; width: 100%; background: #fdf0f4; color: #e87b9e; border: 1px solid #e87b9e; padding: 10px; border-radius: 8px; font-weight: bold; margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease;">
+            Usar mi última dirección guardada
+        </button>
+        
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
             <input type="text" id="dir_calle" placeholder=" Calle *" style="width: 60%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
             <input type="text" id="dir_numero" placeholder=" Núm. (Casa/Depto) *" style="width: 40%; padding: 10px; border: 1px solid #f48fb1; border-radius: 8px; box-sizing: border-box;">
