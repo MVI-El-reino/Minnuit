@@ -289,7 +289,7 @@ function agregarBaseConfigAlCarrito() {
     const colorLogo = document.getElementById("sel_color_logo_base").value;
     const cantidad = parseInt(document.getElementById("cant_base_config").value);
 
-    const nombreCompuesto = `Base ${linea} ${forma} ${grosor} ${tamano}`;
+    const nombreCompuesto = `Bases ${linea} ${forma} ${grosor} ${tamano}`;
     const detalleCompuesto = `Logo: ${colorLogo}`;
     
     // LÓGICA ANTI-DUPLICADOS
