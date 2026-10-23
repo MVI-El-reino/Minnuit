@@ -546,7 +546,7 @@ function actualizarVistaCarrito() {
     let totalPasteles = 0;
     
     carrito.forEach(item => {
-        if(item.nombre.includes("Base")) { totalBases += item.cantidad; }
+        if(item.nombre.includes("Bases")) { totalBases += item.cantidad; }
         if(item.nombre.includes("Cupcake")) { totalCupcakes += item.cantidad; }
         if(item.tipoPastel) { totalPasteles += item.cantidad; } 
     });
