@@ -122,6 +122,8 @@ function reemplazarOpciones(id, opciones) {
 }
 
 function inicializarTienda() { 
+    const selectEnvioInicial = document.getElementById("sel_entrega");
+    if (selectEnvioInicial) selectEnvioInicial.value = "0";
     // Guardamos las opciones originales de todos los selects antes de que Choices los modifique
     document.querySelectorAll("select").forEach(select => {
         if (!opcionesOriginales[select.id]) opcionesOriginales[select.id] = Array.from(select.options).map(opt => opt.value);
@@ -638,50 +640,69 @@ function actualizarVistaCarrito() {
             // --- ELIGIÓ TARJETA DE CRÉDITO (LINK MERCADO PAGO) ---
             if (requiereFactura === "Si") {
                 cajaBancos.innerHTML = `
-                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">💳 Pago con Tarjeta + Factura</p>
-                    <p style="margin: 0 0 6px 0;">Al confirmar tu pedido, te enviaremos por WhatsApp tu <strong>link de pago seguro</strong> (Mercado Pago).</p>
-                    <p style="margin: 0; font-size: 0.8rem; color: #d81b60;">* Recuerda tener a la mano tu Constancia de Situación Fiscal.</p>
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">💳 PAGO CON TARJETA + FACTURA</p>
+                    <div style="box-sizing: border-box; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fce4ec;">
+                        <p style="margin: 0 0 6px 0;">Al confirmar tu pedido, te enviaremos por WhatsApp tu <strong>link de pago seguro</strong> (Mercado Pago).</p>
+                        <p style="margin: 0; font-size: 0.8rem; color: #d81b60;">* Recuerda tener a la mano tu Constancia de Situación Fiscal.</p>
+                    </div>
                 `;
             } else {
                 cajaBancos.innerHTML = `
-                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">💳 Pago con Tarjeta</p>
-                    <p style="margin: 0;">Al confirmar tu pedido, te enviaremos por WhatsApp tu <strong>link de pago seguro</strong> (Mercado Pago) para que pagues cómodamente.</p>
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">💳 PAGO CON TARJETA</p>
+                    <div style="box-sizing: border-box; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fce4ec;">
+                        <p style="margin: 0;">Al confirmar tu pedido, te enviaremos por WhatsApp tu <strong>link de pago seguro</strong> (Mercado Pago) para que pagues cómodamente.</p>
+                    </div>
                 `;
             }
         } else {
             // --- ELIGIÓ TRANSFERENCIA BANCARIA ---
             if (requiereFactura === "Si") {
-                // Imagen 3 (Banamex - Daniel Bonilla)
+                // Imagen 3 (Banamex - Factura) -> Ahora con el recuadro blanco igual que Santander
                 cajaBancos.innerHTML = `
-                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">Datos Bancarios</p>
-                    <p style="margin: 0 0 3px 0;"><strong>Banco:</strong> BANAMEX</p>
-                    <p style="margin: 0 0 3px 0;"><strong>Nombre:</strong> Daniel Bonilla Rodriguez</p>
-                    <p style="margin: 0 0 3px 0;"><strong>No° de cuenta:</strong> 886 5665 / Sucursal 7012</p>
-                    <p style="margin: 0 0 3px 0;"><strong>No° de clabe:</strong> 0026 5070 1288 6566 51</p>
-                    <p style="margin: 0;"><strong>No° de tarjeta (Oxxo):</strong> 5204 1662 4268 9190</p>
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">DATOS BANCARIOS</p>
+                    <div style="box-sizing: border-box; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fce4ec;">
+                        <p style="margin: 0 0 5px 0; font-weight: bold; color: #4a3b40;">🏦 BANAMEX</p>
+                        <p style="margin: 0 0 3px 0;"><strong>Nombre:</strong> Daniel Bonilla Rodriguez</p>
+                        <p style="margin: 0 0 3px 0;"><strong>No° cuenta:</strong> 886 5665 / Suc. 7012</p>
+                        <p style="margin: 0 0 3px 0;"><strong>CLABE:</strong> 0026 5070 1288 6566 51</p>
+                        <p style="margin: 0;"><strong>Tarjeta (Oxxo):</strong> 5204 1662 4268 9190</p>
+                    </div>
                 `;
             } else {
-                // Imágenes 1 y 2 (Santander y Mercado Pago en un carrusel deslizable)
+                // Imágenes 1 y 2 (Santander y Mercado Pago en carrusel) -> Con flechas y títulos limpios
                 cajaBancos.innerHTML = `
-                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">
-                        Datos Bancarios <span style="font-size: 0.75rem; color: #a39599; font-weight: normal;">(Mercado pago ->)</span>
-                    </p>
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">DATOS BANCARIOS</p>
                     <div style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; padding-bottom: 5px;">
+                        
                         <!-- Tarjeta 1: Santander -->
-                        <div style="flex: 0 0 100%; scroll-snap-align: center; box-sizing: border-box; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fce4ec;">
+                        <div style="flex: 0 0 100%; scroll-snap-align: center; box-sizing: border-box; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fce4ec; position: relative;">
                             <p style="margin: 0 0 5px 0; font-weight: bold; color: #4a3b40;">🏦 Opción 1: SANTANDER</p>
                             <p style="margin: 0 0 3px 0;"><strong>Nombre:</strong> Elizabeth Ramirez Ramirez</p>
                             <p style="margin: 0 0 3px 0;"><strong>No° cuenta:</strong> 1402 4074 580</p>
                             <p style="margin: 0 0 3px 0;"><strong>CLABE:</strong> 0146 5014 0240 7458 03</p>
-                            <p style="margin: 0;"><strong>Tarjeta (Oxxo):</strong> 5579 0870 1226 6216</p>
+                            <p style="margin: 0; width: 85%;"><strong>Tarjeta (Oxxo):</strong> 5579 0870 1226 6216</p>
+                            
+                            <!-- Flecha indicadora derecha -->
+                            <div style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #ff6b96; font-size: 22px; font-weight: bold; opacity: 0.7;">
+                                ❯
+                            </div>
                         </div>
+                        
                         <!-- Tarjeta 2: Mercado Pago -->
-                        <div style="flex: 0 0 100%; scroll-snap-align: center; box-sizing: border-box; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fce4ec;">
-                            <p style="margin: 0 0 5px 0; font-weight: bold; color: #4a3b40;">💳 Opción 2: MERCADO PAGO</p>
-                            <p style="margin: 0 0 3px 0;"><strong>Nombre:</strong> Elizabeth Ramírez Ramírez</p>
-                            <p style="margin: 0 0 3px 0;"><strong>CLABE:</strong> 722 969 070 993 840 205</p>
-                            <p style="margin: 0; font-size: 0.8rem; color: #a39599;">(Transferencia directa a cuenta)</p>
+                        <div style="flex: 0 0 100%; scroll-snap-align: center; box-sizing: border-box; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fce4ec; position: relative;">
+                            <!-- Flecha indicadora izquierda -->
+                            <div style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #ff6b96; font-size: 22px; font-weight: bold; opacity: 0.7;">
+                                ❮
+                            </div>
+                            
+                            <div style="margin-left: 28px;">
+                                <p style="margin: 0 0 5px 0; font-weight: bold; color: #4a3b40;">💳 Opción 2: MERCADO PAGO</p>
+                                <p style="margin: 0 0 3px 0;"><strong>Nombre:</strong> Elizabeth Ramírez Ramírez</p>
+                                <p style="margin: 0 0 3px 0;"><strong>CLABE:</strong> 722 969 070 993 840 205</p>
+                                <p style="margin: 0; font-size: 0.8rem; color: #a39599;">(Transferencia directa a cuenta)</p>
+                            </div>
                         </div>
+                        
                     </div>
                 `;
             }
