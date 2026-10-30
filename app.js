@@ -550,7 +550,7 @@ function actualizarVistaCarrito() {
     let totalPasteles = 0;
     
     carrito.forEach(item => {
-        if(item.nombre.includes("Bases")) { totalBases += item.cantidad; }
+        if(item.nombre.includes("Base")) { totalBases += item.cantidad; }
         if(item.nombre.includes("Cupcake")) { totalCupcakes += item.cantidad; }
         if(item.tipoPastel) { totalPasteles += item.cantidad; } 
     });
@@ -614,11 +614,12 @@ function actualizarVistaCarrito() {
     let costoEnvio = 0;
     let costoComision = 0; 
     let costoIVA = 0; 
-    
-    // Leemos qué eligieron en el select de envío SOLO si el candado está abierto
+
+    // CANDADO: Solo sumamos envío si ya entró a llenar sus datos
     const selEntrega = document.getElementById("sel_entrega");
-    if (selEntrega && elClienteYaEntroADatos) { 
+    if (selEntrega && typeof elClienteYaEntroADatos !== 'undefined' && elClienteYaEntroADatos) {
         costoEnvio = parseFloat(selEntrega.value) || 0; 
+    }
 
     // Leemos qué eligieron en el select de pago (Solo una vez)
     const selPago = document.getElementById("sel_pago");
