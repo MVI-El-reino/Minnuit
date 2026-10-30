@@ -86,25 +86,26 @@ select,
     border: 1px solid var(--borde-suave);
 }
 
-/* 1. Volvemos a alinear los títulos arriba y los números abajo */
+/* 1. Empujamos todo un poco hacia abajo para centrar el bloque */
 .precio-col, .cantidad-col {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between; 
+    justify-content: flex-end; 
     width: 48%;
+    padding-top: 10px; /* Baja el conjunto para que no toque el borde superior */
 }
 
-/* 2. Forzamos el centrado perfecto horizontal de los títulos */
+/* 2. Acercamos el texto milimétricamente a los números/botones */
 .etiqueta-precio {
     font-size: 0.75rem;
     text-transform: uppercase;
     color: var(--texto-secundario);
     font-weight: 700;
-    margin: 0 !important; 
-    line-height: 1 !important;
+    margin: 0 0 5px 0 !important; /* El 5px es la separación exacta con la caja de abajo */
+    line-height: 1.1 !important;
     text-align: center;
-    width: 100%; /* Esto obliga a CANTIDAD a centrarse con la caja de abajo */
+    width: 100%; 
 }
 
 /* 3. Eliminamos el margen invisible gigante del precio */
