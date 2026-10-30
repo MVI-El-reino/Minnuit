@@ -786,10 +786,6 @@ function actualizarVistaCarrito() {
 
 function abrirModal() {
     if(carrito.length === 0) return mostrarAlerta(" Tu carrito está vacío.");
-    elClienteYaEntroADatos = true;
-    actualizarVistaCarrito(); // Forzamos a que se recalcule el total ahora sí sumando el envío
-    // Cargar datos personales
-    if (localStorage.getItem("minuit_nombre"))
     document.getElementById("modal-carrito").style.display = "block";
 }
 function cerrarModal() {
@@ -798,6 +794,10 @@ function cerrarModal() {
 
 function abrirModalDatos() {
     if(carrito.length === 0) return mostrarAlerta("Tu carrito está vacío.");
+
+    // NUEVO: Activamos el cobro de envío justo en el momento en que entran a esta pantalla
+    elClienteYaEntroADatos = true;
+    actualizarVistaCarrito(); // Forzamos a que se recalcule el total ahora sí sumando el envío
 
     // Cargar datos personales
     if (localStorage.getItem("minuit_nombre")) {
