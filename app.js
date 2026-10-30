@@ -11,6 +11,7 @@
 // ==========================================================================
 
 let carrito = [];
+let elClienteYaEntroADatos = false;
 const numeroDueno = "522215836232"; 
 
 // Colores del PDF de la nota de pedido (ajústalos a los de tu marca)
@@ -122,8 +123,6 @@ function reemplazarOpciones(id, opciones) {
 }
 
 function inicializarTienda() { 
-    const selectEnvioInicial = document.getElementById("sel_entrega");
-    if (selectEnvioInicial) selectEnvioInicial.value = "0";
     // Guardamos las opciones originales de todos los selects antes de que Choices los modifique
     document.querySelectorAll("select").forEach(select => {
         if (!opcionesOriginales[select.id]) opcionesOriginales[select.id] = Array.from(select.options).map(opt => opt.value);
@@ -616,10 +615,11 @@ function actualizarVistaCarrito() {
     let costoComision = 0; 
     let costoIVA = 0; 
     
-    // Leemos qué eligieron en el select de envío
+    // Leemos qué eligieron en el select de envío SOLO si el candado está abierto
     const selEntrega = document.getElementById("sel_entrega");
-    if (selEntrega) { costoEnvio = parseFloat(selEntrega.value) || 0; }
-    
+    if (selEntrega && elClienteYaEntroADatos) { 
+        costoEnvio = parseFloat(selEntrega.value) || 0; 
+
     // Leemos qué eligieron en el select de pago (Solo una vez)
     const selPago = document.getElementById("sel_pago");
     let metodoPago = "Transferencia";
@@ -786,6 +786,10 @@ function actualizarVistaCarrito() {
 
 function abrirModal() {
     if(carrito.length === 0) return mostrarAlerta(" Tu carrito está vacío.");
+    elClienteYaEntroADatos = true;
+    actualizarVistaCarrito(); // Forzamos a que se recalcule el total ahora sí sumando el envío
+    // Cargar datos personales
+    if (localStorage.getItem("minuit_nombre"))
     document.getElementById("modal-carrito").style.display = "block";
 }
 function cerrarModal() {
