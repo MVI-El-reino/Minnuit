@@ -235,7 +235,18 @@ function animarBotónCarrito() {
     void fabCarrito.offsetWidth;
     fabCarrito.classList.add('con-items');
 }
-
+// Oculta o muestra el selector de color del logo dependiendo si elige Si o No
+function toggleColorLogo(tipo) {
+    const selectTieneLogo = document.getElementById(`sel_tiene_logo_${tipo}`);
+    const contenedorColor = document.getElementById(`contenedor_color_logo_${tipo}`);
+    if (selectTieneLogo && contenedorColor) {
+        if (selectTieneLogo.value === "No") {
+            contenedorColor.style.display = "none";
+        } else {
+            contenedorColor.style.display = "block";
+        }
+    }
+}
 // ==========================================
 // LÓGICA DE BASES MDF
 // ==========================================
@@ -287,13 +298,16 @@ function agregarBaseConfigAlCarrito() {
     const grosor = document.getElementById("sel_grosor_base").value;
     const tamano = document.getElementById("sel_tamano_base").value;
     const forma = document.getElementById("sel_forma_base").value;
-    const colorLogo = document.getElementById("sel_color_logo_base").value;
+    
+    const tieneLogo = document.getElementById("sel_tiene_logo_base").value;
+    const colorLogoRaw = document.getElementById("sel_color_logo_base").value;
+    const colorLogo = tieneLogo === "Si" ? colorLogoRaw : "Sin logotipo";
+    
     const cantidad = parseInt(document.getElementById("cant_base_config").value);
 
     const nombreCompuesto = `Bases ${linea} ${forma} ${grosor} ${tamano}`;
     const detalleCompuesto = `Logo: ${colorLogo}`;
     
-    // LÓGICA ANTI-DUPLICADOS
     const index = carrito.findIndex(item => item.nombre === nombreCompuesto && item.detalle === detalleCompuesto);
     if (index !== -1) {
         carrito[index].cantidad += cantidad;
@@ -306,6 +320,9 @@ function agregarBaseConfigAlCarrito() {
     resetearSelect("sel_grosor_base");
     resetearSelect("sel_tamano_base");
     resetearSelect("sel_forma_base");
+    resetearSelect("sel_tiene_logo_base");
+    toggleColorLogo('base'); // Regresa la caja de color a la normalidad
+    
     document.getElementById("cant_base_config").value = "1"; 
     actualizarConfiguradorBases();
 
@@ -313,7 +330,6 @@ function agregarBaseConfigAlCarrito() {
     actualizarVistaCarrito();
     animarBotónCarrito();
 }
-
 // ==========================================
 // LÓGICA DE CAJAS CUPCAKES
 // ==========================================
@@ -394,19 +410,19 @@ function agregarCupcakeConfigAlCarrito() {
     const cantidad = parseInt(document.getElementById("cant_cupcake_config").value);
     const tamano = document.getElementById("sel_tamano_cupcake").value;
     const tieneSoporte = document.getElementById("sel_tiene_soporte").value === "Si";
-    const colorLogo = document.getElementById("sel_color_logo_cupcake").value;
     const redes = document.getElementById("sel_redes_cupcake").value;
     const extraInfo = document.getElementById("detalle_cupcake1").value || "Sin notas extra";
 
-    // --- NUEVO FORMATO DEL NOMBRE PARA CUPCAKES ---
+    const tieneLogo = document.getElementById("sel_tiene_logo_cupcake").value;
+    const colorLogoRaw = document.getElementById("sel_color_logo_cupcake").value;
+    const colorLogo = tieneLogo === "Si" ? colorLogoRaw : "Sin logotipo";
+
     const cantidadCupcakes = tamano === "31cm" ? "4" : "2";
     const nombre = `Caja (${cantidadCupcakes} Cupcakes) ${tamano}`;
     
-    // Antes siempre salía el color del soporte, aunque el cliente eligiera "No". Ahora dice "No" cuando no lo pide.
     const soporteTexto = tieneSoporte ? `${SOPORTE_INTERNO_COLOR} (incluido)` : "No";
     const detalle = `Soporte interior: ${soporteTexto} | Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
 
-    // LÓGICA ANTI-DUPLICADOS
     const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
     if (index !== -1) {
         carrito[index].cantidad += cantidad;
@@ -415,10 +431,12 @@ function agregarCupcakeConfigAlCarrito() {
         carrito.push({ nombre, cantidad, detalle, precio: precioCupcakeActual, subtotal: precioCupcakeActual * cantidad });
     }
 
-    // Regresamos los menús a su opción inicial para la siguiente caja
     resetearSelect("sel_tamano_cupcake");
+    resetearSelect("sel_tiene_logo_cupcake");
     resetearSelect("sel_color_logo_cupcake");
     resetearSelect("sel_redes_cupcake");
+    toggleColorLogo('cupcake'); // Regresa la caja de color a la normalidad
+    
     document.getElementById("detalle_cupcake1").value = "";
     document.getElementById("cant_cupcake_config").value = "5";
     actualizarConfiguradorCupcakes();
@@ -427,7 +445,6 @@ function agregarCupcakeConfigAlCarrito() {
     actualizarVistaCarrito();
     animarBotónCarrito();
 }
-
 // ==========================================
 // LÓGICA DE CAJAS PASTEL 
 // ==========================================
@@ -496,15 +513,16 @@ function agregarPastelConfigAlCarrito() {
     const cantidad = parseInt(document.getElementById("cant_pastel_config").value);
     const tipo = document.getElementById("sel_tipo_pastel").value;
     const tamano = document.getElementById("sel_tamano_pastel").value;
-    const colorLogo = document.getElementById("sel_color_logo_pastel").value;
     const redes = document.getElementById("sel_redes_pastel").value;
     const extraInfo = document.getElementById("detalle_pastel1").value || "Sin notas extra";
+    
+    const tieneLogo = document.getElementById("sel_tiene_logo_pastel").value;
+    const colorLogoRaw = document.getElementById("sel_color_logo_pastel").value;
+    const colorLogo = tieneLogo === "Si" ? colorLogoRaw : "Sin logotipo";
     
     const nombre = `Caja Pastel ${tipo} (${tamano})`;
     const detalle = `Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
     
-    // IMPORTANTE: Guardamos parámetros ocultos para poder recalcular precios después
-    // LÓGICA ANTI-DUPLICADOS
     const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
     if (index !== -1) {
         carrito[index].cantidad += cantidad;
@@ -520,12 +538,14 @@ function agregarPastelConfigAlCarrito() {
     
     resetearSelect("sel_tipo_pastel");
     actualizarOpcionesTamanoPastel();
+    resetearSelect("sel_tiene_logo_pastel");
     resetearSelect("sel_color_logo_pastel");
     resetearSelect("sel_redes_pastel");
+    toggleColorLogo('pastel'); // Regresa la caja de color a la normalidad
+    
     document.getElementById("detalle_pastel1").value = "";
     document.getElementById("cant_pastel_config").value = "5"; 
     
-    // Forzamos la actualización visual
     actualizarVistaCarrito();
     actualizarConfiguradorPasteles();
 
