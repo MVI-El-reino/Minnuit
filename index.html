@@ -115,11 +115,20 @@
                     </select>
                 </div>
                 
+               <!-- NUEVO: Pregunta si lleva logo -->
                 <div class="controles-config">
-                    <label for="sel_color_logo_base">Color Logotipo:</label>
-                    <select id="sel_color_logo_base"></select>
+                    <label for="sel_tiene_logo_base">Personalizada con logotipo:</label>
+                    <select id="sel_tiene_logo_base" onchange="toggleColorLogo('base')">
+                        <option value="Si">Sí</option>
+                        <option value="No">No</option>
+                    </select>
                 </div>
                 
+                <!-- MODIFICADO: Agregamos ID al contenedor y cambiamos el título -->
+                <div class="controles-config" id="contenedor_color_logo_base">
+                    <label for="sel_color_logo_base">Color de logotipo:</label>
+                    <select id="sel_color_logo_base"></select>
+                </div>
                 <br>
                 <button class="btn-agregar" onclick="agregarBaseConfigAlCarrito()">Agregar al Carrito</button>
             </div>
@@ -165,8 +174,18 @@
                     </select>
                 </div>
 
+                <!-- NUEVO: Pregunta si lleva logo -->
                 <div class="controles-config">
-                    <label for="sel_color_logo_pastel">Color del Logotipo:</label>
+                    <label for="sel_tiene_logo_pastel">Personalizada con logotipo:</label>
+                    <select id="sel_tiene_logo_pastel" onchange="toggleColorLogo('pastel')">
+                        <option value="Si">Sí</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+
+                <!-- MODIFICADO: Agregamos ID al contenedor y cambiamos el título -->
+                <div class="controles-config" id="contenedor_color_logo_pastel">
+                    <label for="sel_color_logo_pastel">Color de logotipo:</label>
                     <select id="sel_color_logo_pastel">
                         <!-- Se llena automáticamente con JS -->
                     </select>
@@ -252,11 +271,20 @@
                     </p>
                 </div>
 
-                <!-- CAMBIO 2: Color del logotipo (misma lista que en Cajas para Pastel; la llena app.js) -->
+                <!-- NUEVO: Pregunta si lleva logo -->
                 <div class="controles-config">
-                    <label for="sel_color_logo_cupcake">Color del Logotipo:</label>
+                    <label for="sel_tiene_logo_cupcake">Personalizada con logotipo:</label>
+                    <select id="sel_tiene_logo_cupcake" onchange="toggleColorLogo('cupcake')">
+                        <option value="Si">Sí</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+
+                <!-- MODIFICADO: Agregamos ID al contenedor y cambiamos el título -->
+                <div class="controles-config" id="contenedor_color_logo_cupcake">
+                    <label for="sel_color_logo_cupcake">Color de logotipo:</label>
                     <select id="sel_color_logo_cupcake">
-                        <!-- Se llena automáticamente con JS (lista coloresLogotipoPastel) -->
+                        <!-- Se llena automáticamente con JS -->
                     </select>
                 </div>
 
