@@ -30,8 +30,8 @@
             font-size: 16px !important;
         }
         .logo-principal {
-            /* Baja el logo para centrarlo mejor */
-            margin-top: 12px; 
+            margin-top: 35px !important; /* Más abajo, como pidió la dueña */
+            max-width: 285px !important; /* Mantenemos el tamaño grueso */
         }
     </style>
 </head>
@@ -54,10 +54,7 @@
              ============================== -->
         <section id="bases" class="categoria-seccion active">
             <div class="card-producto card-configurador">
-                <h3>Bases Personalizadas</h3>
-                <p>Mínimo de compra: 30 piezas.</p>
-                <p>(Puedes combinar tamaños)</p>
-
+                
                 <div class="fila-precio-cantidad">
                     <div class="precio-col">
                         <span class="etiqueta-precio">PRECIO UNITARIO</span>
@@ -67,10 +64,13 @@
                     <div class="cantidad-col">
                         <span class="etiqueta-precio">Cantidad</span>
                         <div class="controles-cantidad">
-    <input type="number" id="cant_base_config" value="1" min="1" onchange="validarManual('cant_base_config', 1); actualizarConfiguradorBases()">
-</div>
+                            <input type="number" id="cant_base_config" value="1" min="1" onchange="validarManual('cant_base_config', 1); actualizarConfiguradorBases()">
+                        </div>
                     </div>
                 </div>
+                
+                <p>Mínimo de compra: 30 piezas.</p>
+                <p>(Puedes combinar tamaños)</p>
                 
                 <div class="controles-config">
                     <label for="sel_linea_base">Línea:</label>
@@ -139,10 +139,6 @@
              ============================== -->
         <section id="cajas_pastel" class="categoria-seccion">
             <div class="card-producto card-configurador">
-                <h3>Cajas para Pastel Personalizadas</h3>
-                <p>Mínimo de compra: 30 piezas.</p>
-                <p>(Puedes combinar tamaños).</p>
-
                 <div class="fila-precio-cantidad">
                     <div class="precio-col">
                         <span class="etiqueta-precio">PRECIO UNITARIO</span>
@@ -153,9 +149,12 @@
                         <span class="etiqueta-precio">Cantidad</span>
                         <div class="controles-cantidad">
                     <input type="number" id="cant_pastel_config" value="5" min="5" style="font-size: 16px;" onchange="validarManual('cant_pastel_config', 5); actualizarConfiguradorPasteles()">
-            </div>
+                        </div>
                     </div>
                 </div>
+                
+                <p>Mínimo de compra: 30 piezas.</p>
+                <p>(Puedes combinar tamaños).</p>
                 
                 <!-- Indicador visual del mayoreo -->
                 <p style="font-size: 0.8rem; color: var(--rosa-principal); text-align: center; margin-top: -15px; margin-bottom: 15px; font-weight: 600;" id="indicador_mayoreo">Nivel: Menudeo (10-39 pzas)</p>
@@ -225,11 +224,8 @@
              ============================== -->
         <section id="cajas_cupcakes" class="categoria-seccion">
             <div class="card-producto card-configurador">
-                <h3>Cajas para Cupcakes, galletas y/o postres.</h3>
-                <p>Mínimo de compra: 30 piezas.</p>
-                <p>Combínalas con cajas para pastel</p>
 
-                <!-- INICIO DE LA FILA DE PRECIO Y CANTIDAD -->
+                 <!-- INICIO DE LA FILA DE PRECIO Y CANTIDAD -->
                 <div class="fila-precio-cantidad">
                     <div class="precio-col">
                         <span class="etiqueta-precio">PRECIO UNITARIO</span>
@@ -243,7 +239,10 @@
                             <input type="number" id="cant_cupcake_config" value="5" min="5" style="font-size: 16px;" onchange="validarManual('cant_cupcake_config', 5); actualizarConfiguradorCupcakes()">
                         </div>
                     </div>
-                </div> <!-- ESTE DIV CERRADO FUE EL QUE SALVÓ EL DISEÑO -->
+                </div> 
+                <br>
+                <p>Mínimo de compra: 30 piezas.</p>
+                <p>Combínalas con cajas para pastel</p>
 
                 <!-- Select capacidad -->
                 <div class="controles-config">
@@ -383,9 +382,8 @@
             <p style="margin: 0 0 10px 0; font-size: 0.95rem; color: #4a3b40; font-weight: bold; text-align: center;">🏪 Recoger en Taller Minuit</p>
             <p style="margin: 0 0 6px 0; font-size: 0.85rem; color: #4a3b40;"><strong>Dirección:</strong> Evenecer 23, Fuertes de Guadalupe, 72706 Barrio de Nuevo León, Pue.</p>
             <p style="margin: 0; font-size: 0.85rem; color: #4a3b40;"><strong>Referencias:</strong> Segundo piso, primera puerta blanca con timbre rosa, arriba de carnicería Dory’s.</p>
-            <a href="https://www.google.com/maps/dir/?api=1&amp;destination=19.0848294,-98.2901741" target="_blank" rel="noopener" style="display: block; margin: 12px 0; background: #e87b9e; color: white; padding: 10px; border-radius: 8px; text-align: center; text-decoration: none; font-weight: bold; font-size: 0.9rem;">📍 Cómo llegar (Google Maps)</a>
-            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.5200262039803!2d-98.2901741!3d19.0848294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85cfc7003cb2ab71%3A0x9b69e0ef225774d9!2sPlaza%20Evenecer!5e0!3m2!1ses-419!2smx!4v1792090407102!5m2!1ses-419!2smx" width="100%" height="220" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-            <p style="margin: 8px 0 0 0; font-size: 0.8rem; color: #e87b9e; text-align: center;">Horarios: te los confirmamos por WhatsApp al confirmar tu pedido.</p>
+            
+            <p style="margin: 12px 0 0 0; font-size: 0.9rem; color: #e87b9e; text-align: center; font-weight: bold;">Horario: Te lo confirmamos por whats.</p>
         </div>
 
         
@@ -435,9 +433,9 @@
         <span onclick="cerrarModalDireccion()" style="position: absolute; right: 15px; top: 10px; font-size: 24px; color: #e87b9e; cursor: pointer; font-weight: bold;">&times;</span>
         <h3 style="text-align: center; color: #e87b9e; margin-top: 0;"> DIRECCIÓN DE ENVÍO</h3>
         
-        <!-- NUEVO: BOTÓN DE AUTOGUARDADO (Inicia oculto) -->
-        <button type="button" id="btn_cargar_direccion" onclick="cargarDireccionGuardada()" style="display: none; width: 100%; background: #fdf0f4; color: #e87b9e; border: 1px solid #e87b9e; padding: 10px; border-radius: 8px; font-weight: bold; margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease;">
-            Usar mi última dirección guardada
+       <!-- BOTÓN DE AUTOGUARDADO (Rosa fuerte y disquete) -->
+        <button type="button" id="btn_cargar_direccion" onclick="cargarDireccionGuardada()" style="display: none; width: 100%; background: #e87b9e; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; margin-bottom: 15px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(232, 123, 158, 0.4);">
+            💾 Usar mi última dirección guardada
         </button>
         
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
