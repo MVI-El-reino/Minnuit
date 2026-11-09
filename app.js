@@ -123,6 +123,8 @@ function reemplazarOpciones(id, opciones) {
 }
 
 function inicializarTienda() { 
+    const selectEnvioInicial = document.getElementById("sel_entrega");
+    if (selectEnvioInicial) selectEnvioInicial.value = "0";
     // Guardamos las opciones originales de todos los selects antes de que Choices los modifique
     document.querySelectorAll("select").forEach(select => {
         if (!opcionesOriginales[select.id]) opcionesOriginales[select.id] = Array.from(select.options).map(opt => opt.value);
@@ -690,10 +692,10 @@ function actualizarVistaCarrito() {
                     </div>
                 `;
             } else {
-                // Imágenes 1 y 2 (Santander y Mercado Pago en carrusel) -> Con flechas y títulos limpios
+               // Imágenes 1 y 2 (Santander y Mercado Pago en carrusel funcional)
                 cajaBancos.innerHTML = `
                     <p style="margin: 0 0 8px 0; font-weight: bold; color: #e87b9e; font-size: 0.95rem;">DATOS BANCARIOS</p>
-                    <div style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; padding-bottom: 5px;">
+                    <div id="carrusel_bancos" style="display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 10px; padding-bottom: 5px; scroll-behavior: smooth;">
                         
                         <!-- Tarjeta 1: Santander -->
                         <div style="flex: 0 0 100%; scroll-snap-align: center; box-sizing: border-box; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fce4ec; position: relative;">
@@ -703,27 +705,26 @@ function actualizarVistaCarrito() {
                             <p style="margin: 0 0 3px 0;"><strong>CLABE:</strong> 0146 5014 0240 7458 03</p>
                             <p style="margin: 0; width: 85%;"><strong>Tarjeta (Oxxo):</strong> 5579 0870 1226 6216</p>
                             
-                            <!-- Flecha indicadora derecha -->
-                            <div style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #ff6b96; font-size: 22px; font-weight: bold; opacity: 0.7;">
+                            <!-- Flecha indicadora derecha FUNCIONAL -->
+                            <div onclick="document.getElementById('carrusel_bancos').scrollBy({left: 300, behavior: 'smooth'})" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #ff6b96; font-size: 26px; font-weight: bold; cursor: pointer; padding: 10px;">
                                 ❯
                             </div>
                         </div>
                         
                         <!-- Tarjeta 2: Mercado Pago -->
                         <div style="flex: 0 0 100%; scroll-snap-align: center; box-sizing: border-box; background: white; padding: 10px; border-radius: 8px; border: 1px solid #fce4ec; position: relative;">
-                            <!-- Flecha indicadora izquierda -->
-                            <div style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #ff6b96; font-size: 22px; font-weight: bold; opacity: 0.7;">
+                            <!-- Flecha indicadora izquierda FUNCIONAL -->
+                            <div onclick="document.getElementById('carrusel_bancos').scrollBy({left: -300, behavior: 'smooth'})" style="position: absolute; left: 5px; top: 50%; transform: translateY(-50%); color: #ff6b96; font-size: 26px; font-weight: bold; cursor: pointer; padding: 10px;">
                                 ❮
                             </div>
                             
-                            <div style="margin-left: 28px;">
+                            <div style="margin-left: 35px;">
                                 <p style="margin: 0 0 5px 0; font-weight: bold; color: #4a3b40;">💳 Opción 2: MERCADO PAGO</p>
                                 <p style="margin: 0 0 3px 0;"><strong>Nombre:</strong> Elizabeth Ramírez Ramírez</p>
                                 <p style="margin: 0 0 3px 0;"><strong>CLABE:</strong> 722 969 070 993 840 205</p>
                                 <p style="margin: 0; font-size: 0.8rem; color: #a39599;">(Transferencia directa a cuenta)</p>
                             </div>
                         </div>
-                        
                     </div>
                 `;
             }
@@ -889,8 +890,16 @@ function cargarDireccionGuardada() {
 }
 
 function cerrarModalDireccion() {
+    // === NUEVO: Obligamos a Safari a guardar los datos en este instante ===
+    localStorage.setItem("minuit_calle", document.getElementById("dir_calle").value);
+    localStorage.setItem("minuit_numero", document.getElementById("dir_numero").value);
+    localStorage.setItem("minuit_colonia", document.getElementById("dir_colonia").value);
+    localStorage.setItem("minuit_cp", document.getElementById("dir_cp").value);
+    localStorage.setItem("minuit_ciudad", document.getElementById("dir_ciudad").value);
+    localStorage.setItem("minuit_estado", document.getElementById("dir_estado").value);
+    localStorage.setItem("minuit_referencias", document.getElementById("dir_referencias").value);
+
     document.getElementById("modal-direccion").style.display = "none";
-    // Volvemos a abrir el modal principal para que terminen
     document.getElementById("modal-datos").style.display = "block";
 }
 function mostrarTerminosEnvio() {
@@ -1390,9 +1399,7 @@ async function procesarPedidoCompleto(soloDescargar) {
 
         const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
 
-        // =========================================================
         // 1. GUARDAR COPIA LOCAL (Bóveda del navegador)
-        // =========================================================
         const pdfBase64 = pdf.output('datauristring');
         try {
             localStorage.setItem("minuit_ultimo_pdf", pdfBase64);
@@ -1400,17 +1407,16 @@ async function procesarPedidoCompleto(soloDescargar) {
             console.warn("No se pudo guardar la copia local.", e);
         }
 
-        // =========================================================
-        // 2. ¡DESCARGAR INMEDIATAMENTE!
-        // =========================================================
-        pdf.save(nombreArchivo); 
+        // === NUEVO: DETECCIÓN INTELIGENTE DE IPHONE/SAFARI ===
+        const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-        // =========================================================
-        // 3. INTERCEPTOR PARA EL BOTÓN DE "SOLO DESCARGAR"
-        // =========================================================
         const urlGoogleScript = "https://script.google.com/macros/s/AKfycbw_RFDbSPc0tZNODZ2cltlC26DtKGciqqkkrLvhHSeg-NkyJ-CfpaQiMbfS0ftjHa77-A/exec";
 
+        // =========================================================
+        // 2. BOTÓN "SOLO DESCARGAR"
+        // =========================================================
         if (soloDescargar) {
+            pdf.save(nombreArchivo); // Aquí siempre forzamos descarga
             mostrarAlerta("✅ ¡Nota descargada! Subiendo copia a tu registro...");
             
             fetch(urlGoogleScript, {
@@ -1425,9 +1431,17 @@ async function procesarPedidoCompleto(soloDescargar) {
         }
 
         // =========================================================
-        // 4. SI PRESIONÓ "ENVIAR", SUBIMOS A DRIVE Y VAMOS A WHATSAPP
+        // 3. FLUJO PRINCIPAL (CONFIRMAR Y ENVIAR)
         // =========================================================
-        mostrarAlerta("📤 Generando link de Drive y abriendo WhatsApp...");
+        if (!esIOS) {
+            // Si es Android, PC o Mac: Descargamos el PDF automáticamente
+            pdf.save(nombreArchivo);
+        } else {
+            // Si es iPhone (Safari): Omitimos la descarga para que no bloquee WhatsApp.
+            // (La nota de todos modos ya quedó guardada en su historial local).
+        }
+
+        mostrarAlerta("📤 Procesando pedido y abriendo WhatsApp...");
         const controlador = new AbortController();
         const tiempoLimite = setTimeout(() => controlador.abort(), 8000);
 
@@ -1441,7 +1455,8 @@ async function procesarPedidoCompleto(soloDescargar) {
 
             const resultado = await respuesta.json();
             if (resultado.estatus === 'exito') {
-                textoWhatsApp += `\n📁 *Descarga el PDF de registro aquí:*\n👉 ${resultado.urlDrive}`;
+                // === NUEVO: TEXTO EN WHATSAPP EXCLUSIVO PARA QUE LO USE LA DUEÑA ===
+                textoWhatsApp += `\n\n⚙️ *(Uso interno Minuit - Documento en la nube):*\n👉 ${resultado.urlDrive}`;
             }
         } catch (errorDrive) {
             console.warn("Drive falló o tardó mucho, seguimos sin link.", errorDrive);
