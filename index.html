@@ -148,17 +148,17 @@
                     <div class="cantidad-col">
                         <span class="etiqueta-precio">Cantidad</span>
                         <div class="controles-cantidad">
-                    <input type="number" id="cant_pastel_config" value="5" min="5" style="font-size: 16px;" onchange="validarManual('cant_pastel_config', 5); actualizarConfiguradorPasteles()">
-                        </div>
+<input type="number" id="cant_pastel_config" value="5" min="5" style="font-size: 16px;" onchange="validarManual('cant_pastel_config', 5); actualizarConfiguradorPasteles()" onkeyup="actualizarConfiguradorPasteles()">                        </div>
                     </div>
                 </div>
-                <!-- NUEVO: Selector de Mayoreo Interactivo -->
+                <!-- Selector de Mayoreo como Guía Visual -->
                 <div class="selector-mayoreo" id="selector_mayoreo_pastel">
-                    <button type="button" class="btn-mayoreo active" onclick="forzarMayoreo('cant_pastel_config', 5)">Menudeo</button>
-                    <button type="button" class="btn-mayoreo" onclick="forzarMayoreo('cant_pastel_config', 40)">1er Mayoreo</button>
-                    <button type="button" class="btn-mayoreo" onclick="forzarMayoreo('cant_pastel_config', 80)">2do Mayoreo</button>
-                    <button type="button" class="btn-mayoreo" onclick="forzarMayoreo('cant_pastel_config', 150)">3er Mayoreo</button>
-                </div><br>
+                    <button type="button" class="btn-mayoreo active" onclick="mostrarInfoMayoreo(1)">Menudeo</button>
+                    <button type="button" class="btn-mayoreo" onclick="mostrarInfoMayoreo(2)">1er Mayoreo</button>
+                    <button type="button" class="btn-mayoreo" onclick="mostrarInfoMayoreo(3)">2do Mayoreo</button>
+                    <button type="button" class="btn-mayoreo" onclick="mostrarInfoMayoreo(4)">3er Mayoreo</button>
+                </div>
+                <br>
 
                 <p>Mínimo de compra: 30 piezas.</p>
                 <p>(Puedes combinar tamaños).</p>
@@ -244,7 +244,8 @@
                         </div>
                     </div>
                 </div> 
-                <hr>
+            </div>
+             <div class="card-producto card-configurador">
                 <p>Mínimo de compra: 30 piezas.</p>
                 <p>Combínalas con cajas para pastel</p>
 
