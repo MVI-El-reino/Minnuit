@@ -235,6 +235,98 @@ function mostrarAlerta(mensaje) {
     contenedor.appendChild(toast);
     setTimeout(() => { toast.remove(); }, 3000);
 }
+// ==========================================
+// LÓGICA DE LA SUB-VENTANA DE LOGOTIPO
+// ==========================================
+let logoDataActual = {
+    base: { color: '', vector: false, archivo: '', configurado: false },
+    pastel: { color: '', vector: false, archivo: '', configurado: false },
+    cupcake: { color: '', vector: false, archivo: '', configurado: false }
+};
+let tipoLogoActivo = '';
+
+function gestionarLogo(tipo) {
+    const select = document.getElementById(`sel_tiene_logo_${tipo}`);
+    if (select.value === "Si") {
+        abrirModalLogo(tipo);
+    } else {
+        document.getElementById(`resumen_logo_${tipo}`).style.display = "none";
+        logoDataActual[tipo].configurado = false;
+    }
+}
+
+function abrirModalLogo(tipo) {
+    tipoLogoActivo = tipo;
+    const selectColor = document.getElementById("modal_logo_color");
+    selectColor.innerHTML = "";
+
+    // Cargar colores dependiendo del producto
+    let colores = [];
+    if (tipo === 'base') {
+        const linea = document.getElementById("sel_linea_base").value;
+        colores = coloresLogotipo[linea] || coloresLogotipo["Basic"];
+    } else {
+        colores = coloresLogotipoPastel;
+    }
+
+    colores.forEach(c => {
+        selectColor.add(new Option(c.charAt(0).toUpperCase() + c.slice(1), c));
+    });
+
+    document.getElementById("modal_logo_archivo").value = ""; 
+    document.getElementById("modal_logo_vector").value = "Si";
+    actualizarAvisoVector();
+    
+    document.getElementById("modal-logo").style.display = "block";
+}
+
+function cerrarModalLogo() {
+    document.getElementById("modal-logo").style.display = "none";
+    // Si lo cerró sin guardar, regresamos el select a "No" para evitar errores
+    if (!logoDataActual[tipoLogoActivo].configurado) {
+        const selectNat = document.getElementById(`sel_tiene_logo_${tipoLogoActivo}`);
+        if(selectNat) selectNat.value = "No";
+        if (instanciasSelect[`sel_tiene_logo_${tipoLogoActivo}`]) {
+            instanciasSelect[`sel_tiene_logo_${tipoLogoActivo}`].setChoiceByValue("No");
+        }
+    }
+}
+
+function actualizarAvisoVector() {
+    const estado = document.getElementById("modal_logo_vector").value;
+    const aviso = document.getElementById("aviso_vector");
+    if (estado === "Si") {
+        aviso.innerHTML = "⚠️ Nota: Los archivos PDF/EPS/Ai están sujetos a revisión técnica. Si tu archivo no está correctamente vectorizado, nos contactaremos contigo.";
+        aviso.style.color = "#d35400"; aviso.style.background = "#fdfae3"; aviso.style.borderColor = "#f9e79f";
+    } else {
+        aviso.innerHTML = "✨ Se agregará un cargo único de $500 MXN a tu pedido por el servicio de vectorización profesional. (Aplica para todo tu pedido).";
+        aviso.style.color = "#27ae60"; aviso.style.background = "#eafaf1"; aviso.style.borderColor = "#a9dfbf";
+    }
+}
+
+function guardarLogoModal() {
+    const color = document.getElementById("modal_logo_color").value;
+    const necesitaVector = document.getElementById("modal_logo_vector").value === "No";
+    const fileInput = document.getElementById("modal_logo_archivo");
+    
+    let archivoNombre = fileInput.files.length > 0 ? fileInput.files[0].name : "Se enviará por WhatsApp";
+
+    logoDataActual[tipoLogoActivo] = {
+        color: color,
+        necesitaVector: necesitaVector,
+        archivo: archivoNombre,
+        configurado: true
+    };
+
+    // Actualizar el resumen visual en la tarjeta
+    document.getElementById(`res_color_${tipoLogoActivo}`).innerText = color;
+    let textoArchivo = archivoNombre;
+    if (necesitaVector) textoArchivo += " (Requiere Vectorización +$500)";
+    document.getElementById(`res_archivo_${tipoLogoActivo}`).innerText = textoArchivo;
+    
+    document.getElementById(`resumen_logo_${tipoLogoActivo}`).style.display = "block";
+    document.getElementById("modal-logo").style.display = "none";
+}
 
 function cambiarTab(idSeccion) {
     document.querySelectorAll('.categoria-seccion').forEach(sec => sec.classList.remove('active'));
@@ -333,6 +425,25 @@ function agregarBaseConfigAlCarrito() {
     const detalleCompuesto = `Logo: ${colorLogo}`;
     
     const index = carrito.findIndex(item => item.nombre === nombreCompuesto && item.detalle === detalleCompuesto);
+    // === LÓGICA DE COBRO DE VECTORIZACIÓN Y EXTRACCIÓN DE DATOS ===
+    const tieneLogo = document.getElementById("sel_tiene_logo_base").value; // Cambia '_base' por '_pastel' o '_cupcake' según corresponda
+    let colorLogo = "Sin logotipo";
+    let textoExtraLogo = "";
+
+    if (tieneLogo === "Si") {
+        if (!logoDataActual.base.configurado) return mostrarAlerta("⚠️ Por favor configura tu logotipo antes de agregar al carrito.");
+        
+        colorLogo = logoDataActual.base.color;
+        textoExtraLogo = ` | Archivo: ${logoDataActual.base.archivo}`;
+        
+        // Si necesita vector, lo cobramos solo si no lo hemos cobrado antes
+        if (logoDataActual.base.necesitaVector) {
+            const yaSeCobroVector = carrito.some(item => item.nombre === "Servicio de Vectorización de Logo");
+            if (!yaSeCobroVector) {
+                carrito.push({ nombre: "Servicio de Vectorización de Logo", cantidad: 1, precio: 500, subtotal: 500, detalle: "Pago único por diseño y preparación de archivos." });
+            }
+        }
+    }
     if (index !== -1) {
         carrito[index].cantidad += cantidad;
         carrito[index].subtotal = carrito[index].cantidad * precioBaseActual;
@@ -448,6 +559,26 @@ function agregarCupcakeConfigAlCarrito() {
     const detalle = `Soporte interior: ${soporteTexto} | Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
 
     const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
+
+    // === LÓGICA DE COBRO DE VECTORIZACIÓN Y EXTRACCIÓN DE DATOS ===
+    const tieneLogo = document.getElementById("sel_tiene_logo_base").value; // Cambia '_base' por '_pastel' o '_cupcake' según corresponda
+    let colorLogo = "Sin logotipo";
+    let textoExtraLogo = "";
+
+    if (tieneLogo === "Si") {
+        if (!logoDataActual.base.configurado) return mostrarAlerta("⚠️ Por favor configura tu logotipo antes de agregar al carrito.");
+        
+        colorLogo = logoDataActual.base.color;
+        textoExtraLogo = ` | Archivo: ${logoDataActual.base.archivo}`;
+        
+        // Si necesita vector, lo cobramos solo si no lo hemos cobrado antes
+        if (logoDataActual.base.necesitaVector) {
+            const yaSeCobroVector = carrito.some(item => item.nombre === "Servicio de Vectorización de Logo");
+            if (!yaSeCobroVector) {
+                carrito.push({ nombre: "Servicio de Vectorización de Logo", cantidad: 1, precio: 500, subtotal: 500, detalle: "Pago único por diseño y preparación de archivos." });
+            }
+        }
+    }
     if (index !== -1) {
         carrito[index].cantidad += cantidad;
         carrito[index].subtotal = carrito[index].cantidad * precioCupcakeActual;
@@ -553,6 +684,26 @@ function agregarPastelConfigAlCarrito() {
     const detalle = `Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
     
     const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
+
+    // === LÓGICA DE COBRO DE VECTORIZACIÓN Y EXTRACCIÓN DE DATOS ===
+    const tieneLogo = document.getElementById("sel_tiene_logo_base").value; // Cambia '_base' por '_pastel' o '_cupcake' según corresponda
+    let colorLogo = "Sin logotipo";
+    let textoExtraLogo = "";
+
+    if (tieneLogo === "Si") {
+        if (!logoDataActual.base.configurado) return mostrarAlerta("⚠️ Por favor configura tu logotipo antes de agregar al carrito.");
+        
+        colorLogo = logoDataActual.base.color;
+        textoExtraLogo = ` | Archivo: ${logoDataActual.base.archivo}`;
+        
+        // Si necesita vector, lo cobramos solo si no lo hemos cobrado antes
+        if (logoDataActual.base.necesitaVector) {
+            const yaSeCobroVector = carrito.some(item => item.nombre === "Servicio de Vectorización de Logo");
+            if (!yaSeCobroVector) {
+                carrito.push({ nombre: "Servicio de Vectorización de Logo", cantidad: 1, precio: 500, subtotal: 500, detalle: "Pago único por diseño y preparación de archivos." });
+            }
+        }
+    }
     if (index !== -1) {
         carrito[index].cantidad += cantidad;
         carrito[index].subtotal = carrito[index].cantidad * precioPastelActual;
