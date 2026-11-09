@@ -124,20 +124,19 @@
                     </select>
                 </div>
                 
-               <!-- NUEVO: Pregunta si lleva logo -->
-                <div class="controles-config">
-                    <label for="sel_tiene_logo_base">Personalizada con logotipo:</label>
-                    <select id="sel_tiene_logo_base" onchange="toggleColorLogo('base')">
-                        <option value="Si">Sí</option>
+               <div class="controles-config">
+                    <label>Personalizada con logotipo:</label>
+                    <select id="sel_tiene_logo_base" onchange="gestionarLogo('base')">
                         <option value="No">No</option>
+                        <option value="Si">Sí (+ Configurar diseño)</option>
                     </select>
                 </div>
-                
-                <!-- MODIFICADO: Agregamos ID al contenedor y cambiamos el título -->
-                <div class="controles-config" id="contenedor_color_logo_base">
-                    <label for="sel_color_logo_base">Color de logotipo:</label>
-                    <select id="sel_color_logo_base"></select>
+                <div id="resumen_logo_base" style="display: none; background: #fffafb; padding: 12px; border-radius: 8px; border: 1px dashed var(--rosa-principal); margin-bottom: 15px; font-size: 0.85rem;">
+                    <p style="margin: 0; color: var(--texto-oscuro);"><strong>Color:</strong> <span id="res_color_base"></span></p>
+                    <p style="margin: 3px 0 0 0; color: var(--texto-oscuro);"><strong>Archivo:</strong> <span id="res_archivo_base"></span></p>
+                    <button type="button" onclick="abrirModalLogo('base')" style="background: none; border: none; color: var(--rosa-principal); font-weight: bold; padding: 0; margin-top: 8px; cursor: pointer;">Editar configuración ✏️</button>
                 </div>
+                
                 <br>
                 <button class="btn-agregar" onclick="agregarBaseConfigAlCarrito()">Agregar al Carrito</button>
             </div>
@@ -186,21 +185,17 @@
                     </select>
                 </div>
 
-                <!-- NUEVO: Pregunta si lleva logo -->
                 <div class="controles-config">
-                    <label for="sel_tiene_logo_pastel">Personalizada con logotipo:</label>
-                    <select id="sel_tiene_logo_pastel" onchange="toggleColorLogo('pastel')">
-                        <option value="Si">Sí</option>
+                    <label>Personalizada con logotipo:</label>
+                    <select id="sel_tiene_logo_pastel" onchange="gestionarLogo('pastel')">
                         <option value="No">No</option>
+                        <option value="Si">Sí (+ Configurar diseño)</option>
                     </select>
                 </div>
-
-                <!-- MODIFICADO: Agregamos ID al contenedor y cambiamos el título -->
-                <div class="controles-config" id="contenedor_color_logo_pastel">
-                    <label for="sel_color_logo_pastel">Color de logotipo:</label>
-                    <select id="sel_color_logo_pastel">
-                        <!-- Se llena automáticamente con JS -->
-                    </select>
+                <div id="resumen_logo_pastel" style="display: none; background: #fffafb; padding: 12px; border-radius: 8px; border: 1px dashed var(--rosa-principal); margin-bottom: 15px; font-size: 0.85rem;">
+                    <p style="margin: 0; color: var(--texto-oscuro);"><strong>Color:</strong> <span id="res_color_pastel"></span></p>
+                    <p style="margin: 3px 0 0 0; color: var(--texto-oscuro);"><strong>Archivo:</strong> <span id="res_archivo_pastel"></span></p>
+                    <button type="button" onclick="abrirModalLogo('pastel')" style="background: none; border: none; color: var(--rosa-principal); font-weight: bold; padding: 0; margin-top: 8px; cursor: pointer;">Editar configuración ✏️</button>
                 </div>
 
                 <div class="controles-config">
@@ -283,21 +278,17 @@
                     </p>
                 </div>
 
-                <!-- NUEVO: Pregunta si lleva logo -->
-                <div class="controles-config">
-                    <label for="sel_tiene_logo_cupcake">Personalizada con logotipo:</label>
-                    <select id="sel_tiene_logo_cupcake" onchange="toggleColorLogo('cupcake')">
-                        <option value="Si">Sí</option>
+               <div class="controles-config">
+                    <label>Personalizada con logotipo:</label>
+                    <select id="sel_tiene_logo_cupcake" onchange="gestionarLogo('cupcake')">
                         <option value="No">No</option>
+                        <option value="Si">Sí (+ Configurar diseño)</option>
                     </select>
                 </div>
-
-                <!-- MODIFICADO: Agregamos ID al contenedor y cambiamos el título -->
-                <div class="controles-config" id="contenedor_color_logo_cupcake">
-                    <label for="sel_color_logo_cupcake">Color de logotipo:</label>
-                    <select id="sel_color_logo_cupcake">
-                        <!-- Se llena automáticamente con JS -->
-                    </select>
+                <div id="resumen_logo_cupcake" style="display: none; background: #fffafb; padding: 12px; border-radius: 8px; border: 1px dashed var(--rosa-principal); margin-bottom: 15px; font-size: 0.85rem;">
+                    <p style="margin: 0; color: var(--texto-oscuro);"><strong>Color:</strong> <span id="res_color_cupcake"></span></p>
+                    <p style="margin: 3px 0 0 0; color: var(--texto-oscuro);"><strong>Archivo:</strong> <span id="res_archivo_cupcake"></span></p>
+                    <button type="button" onclick="abrirModalLogo('cupcake')" style="background: none; border: none; color: var(--rosa-principal); font-weight: bold; padding: 0; margin-top: 8px; cursor: pointer;">Editar configuración ✏️</button>
                 </div>
 
                 <!-- CAMBIO 2: Redes sociales (igual que en Cajas para Pastel) -->
@@ -487,6 +478,45 @@
         <button type="button" onclick="cerrarModalDireccion()" style="width: 100%; background: #e87b9e; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">Guardar Dirección</button>
     </div>
 </div>
+
+    <!-- =========================================
+         MODAL: SUB-VENTANA DE LOGOTIPO
+         ========================================= -->
+    <div id="modal-logo" class="modal">
+        <div class="modal-contenido" style="max-width: 400px; margin: 15vh auto; padding: 25px;">
+            <span class="cerrar" onclick="cerrarModalLogo()">&times;</span>
+            <h3 style="color: var(--rosa-principal); text-align: center; margin-bottom: 15px;">🖼️ Configurar Logotipo</h3>
+            
+            <div class="controles-config">
+                <label style="font-weight: bold; margin-bottom: 5px; display: block;">1. Elige el color del logo:</label>
+                <select id="modal_logo_color" style="width: 100%; padding: 12px; border: 2px solid var(--borde-suave); border-radius: 8px; font-family: 'Poppins'; margin-bottom: 15px;">
+                    <!-- Se llena con JS -->
+                </select>
+            </div>
+
+            <div class="controles-config">
+                <label style="font-weight: bold; margin-bottom: 5px; display: block;">2. ¿Tienes tu logo vectorizado?</label>
+                <select id="modal_logo_vector" onchange="actualizarAvisoVector()" style="width: 100%; padding: 12px; border: 2px solid var(--borde-suave); border-radius: 8px; font-family: 'Poppins'; margin-bottom: 10px;">
+                    <option value="Si">Sí</option>
+                    <option value="No">No(+$500 MXN)</option>
+                </select>
+            </div>
+
+            <p id="aviso_vector" style="font-size: 0.75rem; color: #d35400; background: #fdfae3; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #f9e79f; font-weight: 600;">
+                ⚠️ Nota: Los archivos están sujetos a revisión técnica. Si tu PDF no está correctamente vectorizado, nos pondremos en contacto contigo.
+            </p>
+
+            <div class="controles-config">
+                <label style="font-weight: bold; margin-bottom: 5px; display: block;">3. Sube tu archivo:</label>
+                <input type="file" id="modal_logo_archivo" accept=".ai,.eps,.pdf,.jpg,.png,.jpeg" style="width: 100%; padding: 10px; font-size: 0.85rem; border: 1px dashed var(--rosa-principal); border-radius: 8px; margin-bottom: 5px;">
+                <p style="font-size: 0.7rem; color: var(--texto-secundario); margin-bottom: 20px;">* El archivo físico se lo enviarás a Minuit por WhatsApp al confirmar tu pedido.</p>
+            </div>
+
+            <button type="button" onclick="guardarLogoModal()" style="width: 100%; background: var(--rosa-gradiente); color: white; padding: 14px; border: none; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; box-shadow: var(--sombra-boton);">
+                💾 Guardar Configuración
+            </button>
+        </div>
+    </div>
     
     <div id="toast-container"></div>
 
