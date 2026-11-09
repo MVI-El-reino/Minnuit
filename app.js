@@ -84,6 +84,13 @@ const opcionesOriginales = {};
 // Configuración única de los menús Choices (la misma al arrancar y al reconstruirlos)
 const CONFIG_MENU = { searchEnabled: false, itemSelectText: "", shouldSort: false, position: "auto" };
 
+
+// === NUEVA FUNCIÓN: Al hacer clic en la barra, auto-escribe la cantidad ===
+function forzarMayoreo(inputId, cantidad) {
+    document.getElementById(inputId).value = cantidad;
+    actualizarConfiguradorPasteles();
+}
+
 // Reemplaza las opciones de un menú. No edita la lista que ya está dibujada: quita el menú anterior,
 // deja el <select> nativo solo con las opciones nuevas y crea el menú otra vez.
 // Así nunca se acumulan opciones ni queda un menú viejo en pantalla.
@@ -163,6 +170,16 @@ function inicializarTienda() {
             position: 'auto' 
         });
     });
+    
+    // === NUEVO: Cargar el borrador del carrito si existe ===
+    const carritoGuardado = localStorage.getItem('minuit_carrito_borrador');
+    if (carritoGuardado) {
+        carrito = JSON.parse(carritoGuardado);
+        if(carrito.length > 0) {
+            actualizarVistaCarrito();
+            animarBotónCarrito();
+        }
+    }
     
     actualizarConfiguradorBases(); 
     actualizarConfiguradorCupcakes();
@@ -467,11 +484,17 @@ function actualizarConfiguradorPasteles() {
     let cantidadTotalEvaluada = totalEnCarrito + cantidadActual;
 
     let indicePrecio = 0; 
-    let nivelTexto = "Menudeo (10-39 pzas)";
 
-    if (cantidadTotalEvaluada >= 40 && cantidadTotalEvaluada <= 79) { indicePrecio = 1; nivelTexto = "1er Mayoreo (40-79 pzas)"; }
-    else if (cantidadTotalEvaluada >= 80 && cantidadTotalEvaluada <= 149) { indicePrecio = 2; nivelTexto = "2do Mayoreo (80-149 pzas)"; }
-    else if (cantidadTotalEvaluada >= 150) { indicePrecio = 3; nivelTexto = "3er Mayoreo (+150 pzas)"; }
+    if (cantidadTotalEvaluada >= 40 && cantidadTotalEvaluada <= 79) { indicePrecio = 1; }
+    else if (cantidadTotalEvaluada >= 80 && cantidadTotalEvaluada <= 149) { indicePrecio = 2; }
+    else if (cantidadTotalEvaluada >= 150) { indicePrecio = 3; }
+
+    // === NUEVO: Sincronización visual de los botones de mayoreo ===
+    const botonesMayoreo = document.querySelectorAll('#selector_mayoreo_pastel .btn-mayoreo');
+    if (botonesMayoreo.length > 0) {
+        botonesMayoreo.forEach(btn => btn.classList.remove('active'));
+        botonesMayoreo[indicePrecio].classList.add('active');
+    }
 
     const tipo = tipoObj.value;
     const redes = document.getElementById("sel_redes_pastel").value;
@@ -508,7 +531,6 @@ function actualizarConfiguradorPasteles() {
     precioPastelActual = precioBase;
     
     document.getElementById("precio_config_pastel").innerText = `$${precioPastelActual.toFixed(2)} MXN`;
-    document.getElementById("indicador_mayoreo").innerText = `Nivel Activo: ${nivelTexto}`;
 }
 
 function agregarPastelConfigAlCarrito() {
@@ -804,6 +826,9 @@ function actualizarVistaCarrito() {
 
     if(alertaPiezas) alertaPiezas.innerHTML = bannerMayoreoHTML + advertenciaHTML;
     if(btnPedido) btnPedido.disabled = bloqueado;
+
+    // === NUEVO: Guardar el carrito actual en el celular del cliente ===
+    localStorage.setItem('minuit_carrito_borrador', JSON.stringify(carrito));
 }
 
 function abrirModal() {
@@ -1500,6 +1525,7 @@ function abrirWhatsAppYLimpiar(textoWhatsApp) {
     let linkWhatsApp = `https://wa.me/${numeroDueno}?text=${textoCodificado}`;
 
     carrito = [];
+    localStorage.removeItem('minuit_carrito_borrador');
     actualizarVistaCarrito();
     cerrarModal();          
     cerrarModalDatos();     
