@@ -28,6 +28,42 @@
 * {
     -webkit-tap-highlight-color: transparent !important;
 }
+/* =========================================
+   ANIMACIÓN DE ENTRADA
+   ========================================= */
+#pantalla-carga {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--rosa-claro);
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* La pantalla desaparece después de 2.5 segundos */
+    animation: ocultarCarga 0.5s ease 2.5s forwards;
+}
+
+.corazon-animado {
+    width: 100px;
+    height: 100px;
+    fill: transparent;
+    stroke: var(--rosa-principal);
+    stroke-width: 3;
+    stroke-dasharray: 300;
+    stroke-dashoffset: 300;
+    /* Dibuja la línea en 2s, y luego lo rellena de color */
+    animation: dibujarCorazon 1.8s ease forwards, rellenarCorazon 0.5s ease 1.8s forwards;
+}
+
+@keyframes dibujarCorazon {
+    to { stroke-dashoffset: 0; }
+}
+@keyframes rellenarCorazon {
+    to { fill: var(--rosa-principal); stroke-width: 0; transform: scale(1.1); }
+}
+@keyframes ocultarCarga {
+    to { opacity: 0; visibility: hidden; }
+}
 
 /* 2. Forzamos a que NINGUNA tarjeta intente encogerse jamás */
 .card-producto:active,
