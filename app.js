@@ -85,10 +85,15 @@ const opcionesOriginales = {};
 const CONFIG_MENU = { searchEnabled: false, itemSelectText: "", shouldSort: false, position: "auto" };
 
 
-// === NUEVA FUNCIÓN: Al hacer clic en la barra, auto-escribe la cantidad ===
-function forzarMayoreo(inputId, cantidad) {
-    document.getElementById(inputId).value = cantidad;
-    actualizarConfiguradorPasteles();
+// === NUEVA FUNCIÓN: Guía de mayoreo ===
+function mostrarInfoMayoreo(nivel) {
+    let mensaje = "";
+    if (nivel === 1) mensaje = "Menudeo: 10 a 39 piezas. (Puedes combinar tamaños)";
+    if (nivel === 2) mensaje = "1er Mayoreo: 40 a 79 piezas. (Puedes combinar tamaños)";
+    if (nivel === 3) mensaje = "2do Mayoreo: 80 a 149 piezas. (Puedes combinar tamaños)";
+    if (nivel === 4) mensaje = "3er Mayoreo: 150 piezas en adelante. (Puedes combinar tamaños)";
+    
+    mostrarAlerta(`💡 ${mensaje}`);
 }
 
 // Reemplaza las opciones de un menú. No edita la lista que ya está dibujada: quita el menú anterior,
@@ -583,7 +588,7 @@ function agregarPastelConfigAlCarrito() {
 function eliminarDelCarrito(index) {
     carrito.splice(index, 1);
     mostrarAlerta("❌ Artículo eliminado");
-    actualizarCarrito();
+    actualizarVistaCarrito(); // <-- Esta era la palabra correcta
     if(carrito.length === 0) { cerrarModal(); }
 }
 
@@ -835,8 +840,11 @@ function abrirModal() {
     if(carrito.length === 0) return mostrarAlerta(" Tu carrito está vacío.");
     document.getElementById("modal-carrito").style.display = "block";
 }
+
 function cerrarModal() {
     document.getElementById("modal-carrito").style.display = "none";
+    // Forzamos actualización visual al regresar a la tienda
+    actualizarConfiguradorPasteles(); 
 }
 
 function abrirModalDatos() {
