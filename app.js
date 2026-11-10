@@ -257,10 +257,8 @@ function gestionarLogo(tipo) {
 
 function abrirModalLogo(tipo) {
     tipoLogoActivo = tipo;
-    const selectColor = document.getElementById("modal_logo_color");
-    selectColor.innerHTML = "";
 
-    // Cargar colores dependiendo del producto
+    // 1. Cargar colores dependiendo del producto
     let colores = [];
     if (tipo === 'base') {
         const linea = document.getElementById("sel_linea_base").value;
@@ -269,17 +267,26 @@ function abrirModalLogo(tipo) {
         colores = coloresLogotipoPastel;
     }
 
-    colores.forEach(c => {
-        selectColor.add(new Option(c.charAt(0).toUpperCase() + c.slice(1), c));
-    });
+    // 2. Construir las opciones en el formato que exige Choices.js
+    let opcionesColor = colores.map((c, index) => ({
+        value: c, 
+        label: c.charAt(0).toUpperCase() + c.slice(1), 
+        selected: index === 0 // Dejamos el primer color preseleccionado
+    }));
 
+    // 3. Inyectar las opciones usando nuestra función animada
+    reemplazarOpciones("modal_logo_color", opcionesColor);
+
+    // 4. Limpiar el archivo subido
     document.getElementById("modal_logo_archivo").value = ""; 
-    document.getElementById("modal_logo_vector").value = "Si";
+    
+    // 5. Reiniciar visualmente el menú de Vectorizado a "Sí"
+    resetearSelect("modal_logo_vector", 0);
+    
     actualizarAvisoVector();
     
     document.getElementById("modal-logo").style.display = "block";
 }
-
 function cerrarModalLogo() {
     document.getElementById("modal-logo").style.display = "none";
     // Si lo cerró sin guardar, regresamos el select a "No" para evitar errores
