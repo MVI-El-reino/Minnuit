@@ -373,11 +373,9 @@ function actualizarConfiguradorBases() {
     const linea = lineaSelect.value;
     const grosorSelect = document.getElementById("sel_grosor_base");
     const tamanoSelect = document.getElementById("sel_tamano_base");
-    const selectColor = document.getElementById("sel_color_logo_base");
 
     const grosorActual = grosorSelect.value;
     const tamanoActual = tamanoSelect.value;
-    const colorActual = selectColor.value;
 
     const tamanosDisponibles = (opcionesOriginales[tamanoSelect.id] || Array.from(tamanoSelect.options).map(opt => opt.value));
     const grosoresDisponibles = (opcionesOriginales[grosorSelect.id] || Array.from(grosorSelect.options).map(opt => opt.value));
@@ -396,13 +394,6 @@ function actualizarConfiguradorBases() {
             value: val, label: `${val} - $${precios[val][tamanoActual]}`, selected: (val === grosorActual)
         }));
         reemplazarOpciones("sel_grosor_base", opcionesGrosor);
-    }
-
-    if (instanciasSelect["sel_color_logo_base"]) {
-        let opcionesColor = coloresLogotipo[linea].map(color => ({
-            value: color, label: color.charAt(0).toUpperCase() + color.slice(1), selected: (color === colorActual)
-        }));
-        reemplazarOpciones("sel_color_logo_base", opcionesColor);
     }
 
     precioBaseActual = precios[grosorActual][tamanoActual];
