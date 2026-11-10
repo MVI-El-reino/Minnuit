@@ -414,19 +414,10 @@ function agregarBaseConfigAlCarrito() {
     const grosor = document.getElementById("sel_grosor_base").value;
     const tamano = document.getElementById("sel_tamano_base").value;
     const forma = document.getElementById("sel_forma_base").value;
-    
-    const tieneLogo = document.getElementById("sel_tiene_logo_base").value;
-    const colorLogoRaw = document.getElementById("sel_color_logo_base").value;
-    const colorLogo = tieneLogo === "Si" ? colorLogoRaw : "Sin logotipo";
-    
     const cantidad = parseInt(document.getElementById("cant_base_config").value);
 
-    const nombreCompuesto = `Bases ${linea} ${forma} ${grosor} ${tamano}`;
-    const detalleCompuesto = `Logo: ${colorLogo}`;
-    
-    const index = carrito.findIndex(item => item.nombre === nombreCompuesto && item.detalle === detalleCompuesto);
-    // === LÓGICA DE COBRO DE VECTORIZACIÓN Y EXTRACCIÓN DE DATOS ===
-    const tieneLogo = document.getElementById("sel_tiene_logo_base").value; // Cambia '_base' por '_pastel' o '_cupcake' según corresponda
+    // === LÓGICA UNIFICADA DEL LOGO Y COBRO ===
+    const tieneLogo = document.getElementById("sel_tiene_logo_base").value;
     let colorLogo = "Sin logotipo";
     let textoExtraLogo = "";
 
@@ -436,7 +427,6 @@ function agregarBaseConfigAlCarrito() {
         colorLogo = logoDataActual.base.color;
         textoExtraLogo = ` | Archivo: ${logoDataActual.base.archivo}`;
         
-        // Si necesita vector, lo cobramos solo si no lo hemos cobrado antes
         if (logoDataActual.base.necesitaVector) {
             const yaSeCobroVector = carrito.some(item => item.nombre === "Servicio de Vectorización de Logo");
             if (!yaSeCobroVector) {
@@ -444,6 +434,11 @@ function agregarBaseConfigAlCarrito() {
             }
         }
     }
+
+    const nombreCompuesto = `Bases ${linea} ${forma} ${grosor} ${tamano}`;
+    const detalleCompuesto = `Logo: ${colorLogo}${textoExtraLogo}`;
+    
+    const index = carrito.findIndex(item => item.nombre === nombreCompuesto && item.detalle === detalleCompuesto);
     if (index !== -1) {
         carrito[index].cantidad += cantidad;
         carrito[index].subtotal = carrito[index].cantidad * precioBaseActual;
@@ -456,7 +451,7 @@ function agregarBaseConfigAlCarrito() {
     resetearSelect("sel_tamano_base");
     resetearSelect("sel_forma_base");
     resetearSelect("sel_tiene_logo_base");
-    toggleColorLogo('base'); // Regresa la caja de color a la normalidad
+    toggleColorLogo('base'); 
     
     document.getElementById("cant_base_config").value = "1"; 
     actualizarConfiguradorBases();
@@ -548,37 +543,32 @@ function agregarCupcakeConfigAlCarrito() {
     const redes = document.getElementById("sel_redes_cupcake").value;
     const extraInfo = document.getElementById("detalle_cupcake1").value || "Sin notas extra";
 
+    // === LÓGICA UNIFICADA DEL LOGO Y COBRO ===
     const tieneLogo = document.getElementById("sel_tiene_logo_cupcake").value;
-    const colorLogoRaw = document.getElementById("sel_color_logo_cupcake").value;
-    const colorLogo = tieneLogo === "Si" ? colorLogoRaw : "Sin logotipo";
-
-    const cantidadCupcakes = tamano === "31cm" ? "4" : "2";
-    const nombre = `Caja (${cantidadCupcakes} Cupcakes) ${tamano}`;
-    
-    const soporteTexto = tieneSoporte ? `${SOPORTE_INTERNO_COLOR} (incluido)` : "No";
-    const detalle = `Soporte interior: ${soporteTexto} | Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
-
-    const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
-
-    // === LÓGICA DE COBRO DE VECTORIZACIÓN Y EXTRACCIÓN DE DATOS ===
-    const tieneLogo = document.getElementById("sel_tiene_logo_base").value; // Cambia '_base' por '_pastel' o '_cupcake' según corresponda
     let colorLogo = "Sin logotipo";
     let textoExtraLogo = "";
 
     if (tieneLogo === "Si") {
-        if (!logoDataActual.base.configurado) return mostrarAlerta("⚠️ Por favor configura tu logotipo antes de agregar al carrito.");
+        if (!logoDataActual.cupcake.configurado) return mostrarAlerta("⚠️ Por favor configura tu logotipo antes de agregar al carrito.");
         
-        colorLogo = logoDataActual.base.color;
-        textoExtraLogo = ` | Archivo: ${logoDataActual.base.archivo}`;
+        colorLogo = logoDataActual.cupcake.color;
+        textoExtraLogo = ` | Archivo: ${logoDataActual.cupcake.archivo}`;
         
-        // Si necesita vector, lo cobramos solo si no lo hemos cobrado antes
-        if (logoDataActual.base.necesitaVector) {
+        if (logoDataActual.cupcake.necesitaVector) {
             const yaSeCobroVector = carrito.some(item => item.nombre === "Servicio de Vectorización de Logo");
             if (!yaSeCobroVector) {
                 carrito.push({ nombre: "Servicio de Vectorización de Logo", cantidad: 1, precio: 500, subtotal: 500, detalle: "Pago único por diseño y preparación de archivos." });
             }
         }
     }
+
+    const cantidadCupcakes = tamano === "31cm" ? "4" : "2";
+    const nombre = `Caja (${cantidadCupcakes} Cupcakes) ${tamano}`;
+    
+    const soporteTexto = tieneSoporte ? `${SOPORTE_INTERNO_COLOR} (incluido)` : "No";
+    const detalle = `Soporte interior: ${soporteTexto} | Logo: ${colorLogo}${textoExtraLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
+
+    const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
     if (index !== -1) {
         carrito[index].cantidad += cantidad;
         carrito[index].subtotal = carrito[index].cantidad * precioCupcakeActual;
@@ -588,9 +578,8 @@ function agregarCupcakeConfigAlCarrito() {
 
     resetearSelect("sel_tamano_cupcake");
     resetearSelect("sel_tiene_logo_cupcake");
-    resetearSelect("sel_color_logo_cupcake");
     resetearSelect("sel_redes_cupcake");
-    toggleColorLogo('cupcake'); // Regresa la caja de color a la normalidad
+    toggleColorLogo('cupcake'); 
     
     document.getElementById("detalle_cupcake1").value = "";
     document.getElementById("cant_cupcake_config").value = "5";
@@ -676,34 +665,29 @@ function agregarPastelConfigAlCarrito() {
     const redes = document.getElementById("sel_redes_pastel").value;
     const extraInfo = document.getElementById("detalle_pastel1").value || "Sin notas extra";
     
+    // === LÓGICA UNIFICADA DEL LOGO Y COBRO ===
     const tieneLogo = document.getElementById("sel_tiene_logo_pastel").value;
-    const colorLogoRaw = document.getElementById("sel_color_logo_pastel").value;
-    const colorLogo = tieneLogo === "Si" ? colorLogoRaw : "Sin logotipo";
-    
-    const nombre = `Caja Pastel ${tipo} (${tamano})`;
-    const detalle = `Logo: ${colorLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
-    
-    const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
-
-    // === LÓGICA DE COBRO DE VECTORIZACIÓN Y EXTRACCIÓN DE DATOS ===
-    const tieneLogo = document.getElementById("sel_tiene_logo_base").value; // Cambia '_base' por '_pastel' o '_cupcake' según corresponda
     let colorLogo = "Sin logotipo";
     let textoExtraLogo = "";
 
     if (tieneLogo === "Si") {
-        if (!logoDataActual.base.configurado) return mostrarAlerta("⚠️ Por favor configura tu logotipo antes de agregar al carrito.");
+        if (!logoDataActual.pastel.configurado) return mostrarAlerta("⚠️ Por favor configura tu logotipo antes de agregar al carrito.");
         
-        colorLogo = logoDataActual.base.color;
-        textoExtraLogo = ` | Archivo: ${logoDataActual.base.archivo}`;
+        colorLogo = logoDataActual.pastel.color;
+        textoExtraLogo = ` | Archivo: ${logoDataActual.pastel.archivo}`;
         
-        // Si necesita vector, lo cobramos solo si no lo hemos cobrado antes
-        if (logoDataActual.base.necesitaVector) {
+        if (logoDataActual.pastel.necesitaVector) {
             const yaSeCobroVector = carrito.some(item => item.nombre === "Servicio de Vectorización de Logo");
             if (!yaSeCobroVector) {
                 carrito.push({ nombre: "Servicio de Vectorización de Logo", cantidad: 1, precio: 500, subtotal: 500, detalle: "Pago único por diseño y preparación de archivos." });
             }
         }
     }
+    
+    const nombre = `Caja Pastel ${tipo} (${tamano})`;
+    const detalle = `Logo: ${colorLogo}${textoExtraLogo} | Redes: ${redes} | Notas: ${extraInfo}`;
+    
+    const index = carrito.findIndex(item => item.nombre === nombre && item.detalle === detalle);
     if (index !== -1) {
         carrito[index].cantidad += cantidad;
         carrito[index].subtotal = carrito[index].cantidad * precioPastelActual;
@@ -719,9 +703,8 @@ function agregarPastelConfigAlCarrito() {
     resetearSelect("sel_tipo_pastel");
     actualizarOpcionesTamanoPastel();
     resetearSelect("sel_tiene_logo_pastel");
-    resetearSelect("sel_color_logo_pastel");
     resetearSelect("sel_redes_pastel");
-    toggleColorLogo('pastel'); // Regresa la caja de color a la normalidad
+    toggleColorLogo('pastel'); 
     
     document.getElementById("detalle_pastel1").value = "";
     document.getElementById("cant_pastel_config").value = "5"; 
@@ -732,7 +715,6 @@ function agregarPastelConfigAlCarrito() {
     mostrarAlerta(`🛒 ¡Cajas de Pastel agregadas!`);
     animarBotónCarrito();
 }
-
 // ==========================================
 // CONTROL DEL CARRITO
 // ==========================================
