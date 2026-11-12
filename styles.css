@@ -1061,18 +1061,18 @@ body { padding-bottom: 100px; }
 
 .tabs {
     display: flex;
+    justify-content: flex-start !important; /* MAGIA AQUÍ: Obliga a arrancar desde la izquierda, nunca centrado */
     overflow-x: auto;
     scroll-behavior: smooth;
-    /* Ocultamos la barra de scroll fea de abajo */
     -ms-overflow-style: none;
     scrollbar-width: none;
     
-    /* 👈 EL SECRETO: Márgenes internos forzados */
-    padding-left: 20px;  /* Evita que "Bases MDF" se corte a la izquierda */
-    padding-right: 40px; /* Espacio derecho para que no choque con la flecha */
+    padding-left: 20px !important;  
+    padding-right: 45px !important; 
     
     gap: 10px;
     width: 100%;
+    box-sizing: border-box !important; /* Evita que el padding rompa el ancho en celulares */
 }
 
 .tabs::-webkit-scrollbar {
