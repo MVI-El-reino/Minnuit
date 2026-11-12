@@ -1,15 +1,28 @@
 // ==========================================================================
-// REGISTRO DE CAMBIOS (20/10/2026)
-// 1. CUPCAKES - Soporte interno: se quitó el selector "Color del Soporte Interno".
-//    Ahora el color es fijo (constante SOPORTE_INTERNO_COLOR) y se le muestra al cliente
-//    solo si pide soporte. Si el cliente elige "No", el carrito dice "Soporte interior: No".
-// 2. CUPCAKES - Logotipo y redes: se agregaron "Color del Logotipo", "Redes Sociales",
-//    "Medida de Redes" y "Anota tus redes / Observaciones", igual que en Cajas para Pastel.
-// 3. PAGO - PayPal ahora se muestra como "Mercado Pago/PayPal (+5% de comisión)" en el menú
-//    y en el PDF (campo Pago y etiqueta de la comisión). El valor interno sigue siendo "PayPal".
-// 4. ENVÍO Y PAGO - Estos menús se dibujan con Choices, igual que los de los pedidos.
+// CONFIGURACIÓN DE FIREBASE (FASE 4)
 // ==========================================================================
+const firebaseConfig = {
+    apiKey: "AIzaSyB7X4u34sH2F9rmfSBvgVzOejK4TnCJ1MY",
+    authDomain: "minuit-a7053.firebaseapp.com",
+    projectId: "minuit-a7053",
+    storageBucket: "minuit-a7053.firebasestorage.app",
+    messagingSenderId: "326336600987",
+    appId: "1:326336600987:web:ab270c7cb2143719e21f3e"
+};
 
+// Inicializar Firebase (Versión Compat)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+let carrito = []; 
+let elClienteYaEntroADatos = false;
+
+
+
+// ==========================================================================
+//VARIABLES GLOBALES
+// ==========================================================================
 let carrito = [];
 let elClienteYaEntroADatos = false;
 const numeroDueno = "522215836232"; 
@@ -316,16 +329,17 @@ function guardarLogoModal() {
     const necesitaVector = document.getElementById("modal_logo_vector").value === "No";
     const fileInput = document.getElementById("modal_logo_archivo");
     
-    let archivoNombre = fileInput.files.length > 0 ? fileInput.files[0].name : "Se enviará por WhatsApp";
+    let archivoNombre = fileInput.files.length > 0 ? fileInput.files[0].name : "Sin archivo (WhatsApp)";
+    let archivoFisico = fileInput.files.length > 0 ? fileInput.files[0] : null;
 
     logoDataActual[tipoLogoActivo] = {
         color: color,
         necesitaVector: necesitaVector,
         archivo: archivoNombre,
+        archivoObj: archivoFisico, // <-- AQUÍ GUARDAMOS EL ARCHIVO REAL
         configurado: true
     };
 
-    // Actualizar el resumen visual en la tarjeta
     document.getElementById(`res_color_${tipoLogoActivo}`).innerText = color;
     let textoArchivo = archivoNombre;
     if (necesitaVector) textoArchivo += " (Requiere Vectorización +$500)";
