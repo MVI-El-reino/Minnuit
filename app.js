@@ -16,13 +16,13 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 
 // ==========================================================================
-// VARIABLES GLOBALES
+// VARIABLES GLOBALES Y PRECIOS
 // ==========================================================================
 let carrito = [];
 let elClienteYaEntroADatos = false;
 const numeroDueno = "522215836232"; 
 
-// Colores del PDF de la nota de pedido (ajústalos a los de tu marca)
+// Colores del PDF de la nota de pedido
 const COLOR_FONDO = [252, 240, 245];
 const COLOR_TEXTO = [60, 50, 55];
 const COLOR_PRINCIPAL = [245, 143, 176];
@@ -45,13 +45,8 @@ const coloresLogotipo = {
 };
 
 const cupcakesPreciosBase = { "21cm": 18, "31cm": 25 };
-// ==========================================
-// SOPORTE INTERNO DE CUPCAKES (CAMBIO 1)
-// La dueña ya no deja elegir el color: el cliente ve el color fijo y su costo.
-// Para cambiar el color o el precio, modifica SOLO estas dos líneas.
-// ==========================================
-const SOPORTE_INTERNO_COLOR = "Blanco";   // Color que se incluye cuando el cliente pide soporte
-const SOPORTE_INTERNO_PRECIO = 0;         // Costo extra del soporte (0 = gratis)
+const SOPORTE_INTERNO_COLOR = "Blanco";   
+const SOPORTE_INTERNO_PRECIO = 0;         
 
 const pastelesData = {
     "Petite": {
@@ -77,15 +72,10 @@ let precioBaseActual = 25;
 let precioCupcakeActual = 18;
 let precioPastelActual = 0;
 
-// === NUEVO: ALMACÉN DE MENÚS ANIMADOS ===
+// === MENÚS ANIMADOS Y ESTADO ORIGINAL ===
 const instanciasSelect = {};
-
-// Copia de las opciones originales de cada selector (se guarda una sola vez al cargar la página)
 const opcionesOriginales = {};
-
-// Configuración única de los menús Choices (la misma al arrancar y al reconstruirlos)
 const CONFIG_MENU = { searchEnabled: false, itemSelectText: "", shouldSort: false, position: "auto" };
-
 
 // === NUEVA FUNCIÓN: Guía de mayoreo ===
 function mostrarInfoMayoreo(nivel) {
