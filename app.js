@@ -15,13 +15,8 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-let carrito = []; 
-let elClienteYaEntroADatos = false;
-
-
-
 // ==========================================================================
-//VARIABLES GLOBALES
+// VARIABLES GLOBALES
 // ==========================================================================
 let carrito = [];
 let elClienteYaEntroADatos = false;
@@ -31,12 +26,6 @@ const numeroDueno = "522215836232";
 const COLOR_FONDO = [252, 240, 245];
 const COLOR_TEXTO = [60, 50, 55];
 const COLOR_PRINCIPAL = [245, 143, 176];
-
-// Usa tus variables ofuscadas de Telegram aquí
-const tokenParte1 = "AQUI_TU_NUMERO"; 
-const tokenParte2 = "AQUI_TUS_LETRAS"; 
-const TELEGRAM_BOT_TOKEN = tokenParte1 + ":" + tokenParte2; 
-const TELEGRAM_CHAT_ID = "PEGA_AQUI_TU_ID"; 
 
 const basesBasicPrecios = {
     "3mm": { "15cm": 25, "20cm": 35, "23cm": 38, "25cm": 40, "28cm": 45, "30cm": 50, "35cm": 65, "40cm": 80, "45cm": 110, "50cm": 125 },
