@@ -343,6 +343,108 @@
                 <button class="btn-agregar" onclick="agregarCupcakeConfigAlCarrito()">Agregar al Carrito</button>
             </div>
         </section>
+
+        <!-- ==============================
+             SECCIÓN 4: CAKE TOPPERS
+             ============================== -->
+        <section id="cake_toppers" class="categoria-seccion">
+            <div class="card-producto card-configurador">
+                <div class="fila-precio-cantidad">
+                    <div class="precio-col">
+                        <span class="etiqueta-precio">PRECIO UNITARIO</span>
+                        <span class="etiqueta-iva">NO INCLUYE IVA</span>
+                        <p id="precio_config_topper" class="precio-grande">$0.00 MXN</p>
+                    </div>
+                    <div class="cantidad-col">
+                        <span class="etiqueta-precio">Cantidad</span>
+                        <div class="controles-cantidad">
+                            <input type="number" id="cant_topper_config" value="1" min="1" style="font-size: 16px;" onchange="validarManual('cant_topper_config', 1); actualizarConfiguradorToppers()" onkeyup="actualizarConfiguradorToppers()">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controles-config">
+                    <label for="sel_material_topper">Material:</label>
+                    <select id="sel_material_topper" style="font-size: 16px;" onchange="actualizarConfiguradorToppers()">
+                        <option value="MDF">MDF</option>
+                        <option value="Acrilico">Acrílico</option>
+                    </select>
+                </div>
+
+                <div class="controles-config">
+                    <label for="sel_color_topper">Color:</label>
+                    <select id="sel_color_topper" style="font-size: 16px;" onchange="actualizarConfiguradorToppers()">
+                        <option value="Dorado">Dorado Espejo</option>
+                        <option value="Plata">Plata Espejo</option>
+                        <option value="Negro">Negro</option>
+                        <option value="Madera">Color Madera</option>
+                    </select>
+                </div>
+
+                <div class="controles">
+                    <label for="detalle_topper">Texto o Diseño del Topper:</label>
+                    <input type="text" id="detalle_topper" placeholder="Ej. Feliz Cumpleaños / Felicidades Mamá">
+                </div>
+
+                <br>
+                <button class="btn-agregar" onclick="agregarTopperAlCarrito()">Agregar al Carrito</button>
+            </div>
+        </section>
+
+        <!-- ==============================
+             SECCIÓN 5: CHULO BOX
+             ============================== -->
+        <section id="chulo_box" class="categoria-seccion">
+            <div class="card-producto card-configurador">
+                <div class="fila-precio-cantidad">
+                    <div class="precio-col">
+                        <span class="etiqueta-precio">PRECIO UNITARIO</span>
+                        <span class="etiqueta-iva">NO INCLUYE IVA</span>
+                        <p id="precio_config_chulo" class="precio-grande">$0.00 MXN</p>
+                    </div>
+                    <div class="cantidad-col">
+                        <span class="etiqueta-precio">Cantidad</span>
+                        <div class="controles-cantidad">
+                            <input type="number" id="cant_chulo_config" value="5" min="5" style="font-size: 16px;" onchange="validarManual('cant_chulo_config', 5); actualizarConfiguradorChulo()" onkeyup="actualizarConfiguradorChulo()">
+                        </div>
+                    </div>
+                </div>
+
+                <p>Mínimo de compra: 5 piezas.</p>
+
+                <div class="controles-config">
+                    <label for="sel_tamano_chulo">Tamaño:</label>
+                    <select id="sel_tamano_chulo" style="font-size: 16px;" onchange="actualizarConfiguradorChulo()">
+                        <option value="Estandar">Estándar</option>
+                        <option value="Grande">Grande</option>
+                    </select>
+                </div>
+
+                <!-- Sub-ventana de logotipo igual a las otras -->
+                <div class="controles-config">
+                    <label>Personalizada con logotipo:</label>
+                    <select id="sel_tiene_logo_chulo" onchange="gestionarLogo('chulo')">
+                        <option value="No">No</option>
+                        <option value="Si">Sí (+ Configurar diseño)</option>
+                    </select>
+                </div>
+                <div id="resumen_logo_chulo" style="display: none; background: #fffafb; padding: 12px; border-radius: 8px; border: 1px dashed var(--rosa-principal); margin-bottom: 15px; font-size: 0.85rem;">
+                    <p style="margin: 0; color: var(--texto-oscuro);"><strong>Color:</strong> <span id="res_color_chulo"></span></p>
+                    <p style="margin: 3px 0 0 0; color: var(--texto-oscuro);"><strong>Archivo:</strong> <span id="res_archivo_chulo"></span></p>
+                    <button type="button" onclick="abrirModalLogo('chulo')" style="background: none; border: none; color: var(--rosa-principal); font-weight: bold; padding: 0; margin-top: 8px; cursor: pointer;">Editar configuración ✏️</button>
+                </div>
+
+                <div class="controles">
+                    <label for="detalle_chulo">Observaciones:</label>
+                    <input type="text" id="detalle_chulo" placeholder="Ej. Detalles extra o colores">
+                </div>
+
+                <br>
+                <button class="btn-agregar" onclick="agregarChuloAlCarrito()">Agregar al Carrito</button>
+            </div>
+        </section>
+
+        
     </main>
     <!-- =========================================
          PIE DE PÁGINA (REDES Y LEGALES)
