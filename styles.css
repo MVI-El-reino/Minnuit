@@ -1046,3 +1046,60 @@ body { padding-bottom: 100px; }
     font-size: 0.7rem;
     opacity: 0.7;
 }
+
+/* =========================================
+   CONTENEDOR DE TABS (EVITA CORTES EN MÓVIL)
+   ========================================= */
+.contenedor-tabs {
+    position: relative;
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.tabs {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    /* Ocultamos la barra de scroll fea de abajo */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    
+    /* 👈 EL SECRETO: Márgenes internos forzados */
+    padding-left: 20px;  /* Evita que "Bases MDF" se corte a la izquierda */
+    padding-right: 40px; /* Espacio derecho para que no choque con la flecha */
+    
+    gap: 10px;
+    width: 100%;
+}
+
+.tabs::-webkit-scrollbar {
+    display: none;
+}
+
+/* Evitamos que el texto de los botones se aplaste o se rompa en dos líneas */
+.tab-btn {
+    flex: 0 0 auto; 
+    white-space: nowrap;
+}
+
+/* Flecha indicadora con gradiente difuminado (color del fondo #fdf0f4) */
+.flecha-tabs {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 15px;
+    background: linear-gradient(to right, rgba(253,240,244,0) 0%, rgba(253,240,244,1) 70%);
+    color: var(--rosa-principal);
+    font-size: 20px;
+    font-weight: 800;
+    pointer-events: none; /* Permite que el usuario pueda tocar los botones que queden debajo */
+    z-index: 10;
+}
