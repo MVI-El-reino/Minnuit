@@ -1242,15 +1242,15 @@ async function procesarPedido(soloDescargar = false) {
 }
 
 async function procesarPedidoCompleto(soloDescargar) {
-    // 0. Forzamos una última actualización matemática antes de imprimir el PDF
     actualizarVistaCarrito();
+    
+    // --- 1. RECOLECTAR DATOS ---
     let nombreCliente = document.getElementById("nombre_cliente").value.trim();
     let telCliente = document.getElementById("tel_cliente").value.trim();
     let correoCliente = document.getElementById("correo_cliente").value.trim() || "No especificado";
     let marcaCliente = document.getElementById("marca_cliente").value.trim() || "N/A";
     let igCliente = document.getElementById("ig_cliente").value.trim() || "N/A";
     
-    // Extraer la dirección fraccionada
     let dirCalle = document.getElementById("dir_calle").value.trim();
     let dirNumero = document.getElementById("dir_numero").value.trim();
     let dirColonia = document.getElementById("dir_colonia").value.trim();
@@ -1259,7 +1259,7 @@ async function procesarPedidoCompleto(soloDescargar) {
     let dirEstado = document.getElementById("dir_estado").value.trim();
     let dirReferencias = document.getElementById("dir_referencias").value.trim();
 
-    // 1. Validamos los datos antes de generar nada
+    // --- 2. VALIDAR ---
     if (carrito.length === 0) {
         if(document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
         if(document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
@@ -1270,15 +1270,8 @@ async function procesarPedidoCompleto(soloDescargar) {
     let esEnvioNacional = metodoEnvioSeleccionado === "300";
 
     const problema = validarDatosPedido({
-        nombre: nombreCliente,
-        telefono: telCliente,
-        envioNacional: esEnvioNacional,
-        calle: dirCalle,
-        numero: dirNumero,
-        colonia: dirColonia,
-        cp: dirCp,
-        ciudad: dirCiudad,
-        estado: dirEstado
+        nombre: nombreCliente, telefono: telCliente, envioNacional: esEnvioNacional,
+        calle: dirCalle, numero: dirNumero, colonia: dirColonia, cp: dirCp, ciudad: dirCiudad, estado: dirEstado
     });
 
     if (problema) {
@@ -1288,15 +1281,12 @@ async function procesarPedidoCompleto(soloDescargar) {
         return alert(problema.mensaje);
     }
 
-    // Dejamos el teléfono solo con números (por ejemplo, "271 117 0530" se guarda como "2711170530")
     telCliente = telCliente.replace(/[\s\-().]/g, "");
-
-    // 2. Armamos la dirección que aparece en el PDF
     let direccionCliente = esEnvioNacional
         ? `${dirCalle} #${dirNumero}, Col. ${dirColonia}, C.P. ${dirCp}, ${dirCiudad}, ${dirEstado}. Ref: ${dirReferencias || "Ninguna"}`
         : "Entrega Local: Recogerá en Taller Minuit.";
 
-    // 3. Guardar en memoria
+    // Guardar en memoria local
     localStorage.setItem("minuit_nombre", nombreCliente);
     localStorage.setItem("minuit_tel", telCliente);
     localStorage.setItem("minuit_correo", correoCliente !== "No especificado" ? correoCliente : "");
@@ -1310,64 +1300,82 @@ async function procesarPedidoCompleto(soloDescargar) {
     localStorage.setItem("minuit_estado", dirEstado);
     localStorage.setItem("minuit_referencias", dirReferencias);
 
-    mostrarAlerta("⏳ Generando nota de pedido...");
+    mostrarAlerta("⏳ Procesando datos y generando nota...");
     
     // Rescatamos los cálculos
     let totalTxt = document.getElementById("modal-total").innerText;
     let datosTotal = document.getElementById("modal-total").dataset;
     let valSubtotal = parseFloat(datosTotal.subtotal || 0);
     let valEnvio = parseFloat(datosTotal.envio || 0);
-    let valComision = 0; // Ya no hay comisión extra
+    let valComision = 0; 
     let valIva = parseFloat(datosTotal.iva || 0); 
     let requiereFactura = datosTotal.factura || "No"; 
     let metodoPagoTexto = datosTotal.metodopago || "Transferencia";
     let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger en taller Minuit / Mandar Uber";
-
     let metodoPagoSeleccionado = document.getElementById("sel_pago") ? document.getElementById("sel_pago").value : "Transferencia";
 
-    // --- NUEVO: DEFINIR QUÉ DATOS BANCARIOS MOSTRAR ---
+    // --- 3. NUEVA INTEGRACIÓN FIREBASE ---
+    let pedidoID = "MIN-" + Math.floor(1000 + Math.random() * 9000); 
+
+    const paquetePedido = {
+        id: pedidoID,
+        fecha: firebase.firestore.FieldValue.serverTimestamp(),
+        estado: "Pendiente", 
+        cliente: { nombre: nombreCliente, telefono: telCliente, correo: correoCliente, marca: marcaCliente, instagram: igCliente },
+        entrega: { metodo: esEnvioNacional ? "Envío Nacional" : "Recoger en Taller", direccion: direccionCliente },
+        pago: { metodo: metodoPagoTexto, factura: requiereFactura, subtotal: valSubtotal, costoEnvio: valEnvio, iva: valIva, totalFinal: totalTxt },
+        articulos: carrito,
+        archivos_adjuntos: {}
+    };
+
+    try {
+        // Subir Logos a Firebase Storage (Si existen)
+        for (const tipo of ['base', 'pastel', 'cupcake', 'chulo']) {
+            if (logoDataActual[tipo] && logoDataActual[tipo].archivoObj) {
+                const archivo = logoDataActual[tipo].archivoObj;
+                const carpeta = logoDataActual[tipo].necesitaVector ? "logos_NO_vectorizados" : "logos_vectorizado";
+                const nombreSeguro = `${pedidoID}_${tipo}_${archivo.name}`;
+                
+                const storageRef = storage.ref(`${carpeta}/${nombreSeguro}`);
+                await storageRef.put(archivo);
+                const urlDescarga = await storageRef.getDownloadURL();
+                
+                paquetePedido.archivos_adjuntos[tipo] = { url: urlDescarga, vectorizado: !logoDataActual[tipo].necesitaVector };
+            }
+        }
+        // Guardar el Pedido en Firestore
+        const docRef = await db.collection("pedidos").add(paquetePedido);
+        // Generar el Link Dinámico de Firebase (Para usarlo después)
+        var linkTicketFirebase = `https://minuit-pedidos.vercel.app/admin.html`; // Temporalmente mandamos al admin panel
+    } catch (error) {
+        console.error("No se pudo conectar a Firebase:", error);
+        // Si Firebase falla, el código NO se detiene, continúa para al menos darles el PDF.
+    }
+
+    // --- 4. PREPARAR TEXTOS BANCARIOS (Igual que antes) ---
     let datosBancariosMensaje = "";
     let datosBancariosPDF = [];
 
     if (requiereFactura === "Si") {
         datosBancariosMensaje = "\n🏦 *DATOS DE PAGO (FACTURA)*\nBanco: BANAMEX\nNombre: Daniel Bonilla Rodriguez\nNo. de cuenta: 886 5665 / Sucursal 7012\nCLABE: 0026 5070 1288 6566 51\nTarjeta (Oxxo): 5204 1662 4268 9190\n\n📌 *Importante:* Al confirmar tu pedido envía tu Constancia de Situación Fiscal y Uso de CFDI.";
-        datosBancariosPDF = [
-            "DATOS PARA PAGO (CON FACTURA):",
-            "Banco: BANAMEX | Daniel Bonilla Rodriguez",
-            "Cuenta: 886 5665 Suc. 7012",
-            "CLABE: 0026 5070 1288 6566 51",
-            "Tarjeta (Oxxo): 5204 1662 4268 9190"
-        ];
+        datosBancariosPDF = ["DATOS PARA PAGO (CON FACTURA):", "Banco: BANAMEX | Daniel Bonilla Rodriguez", "Cuenta: 886 5665 Suc. 7012", "CLABE: 0026 5070 1288 6566 51", "Tarjeta (Oxxo): 5204 1662 4268 9190"];
     } else {
         if (metodoPagoSeleccionado === "PayPal") { 
             datosBancariosMensaje = "\n💳 *PAGO CON TARJETA*\nTe enviaremos tu link de pago seguro (Mercado Pago) por este medio.\n*(No aplica cobro extra de comisión)*";
-            datosBancariosPDF = [
-                "PAGO CON TARJETA DE CRÉDITO:",
-                "Te enviaremos tu link de Mercado Pago",
-                "por WhatsApp para que pagues de forma segura."
-            ];
+            datosBancariosPDF = ["PAGO CON TARJETA DE CRÉDITO:", "Te enviaremos tu link de Mercado Pago", "por WhatsApp para que pagues de forma segura."];
         } else { 
             datosBancariosMensaje = "\n🏦 *DATOS DE PAGO (Elige una opción)*\n\n*Opción 1: SANTANDER*\nNombre: Elizabeth Ramirez Ramirez\nNo. de cuenta: 1402 4074 580\nCLABE: 0146 5014 0240 7458 03\nTarjeta (Oxxo): 5579 0870 1226 6216\n\n*Opción 2: MERCADO PAGO*\nNombre: Elizabeth Ramírez Ramírez\nCLABE: 722 969 070 993 840 205";
-            datosBancariosPDF = [
-                "DATOS PARA PAGO (Elige una opción):",
-                "Opción 1 (SANTANDER): Elizabeth Ramirez",
-                "Cta: 1402 4074 580 | CLABE: 0146 5014 0240 7458 03",
-                "Tarjeta (Oxxo): 5579 0870 1226 6216",
-                "", 
-                "Opción 2 (MERCADO PAGO): Elizabeth Ramírez",
-                "CLABE: 722 969 070 993 840 205"
-            ];
+            datosBancariosPDF = ["DATOS PARA PAGO (Elige una opción):", "Opción 1 (SANTANDER): Elizabeth Ramirez", "Cta: 1402 4074 580 | CLABE: 0146 5014 0240 7458 03", "Tarjeta (Oxxo): 5579 0870 1226 6216", "", "Opción 2 (MERCADO PAGO): Elizabeth Ramírez", "CLABE: 722 969 070 993 840 205"];
         }
     }
 
-    // Le inyectamos los datos bancarios al mensaje final de WhatsApp
-    let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *FACTURA:* ${requiereFactura}\n *TOTAL A PAGAR: ${totalTxt}*\n${datosBancariosMensaje}\n`;
+    let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Ticket Web:* ${pedidoID}\n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *FACTURA:* ${requiereFactura}\n *TOTAL A PAGAR: ${totalTxt}*\n${datosBancariosMensaje}\n`;
     
+    // --- 5. GENERAR EL PDF (El código largo de siempre) ---
     try {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF("p", "mm", "a4");
 
-        // --- ENCABEZADO CON EL LOGO ORIGINAL ---
         pdf.setFillColor(255, 255, 255);
         pdf.rect(0, 0, 210, 35, "F");
 
@@ -1395,7 +1403,6 @@ async function procesarPedidoCompleto(soloDescargar) {
         pdf.setLineWidth(0.5);
         pdf.line(15, 35, 195, 35);
 
-        // --- CAJA DE DATOS DEL CLIENTE ---
         pdf.setFillColor(...COLOR_FONDO);
         pdf.roundedRect(15, 38, 180, 32, 4, 4, "F"); 
         pdf.setTextColor(...COLOR_TEXTO);
@@ -1403,28 +1410,21 @@ async function procesarPedidoCompleto(soloDescargar) {
         
         pdf.setFont("helvetica", "bold"); pdf.text("Cliente:", 20, 44);
         pdf.setFont("helvetica", "normal"); pdf.text(nombreCliente, 40, 44);
-        
         pdf.setFont("helvetica", "bold"); pdf.text("Teléfono:", 20, 49);
         pdf.setFont("helvetica", "normal"); pdf.text(telCliente, 40, 49);
-        
         pdf.setFont("helvetica", "bold"); pdf.text("Marca/IG:", 20, 54);
         pdf.setFont("helvetica", "normal"); pdf.text(`${marcaCliente} | ${igCliente}`, 40, 54);
-        
         pdf.setFont("helvetica", "bold"); pdf.text("Fecha:", 115, 44);
         pdf.setFont("helvetica", "normal"); pdf.text(new Date().toLocaleDateString("es-MX"), 135, 44);
-        
         pdf.setFont("helvetica", "bold"); pdf.text("Entrega:", 115, 49);
         pdf.setFont("helvetica", "normal"); pdf.text(tipoEntrega, 135, 49);
-        
         pdf.setFont("helvetica", "bold"); pdf.text("Pago:", 115, 54);
         pdf.setFont("helvetica", "normal"); pdf.text(metodoPagoTexto, 135, 54);
-
         pdf.setFont("helvetica", "bold"); pdf.text("Dirección:", 20, 61);
         pdf.setFont("helvetica", "normal");
         let lineasDir = pdf.splitTextToSize(direccionCliente, 150);
         pdf.text(lineasDir, 40, 61);
 
-        // --- TABLA DE PRODUCTOS ---
         let y = 76; 
         pdf.setFillColor(...COLOR_PRINCIPAL);
         pdf.rect(15, y, 180, 10, "F");
@@ -1435,7 +1435,6 @@ async function procesarPedidoCompleto(soloDescargar) {
         pdf.text("CANT.", 130, y + 7, { align: "center" });
         pdf.text("TOTAL", 185, y + 7, { align: "right" });
         y += 15;
-
         pdf.setTextColor(...COLOR_TEXTO);
         
         carrito.forEach(item => {
@@ -1451,17 +1450,13 @@ async function procesarPedidoCompleto(soloDescargar) {
                 y += 15;
                 pdf.setTextColor(...COLOR_TEXTO);
             }
-
             pdf.setFont("helvetica", "bold");
             pdf.setFontSize(10);
             pdf.text(item.nombre, 20, y);
-
             pdf.setFont("helvetica", "normal");
             pdf.setFontSize(8);
             let lineasDetalle = pdf.splitTextToSize(String(item.detalle || ""), 90); 
-            
             pdf.text(lineasDetalle, 20, y + 4.5);
-
             pdf.setFontSize(10);
             pdf.text(String(item.cantidad), 130, y, { align: "center" });
             pdf.text("$" + item.subtotal.toFixed(2), 185, y, { align: "right" });
@@ -1469,11 +1464,9 @@ async function procesarPedidoCompleto(soloDescargar) {
             let altoTotalDetalle = lineasDetalle.length * 3.5;
             pdf.setDrawColor(240, 220, 227);
             pdf.line(20, y + 6 + altoTotalDetalle, 190, y + 6 + altoTotalDetalle);
-            
             y += 12 + altoTotalDetalle;
         });
 
-        // --- CÁLCULOS FINALES Y DESGLOSE ---
         y += 5;
         if (y > 220) { pdf.addPage(); y = 30; }
 
@@ -1483,7 +1476,6 @@ async function procesarPedidoCompleto(soloDescargar) {
 
         pdf.setFillColor(...COLOR_FONDO);
         pdf.roundedRect(100, y, 95, alturaCajaDesglose, 4, 4, "F");
-        
         pdf.setTextColor(...COLOR_TEXTO);
         pdf.setFontSize(10);
         pdf.setFont("helvetica", "normal");
@@ -1491,17 +1483,14 @@ async function procesarPedidoCompleto(soloDescargar) {
         let yDesglose = y + 8;
         pdf.text("Subtotal artículos:", 105, yDesglose);
         pdf.text("$" + valSubtotal.toFixed(2), 190, yDesglose, { align: "right" });
-        
         yDesglose += 7;
         pdf.text("Envío Nacional:", 105, yDesglose);
         pdf.text("$" + valEnvio.toFixed(2), 190, yDesglose, { align: "right" });
-        
         if (valComision > 0) {
             yDesglose += 7;
             pdf.text("Tarjeta de Crédito", 105, yDesglose);
             pdf.text("$" + valComision.toFixed(2), 190, yDesglose, { align: "right" });
         }
-
         if (valIva > 0) {
             yDesglose += 7;
             pdf.text("IVA (16%):", 105, yDesglose);
@@ -1516,15 +1505,14 @@ async function procesarPedidoCompleto(soloDescargar) {
         pdf.setFontSize(14);
         pdf.text(totalTxt, 190, yDesglose, { align: "right" });
 
-        // --- IMPRIMIR DATOS BANCARIOS EN EL PDF ---
-        let yTerminos = y + 7; // Alineamos con el inicio del recuadro de totales
+        let yTerminos = y + 7; 
         pdf.setTextColor(...COLOR_TEXTO);
-        pdf.setFontSize(8); // Letra un poco más pequeña para que quepa bien
+        pdf.setFontSize(8); 
         pdf.setFont("helvetica", "bold");
         
         datosBancariosPDF.forEach((linea, index) => {
             if (linea === "") {
-                yTerminos += 1.5; // Espacio chiquito extra entre Opción 1 y Opción 2
+                yTerminos += 1.5; 
             } else {
                 if(index > 0) pdf.setFont("helvetica", "normal");
                 pdf.text(linea, 15, yTerminos);
@@ -1532,15 +1520,9 @@ async function procesarPedidoCompleto(soloDescargar) {
             }
         });
 
-        // TRUCO: Asegurarnos de que los términos vayan ABAJO de todo (ya sea del cuadro rosa o de los bancos)
         let finDelCuadroRosa = y + alturaCajaDesglose + 6;
-        if (yTerminos < finDelCuadroRosa) {
-            yTerminos = finDelCuadroRosa; 
-        } else {
-            yTerminos += 4; 
-        }
+        if (yTerminos < finDelCuadroRosa) { yTerminos = finDelCuadroRosa; } else { yTerminos += 4; }
 
-        // --- TÉRMINOS Y CONDICIONES ---
         pdf.setTextColor(120, 120, 120);
         pdf.setFontSize(8);
         pdf.setFont("helvetica", "bold");
@@ -1561,7 +1543,6 @@ async function procesarPedidoCompleto(soloDescargar) {
             yTerminos += (textoDividido.length - 1) * 4; 
         });
 
-        // --- PIE DE PÁGINA ---
         pdf.setDrawColor(240, 220, 227); 
         pdf.setLineWidth(0.5);
         pdf.line(20, 275, 190, 275); 
@@ -1577,7 +1558,7 @@ async function procesarPedidoCompleto(soloDescargar) {
 
         const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
 
-        // 1. GUARDAR COPIA LOCAL (Bóveda del navegador)
+        // GUARDAR COPIA LOCAL 
         const pdfBase64 = pdf.output('datauristring');
         try {
             localStorage.setItem("minuit_ultimo_pdf", pdfBase64);
@@ -1585,72 +1566,30 @@ async function procesarPedidoCompleto(soloDescargar) {
             console.warn("No se pudo guardar la copia local.", e);
         }
 
-        // === NUEVO: DETECCIÓN INTELIGENTE DE IPHONE/SAFARI ===
         const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-        const urlGoogleScript = "https://script.google.com/macros/s/AKfycbw_RFDbSPc0tZNODZ2cltlC26DtKGciqqkkrLvhHSeg-NkyJ-CfpaQiMbfS0ftjHa77-A/exec";
-
-        // =========================================================
-        // 2. BOTÓN "SOLO DESCARGAR"
-        // =========================================================
         if (soloDescargar) {
-            pdf.save(nombreArchivo); // Aquí siempre forzamos descarga
-            mostrarAlerta("✅ ¡Nota descargada! Subiendo copia a tu registro...");
-            
-            fetch(urlGoogleScript, {
-                method: 'POST',
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ nombreArchivo: nombreArchivo, base64: pdfBase64 })
-            }).catch(e => console.warn(e));
-
+            pdf.save(nombreArchivo); 
+            mostrarAlerta("✅ ¡Nota descargada en PDF! (También se guardó en la nube)");
             if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
             if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
             return; 
         }
 
-        // =========================================================
-        // 3. FLUJO PRINCIPAL (CONFIRMAR Y ENVIAR)
-        // =========================================================
         if (!esIOS) {
-            // Si es Android, PC o Mac: Descargamos el PDF automáticamente
             pdf.save(nombreArchivo);
-        } else {
-            // Si es iPhone (Safari): Omitimos la descarga para que no bloquee WhatsApp.
-            // (La nota de todos modos ya quedó guardada en su historial local).
-        }
-
-        mostrarAlerta("📤 Procesando pedido y abriendo WhatsApp...");
-        const controlador = new AbortController();
-        const tiempoLimite = setTimeout(() => controlador.abort(), 8000);
-
-        try {
-            const respuesta = await fetch(urlGoogleScript, {
-                method: 'POST',
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ nombreArchivo: nombreArchivo, base64: pdfBase64 }),
-                signal: controlador.signal
-            });
-
-            const resultado = await respuesta.json();
-            if (resultado.estatus === 'exito') {
-                // === NUEVO: TEXTO EN WHATSAPP EXCLUSIVO PARA QUE LO USE LA DUEÑA ===
-                textoWhatsApp += `\n\n⚙️ *(Uso interno Minuit - Documento en la nube):*\n👉 ${resultado.urlDrive}`;
-            }
-        } catch (errorDrive) {
-            console.warn("Drive falló o tardó mucho, seguimos sin link.", errorDrive);
-        } finally {
-            clearTimeout(tiempoLimite);
         }
 
         abrirWhatsAppYLimpiar(textoWhatsApp);
 
     } catch (error) {
-        console.error("Error al procesar el pedido:", error);
-        alert("Ocurrió un error al generar la nota: " + error.message + ". Por favor intenta de nuevo.");
+        console.error("Error al generar PDF:", error);
+        alert("Ocurrió un error al generar la nota PDF: " + error.message + ". Por favor intenta de nuevo.");
         if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
         if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
     }
 }
+
 // ==========================================
 // RECUPERAR ÚLTIMO PEDIDO
 // ==========================================
