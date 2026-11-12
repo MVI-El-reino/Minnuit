@@ -159,6 +159,20 @@
                     <p style="margin: 3px 0 0 0; color: var(--texto-oscuro);"><strong>Archivo:</strong> <span id="res_archivo_base"></span></p>
                     <button type="button" onclick="abrirModalLogo('base')" style="background: none; border: none; color: var(--rosa-principal); font-weight: bold; padding: 0; margin-top: 8px; cursor: pointer;">Editar configuración ✏️</button>
                 </div>
+
+                <!-- ==============================
+             CARRUSEL DE GALERÍA
+             ============================== -->
+                <div class="galeria-carrusel">
+                    <h4 class="titulo-galeria">📸 Galería </h4>
+                    <div class="carrusel-imagenes">
+                        <!-- Para cambiar las fotos, solo cambia el enlace dentro de "src" -->
+                        <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+1" alt="Ejemplo 1" class="img-tarjeta">
+                        <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+2" alt="Ejemplo 2" class="img-tarjeta">
+                        <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+3" alt="Ejemplo 3" class="img-tarjeta">
+                        <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+4" alt="Ejemplo 4" class="img-tarjeta">
+                    </div>
+                </div>
                 
                 <br>
                 <button class="btn-agregar" onclick="agregarBaseConfigAlCarrito()">Agregar al Carrito</button>
@@ -179,7 +193,7 @@
                     <div class="cantidad-col">
                         <span class="etiqueta-precio">Cantidad</span>
                         <div class="controles-cantidad">
-<input type="number" id="cant_pastel_config" value="5" min="5" style="font-size: 16px;" onchange="validarManual('cant_pastel_config', 5); actualizarConfiguradorPasteles()" onkeyup="actualizarConfiguradorPasteles()">                        </div>
+                        <input type="number" id="cant_pastel_config" value="5" min="5" style="font-size: 16px;" onchange="validarManual('cant_pastel_config', 5); actualizarConfiguradorPasteles()" onkeyup="actualizarConfiguradorPasteles()">                        </div>
                     </div>
                 </div>
                 <!-- Selector de Mayoreo como Guía Visual -->
@@ -222,28 +236,42 @@
                 </div>
 
                 <div class="controles-config">
-    <label for="sel_redes_pastel">Redes Sociales:</label>
-    <select id="sel_redes_pastel" onchange="actualizarConfiguradorPasteles()">
-        <option value="No">No, gracias</option>
-        <option value="Si">Sí (+ Costo extra por tamaño)</option>
-    </select>
-</div>
+                    <label for="sel_redes_pastel">Redes Sociales:</label>
+                    <select id="sel_redes_pastel" onchange="actualizarConfiguradorPasteles()">
+                    <option value="No">No, gracias</option>
+                    <option value="Si">Sí (+ Costo extra por tamaño)</option>
+                    </select>
+                </div>
 
-<!-- 2. EL NUEVO MENÚ (Oculto por defecto) -->
-<div class="controles-config" id="contenedor_redes_medida" style="display: none; margin-top: 15px;">
-    <label for="sel_medida_redes">Medida de Redes:</label>
-    <!-- Los "value" son directamente los precios para facilitar el cálculo matemático -->
-    <select id="sel_medida_redes" onchange="actualizarConfiguradorPasteles()">
-        <option value="5">15cm - $5</option>
-        <option value="6">20cm - $6</option>
-        <option value="8">25 y 30cm - $8</option>
-    </select>
-</div>
+        <!-- 2. EL NUEVO MENÚ (Oculto por defecto) -->
+        <div class="controles-config" id="contenedor_redes_medida" style="display: none; margin-top: 15px;">
+            <label for="sel_medida_redes">Medida de Redes:</label>
+            <!-- Los "value" son directamente los precios para facilitar el cálculo matemático -->
+            <select id="sel_medida_redes" onchange="actualizarConfiguradorPasteles()">
+                <option value="5">15cm - $5</option>
+                <option value="6">20cm - $6</option>
+                <option value="8">25 y 30cm - $8</option>
+            </select>
+        </div>
 
                 <div class="controles">
                     <label for="detalle_pastel1">Anota tus redes / Observaciones:</label>
                     <input type="text" id="detalle_pastel1" placeholder="Ej. Insta / Face / Whats / Tiktok">
                 </div>
+
+                <!-- ==============================
+             CARRUSEL DE GALERÍA
+             ============================== -->
+        <div class="galeria-carrusel">
+            <h4 class="titulo-galeria">📸 Galería</h4>
+            <div class="carrusel-imagenes">
+                <!-- Para cambiar las fotos, solo cambia el enlace dentro de "src" -->
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+1" alt="Ejemplo 1" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+2" alt="Ejemplo 2" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+3" alt="Ejemplo 3" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+4" alt="Ejemplo 4" class="img-tarjeta">
+            </div>
+        </div>
 
                 <br>
                 <button class="btn-agregar" onclick="agregarPastelConfigAlCarrito()">Agregar al Carrito</button>
@@ -339,6 +367,20 @@
                     <input type="text" id="detalle_cupcake1" placeholder="Ej. Insta / Face / Whats / Tiktok">
                 </div>
 
+                 <!-- ==============================
+             CARRUSEL DE GALERÍA
+             ============================== -->
+        <div class="galeria-carrusel">
+            <h4 class="titulo-galeria">📸 Galería</h4>
+            <div class="carrusel-imagenes">
+                <!-- Para cambiar las fotos, solo cambia el enlace dentro de "src" -->
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+1" alt="Ejemplo 1" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+2" alt="Ejemplo 2" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+3" alt="Ejemplo 3" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+4" alt="Ejemplo 4" class="img-tarjeta">
+            </div>
+        </div>
+
                 <br>
                 <button class="btn-agregar" onclick="agregarCupcakeConfigAlCarrito()">Agregar al Carrito</button>
             </div>
@@ -385,6 +427,20 @@
                     <label for="detalle_topper">Texto o Diseño del Topper:</label>
                     <input type="text" id="detalle_topper" placeholder="Ej. Feliz Cumpleaños / Felicidades Mamá">
                 </div>
+
+                 <!-- ==============================
+             CARRUSEL DE GALERÍA
+             ============================== -->
+        <div class="galeria-carrusel">
+            <h4 class="titulo-galeria">📸 Galería</h4>
+            <div class="carrusel-imagenes">
+                <!-- Para cambiar las fotos, solo cambia el enlace dentro de "src" -->
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+1" alt="Ejemplo 1" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+2" alt="Ejemplo 2" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+3" alt="Ejemplo 3" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+4" alt="Ejemplo 4" class="img-tarjeta">
+            </div>
+        </div>
 
                 <br>
                 <button class="btn-agregar" onclick="agregarTopperAlCarrito()">Agregar al Carrito</button>
@@ -438,6 +494,20 @@
                     <label for="detalle_chulo">Observaciones:</label>
                     <input type="text" id="detalle_chulo" placeholder="Ej. Detalles extra o colores">
                 </div>
+
+                 <!-- ==============================
+             CARRUSEL DE GALERÍA
+             ============================== -->
+        <div class="galeria-carrusel">
+            <h4 class="titulo-galeria">📸 Galería</h4>
+            <div class="carrusel-imagenes">
+                <!-- Para cambiar las fotos, solo cambia el enlace dentro de "src" -->
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+1" alt="Ejemplo 1" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+2" alt="Ejemplo 2" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+3" alt="Ejemplo 3" class="img-tarjeta">
+                <img src="https://via.placeholder.com/400/fdf0f4/e87b9e?text=Foto+4" alt="Ejemplo 4" class="img-tarjeta">
+            </div>
+        </div>
 
                 <br>
                 <button class="btn-agregar" onclick="agregarChuloAlCarrito()">Agregar al Carrito</button>
