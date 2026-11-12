@@ -1103,3 +1103,44 @@ body { padding-bottom: 100px; }
     pointer-events: none; /* Permite que el usuario pueda tocar los botones que queden debajo */
     z-index: 10;
 }
+
+/* =========================================
+   CARRUSEL DE GALERÍA (TARJETAS ELEGANTES)
+   ========================================= */
+.galeria-carrusel {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+.titulo-galeria {
+    font-size: 0.9rem;
+    color: var(--rosa-principal);
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.carrusel-imagenes {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 5px 15px 15px 15px; /* Margen para que la sombra no se corte */
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.carrusel-imagenes::-webkit-scrollbar {
+    display: none; /* Oculta la barra fea en celulares */
+}
+.img-tarjeta {
+    flex: 0 0 auto;
+    width: 220px;  /* Ancho estandarizado de la tarjeta */
+    height: 220px; /* Alto estandarizado */
+    object-fit: cover; /* Centra y recorta mágicamente sin aplastar la foto */
+    border-radius: 16px;
+    box-shadow: 0 6px 15px rgba(232, 123, 158, 0.2); /* Sombra rosa suave */
+    scroll-snap-align: center;
+    border: 3px solid #ffffff; /* Borde blanco estilo foto polaroid moderna */
+}
