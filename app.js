@@ -727,6 +727,33 @@ function agregarPastelConfigAlCarrito() {
     mostrarAlerta(`🛒 ¡Cajas de Pastel agregadas!`);
     animarBotónCarrito();
 }
+
+// ==========================================
+// CAKE TOPPERS (EN ESPERA DE PRECIOS)
+// ==========================================
+function actualizarConfiguradorToppers() {
+    let precioTopperPlaceholder = 0;
+    const precioTxt = document.getElementById("precio_config_topper");
+    if (precioTxt) precioTxt.innerText = `$${precioTopperPlaceholder.toFixed(2)} MXN`;
+}
+
+function agregarTopperAlCarrito() {
+    mostrarAlerta("⏳ Esta sección estará habilitada pronto con los nuevos precios.");
+}
+
+// ==========================================
+// CHULO BOX (EN ESPERA DE PRECIOS)
+// ==========================================
+function actualizarConfiguradorChulo() {
+    let precioChuloPlaceholder = 0;
+    const precioTxt = document.getElementById("precio_config_chulo");
+    if (precioTxt) precioTxt.innerText = `$${precioChuloPlaceholder.toFixed(2)} MXN`;
+}
+
+function agregarChuloAlCarrito() {
+    mostrarAlerta("⏳ Esta sección estará habilitada pronto con los nuevos precios.");
+}
+
 // ==========================================
 // CONTROL DEL CARRITO
 // ==========================================
