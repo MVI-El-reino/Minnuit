@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Minuit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    
+    <style>
+        body { font-family: 'Poppins', sans-serif; background: #fdf0f4; padding: 20px; }
+        .dashboard { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(232, 123, 158, 0.2); }
+        h1 { color: #e87b9e; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f48fb1; }
+        th { background-color: #fdf0f4; color: #4a3b40; }
+        .btn-descarga { background: #e87b9e; color: white; padding: 6px 12px; text-decoration: none; border-radius: 6px; font-size: 0.8rem; }
+        .estado-pendiente { color: #d35400; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <h1>📊 Panel de Pedidos Minuit</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ticket</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Archivos / Logos</th>
+                </tr>
+            </thead>
+            <tbody id="tabla_pedidos">
+                <!-- Se llenará con Javascript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // PEGA AQUÍ LA MISMA CONFIGURACIÓN DE FIREBASE QUE EN APP.JS
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROYECTO.firebaseapp.com",
+            projectId: "TU_PROYECTO"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Cargar los pedidos en tiempo real
+        db.collection("pedidos").orderBy("fecha", "desc").onSnapshot((querySnapshot) => {
+            const tabla = document.getElementById("tabla_pedidos");
+            tabla.innerHTML = ""; // Limpiar tabla
+
+            querySnapshot.forEach((doc) => {
+                const pedido = doc.data();
+                
+                // Buscar si tiene archivos adjuntos
+                let botonesArchivos = "Sin archivos";
+                if(pedido.archivos_adjuntos) {
+                    botonesArchivos = "";
+                    for (const [key, archivo] of Object.entries(pedido.archivos_adjuntos)) {
+                        let etiqueta = archivo.vectorizado ? "Vectorizado" : "NO Vectorizado";
+                        botonesArchivos += `<a href="${archivo.url}" target="_blank" class="btn-descarga">⬇️ ${key} (${etiqueta})</a><br><br>`;
+                    }
+                }
+
+                // Dibujar la fila en la tabla
+                tabla.innerHTML += `
+                    <tr>
+                        <td><strong>${pedido.id}</strong></td>
+                        <td>${pedido.cliente.nombre}<br><small>${pedido.cliente.telefono}</small></td>
+                        <td><strong>${pedido.pago.totalFinal}</strong></td>
+                        <td class="estado-pendiente">${pedido.estado}</td>
+                        <td>${botonesArchivos}</td>
+                    </tr>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>
