@@ -62,12 +62,23 @@
         <img src="Logo%20Minuit1.png" alt="Logo Minuit" class="logo-principal">
     </header>
 
-    <nav class="tabs">
-        <button class="tab-btn active" onclick="cambiarTab('bases')">Bases MDF</button>
-        <button class="tab-btn" onclick="cambiarTab('cajas_pastel')">Cajas Pastel</button>
-        <button class="tab-btn" onclick="cambiarTab('cajas_cupcakes')">Cajas Cupcakes</button>
+    <!-- =========================================
+         MENÚ DE NAVEGACIÓN (CON PROTECCIÓN Y FLECHA)
+         ========================================= -->
+    <div class="contenedor-tabs">
+        <nav class="tabs" id="menu-tabs">
+            <button class="tab-btn active" onclick="cambiarTab('bases')">Bases MDF</button>
+            <button class="tab-btn" onclick="cambiarTab('cajas_pastel')">Cajas Pastel</button>
+            <button class="tab-btn" onclick="cambiarTab('cajas_cupcakes')">Cajas Cupcakes</button>
+            
+            <!-- NUEVOS BOTONES -->
+            <button class="tab-btn" onclick="cambiarTab('cake_toppers')">Cake Toppers</button>
+            <button class="tab-btn" onclick="cambiarTab('chulo_box')">Chulo Box</button>
+        </nav>
         
-    </nav>
+        <!-- Flecha derecha con difuminado -->
+        <div class="flecha-tabs">❯</div>
+    </div>
 
     <main>
          <!-- ==============================
