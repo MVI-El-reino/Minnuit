@@ -13,7 +13,6 @@ const firebaseConfig = {
 // Inicializar Firebase (Versión Compat)
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const storage = firebase.storage();
 
 // ==========================================================================
 // VARIABLES GLOBALES Y PRECIOS
@@ -1335,29 +1334,54 @@ async function procesarPedidoCompleto(soloDescargar) {
     };
 
     try {
-        // Subir Logos a Firebase Storage (Si existen)
+        // === NUEVO: SUBIR LOGOS A GOOGLE DRIVE VÍA APPS SCRIPT ===
+        const urlScriptDrive = "PEGA_AQUI_LA_URL_DE_TU_NUEVO_SCRIPT"; // <--- PEGA TU URL AQUÍ
+
         for (const tipo of ['base', 'pastel', 'cupcake', 'chulo']) {
             if (logoDataActual[tipo] && logoDataActual[tipo].archivoObj) {
                 const archivo = logoDataActual[tipo].archivoObj;
-                const carpeta = logoDataActual[tipo].necesitaVector ? "logos_NO_vectorizados" : "logos_vectorizado";
+                const esVectorizado = !logoDataActual[tipo].necesitaVector;
                 const nombreSeguro = `${pedidoID}_${tipo}_${archivo.name}`;
                 
-                const storageRef = storage.ref(`${carpeta}/${nombreSeguro}`);
-                await storageRef.put(archivo);
-                const urlDescarga = await storageRef.getDownloadURL();
+                // Convertir archivo a texto (Base64) para enviarlo a Drive
+                const base64Data = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(archivo);
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = error => reject(error);
+                });
+
+                // Enviar a nuestro puente de Drive
+                const respuestaDrive = await fetch(urlScriptDrive, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        nombreArchivo: nombreSeguro,
+                        mimeType: archivo.type || "application/pdf",
+                        base64: base64Data,
+                        vectorizado: esVectorizado
+                    })
+                });
                 
-                paquetePedido.archivos_adjuntos[tipo] = { url: urlDescarga, vectorizado: !logoDataActual[tipo].necesitaVector };
+                const resultadoDrive = await respuestaDrive.json();
+                
+                // Agregar el link de Drive al paquete que irá a Firestore
+                if (resultadoDrive.estatus === 'exito') {
+                    paquetePedido.archivos_adjuntos[tipo] = { 
+                        url: resultadoDrive.url, 
+                        vectorizado: esVectorizado 
+                    };
+                }
             }
         }
-        // Guardar el Pedido en Firestore
-        const docRef = await db.collection("pedidos").add(paquetePedido);
-        // Generar el Link Dinámico de Firebase (Para usarlo después)
-        var linkTicketFirebase = `https://minuit-pedidos.vercel.app/admin.html`; // Temporalmente mandamos al admin panel
-    } catch (error) {
-        console.error("No se pudo conectar a Firebase:", error);
-        // Si Firebase falla, el código NO se detiene, continúa para al menos darles el PDF.
-    }
 
+        // === GUARDAR EL PEDIDO (TEXTO) EN FIRESTORE (TOTALMENTE GRATIS) ===
+        const docRef = await db.collection("pedidos").add(paquetePedido);
+        var linkTicketFirebase = `https://minuit-pedidos.vercel.app/admin.html`; 
+
+    } catch (error) {
+        console.error("No se pudo conectar a Firebase o Drive:", error);
+    }
     // --- 4. PREPARAR TEXTOS BANCARIOS (Igual que antes) ---
     let datosBancariosMensaje = "";
     let datosBancariosPDF = [];
