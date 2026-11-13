@@ -1627,7 +1627,7 @@ async function procesarPedidoCompleto(soloDescargar) {
 
     let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Ticket Web:* ${pedidoID}\n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *FACTURA:* ${requiereFactura}\n *TOTAL A PAGAR: ${totalTxt}*\n${datosBancariosMensaje}\n`;
     
-    ocultarCarga();
+    
 
     // --- DESCARGA AUTOMÁTICA DEL PDF ---
     const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -1641,6 +1641,7 @@ async function procesarPedidoCompleto(soloDescargar) {
         document.body.removeChild(enlace);
 
         if (soloDescargar) {
+            ocultarCarga();
             mostrarAlerta("✅ ¡Nota descargada en PDF!");
             if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
             if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
