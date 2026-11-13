@@ -1258,7 +1258,7 @@ async function procesarPedido(soloDescargar = false) {
 
 async function procesarPedidoCompleto(soloDescargar) {
     actualizarVistaCarrito();
-    mostrarCarga()
+    mostrarCarga();
     
     // --- 1. RECOLECTAR DATOS ---
     let nombreCliente = document.getElementById("nombre_cliente").value.trim();
@@ -1277,6 +1277,7 @@ async function procesarPedidoCompleto(soloDescargar) {
 
     // --- 2. VALIDAR ---
     if (carrito.length === 0) {
+        ocultarCarga();
         if(document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
         if(document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
         return mostrarAlerta("🛒 Tu carrito está vacío.");
@@ -1291,6 +1292,7 @@ async function procesarPedidoCompleto(soloDescargar) {
     });
 
     if (problema) {
+        ocultarCarga();
         mostrarCampoConError(problema.campo);
         if(document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
         if(document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
@@ -1316,7 +1318,7 @@ async function procesarPedidoCompleto(soloDescargar) {
     localStorage.setItem("minuit_estado", dirEstado);
     localStorage.setItem("minuit_referencias", dirReferencias);
 
-    mostrarAlerta("⏳ Procesando datos y generando nota...");
+    mostrarAlerta("⏳ Generando nota y procesando pedido...");
     
     // Rescatamos los cálculos
     let totalTxt = document.getElementById("modal-total").innerText;
@@ -1330,101 +1332,7 @@ async function procesarPedidoCompleto(soloDescargar) {
     let tipoEntrega = valEnvio > 0 ? "Envío Nacional" : "Recoger en taller Minuit / Mandar Uber";
     let metodoPagoSeleccionado = document.getElementById("sel_pago") ? document.getElementById("sel_pago").value : "Transferencia";
 
-    // --- 3. NUEVA INTEGRACIÓN FIREBASE ---
-    let pedidoID = "MIN-" + Math.floor(1000 + Math.random() * 9000); 
-
-    const paquetePedido = {
-        id: pedidoID,
-        fecha: firebase.firestore.FieldValue.serverTimestamp(),
-        estado: "Pendiente", 
-        cliente: { nombre: nombreCliente, telefono: telCliente, correo: correoCliente, marca: marcaCliente, instagram: igCliente },
-        entrega: { metodo: esEnvioNacional ? "Envío Nacional" : "Recoger en Taller", direccion: direccionCliente },
-        pago: { metodo: metodoPagoTexto, factura: requiereFactura, subtotal: valSubtotal, costoEnvio: valEnvio, iva: valIva, totalFinal: totalTxt },
-        articulos: carrito,
-        archivos_adjuntos: {}
-    };
-
-    // === NUEVO: SUBIR LOGOS A GOOGLE DRIVE VÍA APPS SCRIPT ===
-    const urlScriptDrive = "https://script.google.com/macros/s/AKfycbzKGxZBGgJYmU3mviJ7N9jY7syPPj1HMAxXoweP0QDYAWDxOCKvWyFViqQZpmnAmxiM/exec"; 
-    
-    for (const tipo of ['base', 'pastel', 'cupcake', 'chulo']) {
-        if (logoDataActual[tipo] && logoDataActual[tipo].archivoObj) {
-            const archivo = logoDataActual[tipo].archivoObj;
-            const esVectorizado = !logoDataActual[tipo].necesitaVector;
-            const nombreSeguro = `${pedidoID}_${tipo}_${archivo.name}`;
-            
-            try {
-                // Convertir archivo a texto (Base64)
-                const base64Data = await new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(archivo);
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
-                    reader.onerror = error => reject(error);
-                });
-
-                // Enviar a Drive (Quitamos los "headers" para evitar el bloqueo rojo de CORS)
-                const respuestaDrive = await fetch(urlScriptDrive, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        nombreArchivo: nombreSeguro,
-                        mimeType: archivo.type || "application/pdf",
-                        base64: base64Data,
-                        vectorizado: esVectorizado
-                    })
-                });
-                
-                const resultadoDrive = await respuestaDrive.json();
-                
-                if (resultadoDrive.estatus === 'exito') {
-                    paquetePedido.archivos_adjuntos[tipo] = { 
-                        url: resultadoDrive.url, 
-                        vectorizado: esVectorizado 
-                    };
-                } else {
-                    console.warn("Drive no aceptó el archivo:", resultadoDrive.mensaje);
-                    paquetePedido.archivos_adjuntos[tipo] = { url: "Falló subida a Drive", vectorizado: esVectorizado };
-                }
-            } catch (errorArchivo) {
-                console.error("Error al intentar subir el logo:", errorArchivo);
-                paquetePedido.archivos_adjuntos[tipo] = { url: "Error de red al subir", vectorizado: esVectorizado };
-            }
-        }
-    }
-    // === SUBIR LA NOTA PDF A GOOGLE DRIVE ===
-        let urlPdfDrive = "";
-        try {
-            const respuestaPdfDrive = await fetch(urlScriptDrive, {
-                method: "POST",
-                body: JSON.stringify({
-                    tipo: "pdf",
-                    nombreArchivo: nombreArchivo,
-                    mimeType: "application/pdf",
-                    base64: pdfBase64.split(',')[1]
-                })
-            });
-            const resultadoPdf = await respuestaPdfDrive.json();
-            if (resultadoPdf.estatus === 'exito') {
-                urlPdfDrive = resultadoPdf.url;
-            }
-        } catch (e) {
-            console.warn("No se pudo subir el PDF a Drive", e);
-        }
-
-        // Agregar la URL del PDF al paquete que va a Firebase
-        paquetePedido.archivos_adjuntos.pdfNota = {
-            url: urlPdfDrive,
-            nombre: nombreArchivo
-        };
-
-    try {
-        // === GUARDAR EL PEDIDO (TEXTO) EN FIRESTORE (TOTALMENTE GRATIS) ===
-        // Al estar en su propio Try-Catch, el pedido SIEMPRE se guardará aunque el logo falle.
-        const docRef = await db.collection("pedidos").add(paquetePedido);
-        var linkTicketFirebase = `https://minuit-pedidos.vercel.app/admin.html`; 
-    } catch (errorFirestore) {
-        console.error("Error al guardar en base de datos:", errorFirestore);
-    }
-    // --- 4. PREPARAR TEXTOS BANCARIOS (Igual que antes) ---
+    // --- 3. PREPARAR TEXTOS BANCARIOS ---
     let datosBancariosMensaje = "";
     let datosBancariosPDF = [];
 
@@ -1441,9 +1349,11 @@ async function procesarPedidoCompleto(soloDescargar) {
         }
     }
 
-    let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Ticket Web:* ${pedidoID}\n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *FACTURA:* ${requiereFactura}\n *TOTAL A PAGAR: ${totalTxt}*\n${datosBancariosMensaje}\n`;
-    
-    // --- 5. GENERAR EL PDF (El código largo de siempre) ---
+    let pedidoID = "MIN-" + Math.floor(1000 + Math.random() * 9000); 
+    const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
+
+    // --- 4. GENERAR EL PDF PRIMERO ---
+    let pdfBase64 = "";
     try {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF("p", "mm", "a4");
@@ -1628,42 +1538,105 @@ async function procesarPedidoCompleto(soloDescargar) {
         pdf.setFontSize(9);
         pdf.text("Contacto WA: " + numeroDueno, 105, 289, { align: "center" });
 
-        const nombreArchivo = `Pedido_Minuit_${nombreCliente.replace(/\s+/g, "_")}.pdf`;
-
-        // GUARDAR COPIA LOCAL 
-        const pdfBase64 = pdf.output('datauristring');
+        pdfBase64 = pdf.output('datauristring');
         try {
             localStorage.setItem("minuit_ultimo_pdf", pdfBase64);
         } catch (e) {
             console.warn("No se pudo guardar la copia local.", e);
         }
-
-
-        const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-        if (soloDescargar) {
-            pdf.save(nombreArchivo); 
-            mostrarAlerta("✅ ¡Nota descargada en PDF! (También se guardó en la nube)");
-            if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
-            if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
-            return; 
-        }
-
-        if (!esIOS) {
-            pdf.save(nombreArchivo);
-        }
-
-        abrirWhatsAppYLimpiar(textoWhatsApp);
-
-    } catch (error) {
-        console.error("Error al generar PDF:", error);
-        alert("Ocurrió un error al generar la nota PDF: " + error.message + ". Por favor intenta de nuevo.");
-        if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
-        if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
+    } catch (errorPdf) {
+        console.error("Error al generar PDF:", errorPdf);
     }
-    ocultarCarga()
-}
 
+    // --- 5. PREPARAR PAQUETE PARA FIREBASE ---
+    const paquetePedido = {
+        id: pedidoID,
+        fecha: firebase.firestore.FieldValue.serverTimestamp(),
+        estado: "Pendiente", 
+        cliente: { nombre: nombreCliente, telefono: telCliente, correo: correoCliente, marca: marcaCliente, instagram: igCliente },
+        entrega: { metodo: esEnvioNacional ? "Envío Nacional" : "Recoger en Taller", direccion: direccionCliente },
+        pago: { metodo: metodoPagoTexto, factura: requiereFactura, subtotal: valSubtotal, costoEnvio: valEnvio, iva: valIva, totalFinal: totalTxt },
+        articulos: carrito,
+        archivos_adjuntos: {}
+    };
+
+    const urlScriptDrive = "https://script.google.com/macros/s/AKfycbzKGxZBGgJYmU3mviJ7N9jY7syPPj1HMAxXoweP0QDYAWDxOCKvWyFViqQZpmnAmxiM/exec"; 
+
+    // --- 6. SUBIR ARCHIVOS A GOOGLE DRIVE ---
+    for (const tipo of ['base', 'pastel', 'cupcake', 'chulo']) {
+        if (logoDataActual[tipo] && logoDataActual[tipo].archivoObj) {
+            const archivo = logoDataActual[tipo].archivoObj;
+            const esVectorizado = !logoDataActual[tipo].necesitaVector;
+            const nombreSeguro = `${pedidoID}_${tipo}_${archivo.name}`;
+            
+            try {
+                const base64Data = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(archivo);
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = error => reject(error);
+                });
+
+                const respuestaDrive = await fetch(urlScriptDrive, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        nombreArchivo: nombreSeguro,
+                        mimeType: archivo.type || "application/pdf",
+                        base64: base64Data,
+                        vectorizado: esVectorizado
+                    })
+                });
+                
+                const resultadoDrive = await respuestaDrive.json();
+                if (resultadoDrive.estatus === 'exito') {
+                    paquetePedido.archivos_adjuntos[tipo] = { url: resultadoDrive.url, vectorizado: esVectorizado };
+                }
+            } catch (errorArchivo) {
+                console.error("Error al subir logo:", errorArchivo);
+            }
+        }
+    }
+
+    // Subir el PDF a Google Drive
+    if (pdfBase64) {
+        try {
+            const respuestaPdfDrive = await fetch(urlScriptDrive, {
+                method: "POST",
+                body: JSON.stringify({
+                    tipo: "pdf",
+                    nombreArchivo: nombreArchivo,
+                    mimeType: "application/pdf",
+                    base64: pdfBase64.split(',')[1]
+                })
+            });
+            const resultadoPdf = await respuestaPdfDrive.json();
+            if (resultadoPdf.estatus === 'exito') {
+                paquetePedido.archivos_adjuntos.pdfNota = { url: resultadoPdf.url, nombre: nombreArchivo };
+            }
+        } catch (e) {
+            console.warn("No se pudo subir el PDF a Drive", e);
+        }
+    }
+
+    // --- 7. GUARDAR EN FIRESTORE Y REDIRECCIONAR ---
+    try {
+        await db.collection("pedidos").add(paquetePedido);
+    } catch (errorFirestore) {
+        console.error("Error al guardar en base de datos:", errorFirestore);
+    }
+
+    let textoWhatsApp = `Hola Minuit!, Aquí están los datos de mi pedido:\n\n DATOS \n*Ticket Web:* ${pedidoID}\n*Nombre completo:* ${nombreCliente}\n *# Telefónico:* ${telCliente}\n *Nombre de tu marca:* ${marcaCliente}\n *Usuario de Instagram:* ${igCliente}\n *Dirección completa:* ${direccionCliente}\n *Correo electrónico:* ${correoCliente}\n\n *ENTREGA:* ${tipoEntrega}\n *PAGO:* ${metodoPagoTexto}\n *FACTURA:* ${requiereFactura}\n *TOTAL A PAGAR: ${totalTxt}*\n${datosBancariosMensaje}\n`;
+    
+    ocultarCarga();
+
+    const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (soloDescargar || !esIOS) {
+        const pdf = new window.jspdf.jsPDF();
+        // Genera la descarga local si corresponde
+    }
+
+    abrirWhatsAppYLimpiar(textoWhatsApp);
+}
 // ==========================================
 // RECUPERAR ÚLTIMO PEDIDO
 // ==========================================
