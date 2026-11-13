@@ -1560,7 +1560,7 @@ async function procesarPedidoCompleto(soloDescargar) {
         archivos_adjuntos: {}
     };
 
-    const urlScriptDrive = "https://script.google.com/macros/s/AKfycbzKGxZBGgJYmU3mviJ7N9jY7syPPj1HMAxXoweP0QDYAWDxOCKvWyFViqQZpmnAmxiM/exec"; 
+    const urlScriptDrive = "https://script.google.com/macros/s/AKfycbyAbzKveNTQJYgI5Lx-CNSHYIXMGmXnF-3Yu6Tfrdw6fdHr9uN0efltpZ1a_cdpaVo/exec"; 
 
     // --- 6. SUBIR ARCHIVOS A GOOGLE DRIVE ---
     for (const tipo of ['base', 'pastel', 'cupcake', 'chulo']) {
@@ -1629,10 +1629,23 @@ async function procesarPedidoCompleto(soloDescargar) {
     
     ocultarCarga();
 
+    // --- DESCARGA AUTOMÁTICA DEL PDF ---
     const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    if (soloDescargar || !esIOS) {
-        const pdf = new window.jspdf.jsPDF();
-        // Genera la descarga local si corresponde
+    
+    if (pdfBase64 && (soloDescargar || !esIOS)) {
+        const enlace = document.createElement("a");
+        enlace.href = pdfBase64;
+        enlace.download = nombreArchivo;
+        document.body.appendChild(enlace);
+        enlace.click();
+        document.body.removeChild(enlace);
+
+        if (soloDescargar) {
+            mostrarAlerta("✅ ¡Nota descargada en PDF!");
+            if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
+            if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
+            return;
+        }
     }
 
     abrirWhatsAppYLimpiar(textoWhatsApp);
