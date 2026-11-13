@@ -4,44 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administración - Minuit</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
-    <!-- Firebase -->
+    <!-- Firebase SDK (Versión 8 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #fdf0f4; padding: 20px; }
-        .dashboard { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 20px rgba(232, 123, 158, 0.2); }
-        h1 { color: #e87b9e; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #f48fb1; }
-        th { background-color: #fdf0f4; color: #4a3b40; }
-        .btn-descarga { background: #e87b9e; color: white; padding: 6px 12px; text-decoration: none; border-radius: 6px; font-size: 0.8rem; }
-        .estado-pendiente { color: #d35400; font-weight: bold; }
+        :root {
+            --rosa-principal: #e87b9e;
+            --rosa-claro: #fdf0f4;
+            --texto-oscuro: #4a3b40;
+            --blanco: #ffffff;
+        }
+        body { font-family: 'Poppins', sans-serif; background: var(--rosa-claro); margin: 0; padding: 20px; color: var(--texto-oscuro); }
+        .dashboard { max-width: 1200px; margin: 0 auto; background: var(--blanco); padding: 30px; border-radius: 16px; box-shadow: 0 8px 25px rgba(232, 123, 158, 0.15); }
+        
+        /* Cabecera */
+        .header-admin { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 2px solid var(--rosa-claro); padding-bottom: 20px; margin-bottom: 20px; }
+        h1 { color: var(--rosa-principal); margin: 0; font-size: 1.8rem; }
+        
+        /* Tarjetas de Estadísticas */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--rosa-claro); padding: 20px; border-radius: 12px; border-left: 5px solid var(--rosa-principal); }
+        .stat-card h3 { margin: 0; font-size: 0.85rem; color: #7a656d; text-transform: uppercase; }
+        .stat-card p { margin: 8px 0 0 0; font-size: 1.5rem; font-weight: 700; color: var(--texto-oscuro); }
+
+        /* Controles y Filtros */
+        .controles-barra { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+        .buscador { padding: 10px 15px; border: 1px solid #d1b3bd; border-radius: 8px; width: 280px; font-size: 0.9rem; outline: none; }
+        .filtros-estado { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-filtro { background: var(--blanco); border: 1px solid var(--rosa-principal); color: var(--rosa-principal); padding: 6px 14px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+        .btn-filtro.active, .btn-filtro:hover { background: var(--rosa-principal); color: var(--blanco); }
+
+        /* Tabla de Pedidos */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 14px; border-bottom: 1px solid #f3e1e7; font-size: 0.9rem; }
+        th { background-color: var(--rosa-claro); color: var(--texto-oscuro); font-weight: 600; }
+        
+        /* Selectores de Estado */
+        .select-estado { padding: 6px 10px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; border: 1px solid #ccc; cursor: pointer; }
+        .est-Pendiente { background: #fff3cd; color: #856404; }
+        .est-Produccion { background: #cce5ff; color: #004085; }
+        .est-Listo { background: #d4edda; color: #155724; }
+        .est-Entregado { background: #e2e3e5; color: #383d41; }
+
+        /* Botones de Archivos */
+        .btn-archivo { display: inline-block; background: var(--rosa-principal); color: white; padding: 5px 10px; text-decoration: none; border-radius: 6px; font-size: 0.75rem; margin-top: 4px; font-weight: 600; }
+        .btn-archivo.pdf { background: #6c757d; }
+        .btn-archivo:hover { opacity: 0.85; }
     </style>
 </head>
 <body>
 
     <div class="dashboard">
-        <h1>📊 Panel de Pedidos Minuit</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Ticket</th>
-                    <th>Cliente</th>
-                    <th>Total</th>
-                    <th>Estado</th>
-                    <th>Archivos / Logos</th>
-                </tr>
-            </thead>
-            <tbody id="tabla_pedidos">
-                <!-- Se llenará con Javascript -->
-            </tbody>
-        </table>
+        <div class="header-admin">
+            <h1>📊 Panel de Control - Minuit</h1>
+            <span id="fecha-actual" style="font-size: 0.9rem; color: #7a656d;"></span>
+        </div>
+
+        <!-- TARJETAS DE ESTADÍSTICAS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Pedidos</h3>
+                <p id="stat-total">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Ventas Estimadas</h3>
+                <p id="stat-ventas">$0.00 MXN</p>
+            </div>
+            <div class="stat-card">
+                <h3>Pendientes de Atender</h3>
+                <p id="stat-pendientes">0</p>
+            </div>
+        </div>
+
+        <!-- BARRA DE BUSCAR Y FILTRAR -->
+        <div class="controles-barra">
+            <input type="text" id="input-buscar" class="buscador" placeholder="🔍 Buscar por cliente o ticket..." onkeyup="filtrarPedidos()">
+            
+            <div class="filtros-estado">
+                <button class="btn-filtro active" onclick="cambiarFiltro('Todos', this)">Todos</button>
+                <button class="btn-filtro" onclick="cambiarFiltro('Pendiente', this)">Pendientes</button>
+                <button class="btn-filtro" onclick="cambiarFiltro('En Producción', this)">En Producción</button>
+                <button class="btn-filtro" onclick="cambiarFiltro('Listo', this)">Listos</button>
+            </div>
+        </div>
+
+        <!-- TABLA -->
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ticket / Fecha</th>
+                        <th>Cliente / Contacto</th>
+                        <th>Total</th>
+                        <th>Estatus</th>
+                        <th>Documentos y Logos</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla_pedidos">
+                    <!-- Se llena dinámicamente -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
+        // CONFIGURACIÓN DE FIREBASE (Tus claves reales)
         const firebaseConfig = {
             apiKey: "AIzaSyB7X4u34sH2F9rmfSBvgVzOejK4TnCJ1MY",
             authDomain: "minuit-a7053.firebaseapp.com",
@@ -52,36 +123,115 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        // Cargar los pedidos en tiempo real
-        db.collection("pedidos").orderBy("fecha", "desc").onSnapshot((querySnapshot) => {
-            const tabla = document.getElementById("tabla_pedidos");
-            tabla.innerHTML = ""; // Limpiar tabla
 
+        document.getElementById("fecha-actual").innerText = new Date().toLocaleDateString("es-MX", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        let listaPedidosGlobal = [];
+        let filtroActual = "Todos";
+
+        // ESCUCHAR PEDIDOS EN TIEMPO REAL
+        db.collection("pedidos").orderBy("fecha", "desc").onSnapshot((querySnapshot) => {
+            listaPedidosGlobal = [];
             querySnapshot.forEach((doc) => {
-                const pedido = doc.data();
+                listaPedidosGlobal.push({ idDoc: doc.id, ...doc.data() });
+            });
+            actualizarEstadisticas(listaPedidosGlobal);
+            renderizarTabla(listaPedidosGlobal);
+        });
+
+        function renderizarTabla(pedidos) {
+            const tabla = document.getElementById("tabla_pedidos");
+            tabla.innerHTML = "";
+
+            let textoBusqueda = document.getElementById("input-buscar").value.toLowerCase();
+
+            let pedidosFiltrados = pedidos.filter(p => {
+                let coincideFiltro = (filtroActual === "Todos" || p.estado === filtroActual);
+                let coincideBusqueda = p.id.toLowerCase().includes(textoBusqueda) || p.cliente.nombre.toLowerCase().includes(textoBusqueda) || p.cliente.telefono.includes(textoBusqueda);
+                return coincideFiltro && coincideBusqueda;
+            });
+
+            if (pedidosFiltrados.length === 0) {
+                tabla.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888; padding: 20px;">No se encontraron pedidos.</td></tr>`;
+                return;
+            }
+
+            pedidosFiltrados.forEach(pedido => {
+                let fechaFormateada = pedido.fecha ? new Date(pedido.fecha.toDate()).toLocaleDateString("es-MX") : "Reciente";
                 
-                // Buscar si tiene archivos adjuntos
-                let botonesArchivos = "Sin archivos";
-                if(pedido.archivos_adjuntos) {
-                    botonesArchivos = "";
+                // Generar botones de archivos (PDF + Logos)
+                let htmlArchivos = "";
+                if (pedido.archivos_adjuntos) {
+                    if (pedido.archivos_adjuntos.pdfNota && pedido.archivos_adjuntos.pdfNota.url) {
+                        htmlArchivos += `<a href="${pedido.archivos_adjuntos.pdfNota.url}" target="_blank" class="btn-archivo pdf">📄 Ver Nota PDF</a><br>`;
+                    }
                     for (const [key, archivo] of Object.entries(pedido.archivos_adjuntos)) {
-                        let etiqueta = archivo.vectorizado ? "Vectorizado" : "NO Vectorizado";
-                        botonesArchivos += `<a href="${archivo.url}" target="_blank" class="btn-descarga">⬇️ ${key} (${etiqueta})</a><br><br>`;
+                        if (key !== 'pdfNota') {
+                            let etiqueta = archivo.vectorizado ? "Vectorizado" : "NO Vectorizado";
+                            htmlArchivos += `<a href="${archivo.url}" target="_blank" class="btn-archivo">⬇️ Logo (${etiqueta})</a><br>`;
+                        }
                     }
                 }
+                if (!htmlArchivos) htmlArchivos = "<span style='color:#aaa; font-size:0.8rem;'>Sin archivos</span>";
 
-                // Dibujar la fila en la tabla
+                // Selector de estado interactivo
+                let estadoActual = pedido.estado || "Pendiente";
+                let claseSelect = `select-estado est-${estadoActual.replace(/\s+/g, '')}`;
+
+                let selectHtml = `
+                    <select class="${claseSelect}" onchange="cambiarEstado('${pedido.idDoc}', this.value)">
+                        <option value="Pendiente" ${estadoActual === 'Pendiente' ? 'selected' : ''}>Pendiente</option>
+                        <option value="En Producción" ${estadoActual === 'En Producción' ? 'selected' : ''}>En Producción</option>
+                        <option value="Listo" ${estadoActual === 'Listo' ? 'selected' : ''}>Listo</option>
+                        <option value="Entregado" ${estadoActual === 'Entregado' ? 'selected' : ''}>Entregado</option>
+                    </select>
+                `;
+
                 tabla.innerHTML += `
                     <tr>
-                        <td><strong>${pedido.id}</strong></td>
-                        <td>${pedido.cliente.nombre}<br><small>${pedido.cliente.telefono}</small></td>
+                        <td><strong>${pedido.id}</strong><br><small style="color:#777;">${fechaFormateada}</small></td>
+                        <td>${pedido.cliente.nombre}<br><small style="color:#555;">📞 ${pedido.cliente.telefono}</small></td>
                         <td><strong>${pedido.pago.totalFinal}</strong></td>
-                        <td class="estado-pendiente">${pedido.estado}</td>
-                        <td>${botonesArchivos}</td>
+                        <td>${selectHtml}</td>
+                        <td>${htmlArchivos}</td>
                     </tr>
                 `;
             });
-        });
+        }
+
+        // CAMBIAR ESTATUS EN TIEMPO REAL EN FIREBASE
+        async function cambiarEstado(idDoc, nuevoEstado) {
+            try {
+                await db.collection("pedidos").doc(idDoc).update({ estado: nuevoEstado });
+            } catch (e) {
+                alert("Error al actualizar el estatus: " + e.message);
+            }
+        }
+
+        // ACTUALIZAR TARJETAS DE ESTADÍSTICAS
+        function actualizarEstadisticas(pedidos) {
+            document.getElementById("stat-total").innerText = pedidos.length;
+            
+            let sumaVentas = pedidos.reduce((acc, p) => {
+                let num = parseFloat(String(p.pago.totalFinal).replace(/[^0-9.]/g, "")) || 0;
+                return acc + num;
+            }, 0);
+            document.getElementById("stat-ventas").innerText = `$${sumaVentas.toLocaleString('es-MX', {minimumFractionDigits: 2})} MXN`;
+
+            let pendientes = pedidos.filter(p => p.estado === "Pendiente" || !p.estado).length;
+            document.getElementById("stat-pendientes").innerText = pendientes;
+        }
+
+        function cambiarFiltro(estatus, btn) {
+            filtroActual = estatus;
+            document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderizarTabla(listaPedidosGlobal);
+        }
+
+        function filtrarPedidos() {
+            renderizarTabla(listaPedidosGlobal);
+        }
     </script>
 </body>
 </html>
