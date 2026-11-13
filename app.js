@@ -1333,17 +1333,17 @@ async function procesarPedidoCompleto(soloDescargar) {
         archivos_adjuntos: {}
     };
 
-    try {
-        // === NUEVO: SUBIR LOGOS A GOOGLE DRIVE VÍA APPS SCRIPT ===
-        const urlScriptDrive = "PEGA_AQUI_LA_URL_DE_TU_NUEVO_SCRIPT"; // <--- PEGA TU URL AQUÍ
-
-        for (const tipo of ['base', 'pastel', 'cupcake', 'chulo']) {
-            if (logoDataActual[tipo] && logoDataActual[tipo].archivoObj) {
-                const archivo = logoDataActual[tipo].archivoObj;
-                const esVectorizado = !logoDataActual[tipo].necesitaVector;
-                const nombreSeguro = `${pedidoID}_${tipo}_${archivo.name}`;
-                
-                // Convertir archivo a texto (Base64) para enviarlo a Drive
+    // === NUEVO: SUBIR LOGOS A GOOGLE DRIVE VÍA APPS SCRIPT ===
+    const urlScriptDrive = "https://script.google.com/macros/s/AKfycbwgpJJExl36MK5mRrK0FdJFwUPJv408RPeE5-iLa25gL11hUz-KMX59bHt9iYWem3X_/exec"; 
+    
+    for (const tipo of ['base', 'pastel', 'cupcake', 'chulo']) {
+        if (logoDataActual[tipo] && logoDataActual[tipo].archivoObj) {
+            const archivo = logoDataActual[tipo].archivoObj;
+            const esVectorizado = !logoDataActual[tipo].necesitaVector;
+            const nombreSeguro = `${pedidoID}_${tipo}_${archivo.name}`;
+            
+            try {
+                // Convertir archivo a texto (Base64)
                 const base64Data = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.readAsDataURL(archivo);
@@ -1351,10 +1351,9 @@ async function procesarPedidoCompleto(soloDescargar) {
                     reader.onerror = error => reject(error);
                 });
 
-                // Enviar a nuestro puente de Drive
+                // Enviar a Drive (Quitamos los "headers" para evitar el bloqueo rojo de CORS)
                 const respuestaDrive = await fetch(urlScriptDrive, {
                     method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({
                         nombreArchivo: nombreSeguro,
                         mimeType: archivo.type || "application/pdf",
@@ -1365,22 +1364,29 @@ async function procesarPedidoCompleto(soloDescargar) {
                 
                 const resultadoDrive = await respuestaDrive.json();
                 
-                // Agregar el link de Drive al paquete que irá a Firestore
                 if (resultadoDrive.estatus === 'exito') {
                     paquetePedido.archivos_adjuntos[tipo] = { 
                         url: resultadoDrive.url, 
                         vectorizado: esVectorizado 
                     };
+                } else {
+                    console.warn("Drive no aceptó el archivo:", resultadoDrive.mensaje);
+                    paquetePedido.archivos_adjuntos[tipo] = { url: "Falló subida a Drive", vectorizado: esVectorizado };
                 }
+            } catch (errorArchivo) {
+                console.error("Error al intentar subir el logo:", errorArchivo);
+                paquetePedido.archivos_adjuntos[tipo] = { url: "Error de red al subir", vectorizado: esVectorizado };
             }
         }
+    }
 
+    try {
         // === GUARDAR EL PEDIDO (TEXTO) EN FIRESTORE (TOTALMENTE GRATIS) ===
+        // Al estar en su propio Try-Catch, el pedido SIEMPRE se guardará aunque el logo falle.
         const docRef = await db.collection("pedidos").add(paquetePedido);
         var linkTicketFirebase = `https://minuit-pedidos.vercel.app/admin.html`; 
-
-    } catch (error) {
-        console.error("No se pudo conectar a Firebase o Drive:", error);
+    } catch (errorFirestore) {
+        console.error("Error al guardar en base de datos:", errorFirestore);
     }
     // --- 4. PREPARAR TEXTOS BANCARIOS (Igual que antes) ---
     let datosBancariosMensaje = "";
