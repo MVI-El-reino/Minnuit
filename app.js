@@ -1683,7 +1683,7 @@ function abrirWhatsAppYLimpiar(textoWhatsApp) {
     cerrarModal();          
     cerrarModalDatos();     
 
-    // limpieza de casillas
+    // Limpieza de casillas
     document.getElementById("nombre_cliente").value = "";
     document.getElementById("tel_cliente").value = "";
     document.getElementById("dir_calle").value = "";
@@ -1698,9 +1698,10 @@ function abrirWhatsAppYLimpiar(textoWhatsApp) {
         document.getElementById("btn_finalizar_pedido").disabled = false;
     }
 
-    // EL TRUCO PARA EVITAR QUE SE CANCELE LA DESCARGA
-    // Le damos 2 segundos al navegador para procesar el PDF antes de sacarlo de la página
+    // EL TRUCO: La pantalla de carga se queda activa durante todo el proceso 
+    // y se oculta justo en el instante en que salta a WhatsApp.
     setTimeout(() => {
-        window.location.href = linkWhatsApp;
+        ocultarCarga(); // Apagamos el loader
+        window.location.href = linkWhatsApp; // Abrimos WhatsApp
     }, 2000);
 }
