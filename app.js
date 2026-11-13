@@ -125,6 +125,16 @@ function reemplazarOpciones(id, opciones) {
     }, 0);
 }
 
+function mostrarCarga() {
+    const loader = document.getElementById("pantalla-carga");
+    if (loader) loader.style.display = "flex";
+}
+
+function ocultarCarga() {
+    const loader = document.getElementById("pantalla-carga");
+    if (loader) loader.style.display = "none";
+}
+
 function inicializarTienda() { 
     const selectEnvioInicial = document.getElementById("sel_entrega");
     if (selectEnvioInicial) selectEnvioInicial.value = "0";
@@ -1248,6 +1258,7 @@ async function procesarPedido(soloDescargar = false) {
 
 async function procesarPedidoCompleto(soloDescargar) {
     actualizarVistaCarrito();
+    mostrarCarga()
     
     // --- 1. RECOLECTAR DATOS ---
     let nombreCliente = document.getElementById("nombre_cliente").value.trim();
@@ -1334,7 +1345,7 @@ async function procesarPedidoCompleto(soloDescargar) {
     };
 
     // === NUEVO: SUBIR LOGOS A GOOGLE DRIVE VÍA APPS SCRIPT ===
-    const urlScriptDrive = "https://script.google.com/macros/s/AKfycbwgpJJExl36MK5mRrK0FdJFwUPJv408RPeE5-iLa25gL11hUz-KMX59bHt9iYWem3X_/exec"; 
+    const urlScriptDrive = "https://script.google.com/macros/s/AKfycbzKGxZBGgJYmU3mviJ7N9jY7syPPj1HMAxXoweP0QDYAWDxOCKvWyFViqQZpmnAmxiM/exec"; 
     
     for (const tipo of ['base', 'pastel', 'cupcake', 'chulo']) {
         if (logoDataActual[tipo] && logoDataActual[tipo].archivoObj) {
@@ -1379,6 +1390,31 @@ async function procesarPedidoCompleto(soloDescargar) {
             }
         }
     }
+    // === SUBIR LA NOTA PDF A GOOGLE DRIVE ===
+        let urlPdfDrive = "";
+        try {
+            const respuestaPdfDrive = await fetch(urlScriptDrive, {
+                method: "POST",
+                body: JSON.stringify({
+                    tipo: "pdf",
+                    nombreArchivo: nombreArchivo,
+                    mimeType: "application/pdf",
+                    base64: pdfBase64.split(',')[1]
+                })
+            });
+            const resultadoPdf = await respuestaPdfDrive.json();
+            if (resultadoPdf.estatus === 'exito') {
+                urlPdfDrive = resultadoPdf.url;
+            }
+        } catch (e) {
+            console.warn("No se pudo subir el PDF a Drive", e);
+        }
+
+        // Agregar la URL del PDF al paquete que va a Firebase
+        paquetePedido.archivos_adjuntos.pdfNota = {
+            url: urlPdfDrive,
+            nombre: nombreArchivo
+        };
 
     try {
         // === GUARDAR EL PEDIDO (TEXTO) EN FIRESTORE (TOTALMENTE GRATIS) ===
@@ -1602,6 +1638,7 @@ async function procesarPedidoCompleto(soloDescargar) {
             console.warn("No se pudo guardar la copia local.", e);
         }
 
+
         const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
         if (soloDescargar) {
@@ -1624,6 +1661,7 @@ async function procesarPedidoCompleto(soloDescargar) {
         if (document.getElementById("btn_finalizar_pedido")) document.getElementById("btn_finalizar_pedido").disabled = false;
         if (document.getElementById("btn_solo_descarga")) document.getElementById("btn_solo_descarga").disabled = false;
     }
+    ocultarCarga()
 }
 
 // ==========================================
