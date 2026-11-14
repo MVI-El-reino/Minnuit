@@ -30,6 +30,15 @@
 * {
     -webkit-tap-highlight-color: transparent !important;
 }
+/* En styles.css */
+.logo-pantone {
+    width: 240px; /* Ajusta al ancho que ya tenía tu logo */
+    height: 110px; /* Ajusta al alto que ya tenía tu logo */
+    margin: 0 auto;
+    background-color: #F2B2C2; /* Aquí pones el color exacto que quieras */
+    -webkit-mask: url("Logo%20Minuit1.png") no-repeat center / contain;
+    mask: url("Logo%20Minuit1.png") no-repeat center / contain;
+}
 /* =========================================
    ANIMACIÓN DE ENTRADA
    ========================================= */
