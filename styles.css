@@ -249,6 +249,9 @@ header {
     margin: 0 auto 10px auto; /* Lo centra perfectamente y le da espacio abajo */
     
     /* Previene que la imagen pierda calidad al escalarse */
+    mix-blend-mode: normal;
+    filter: none;
+    opacity: 1;
     image-rendering: -webkit-optimize-contrast; 
     object-fit: contain;
 }
