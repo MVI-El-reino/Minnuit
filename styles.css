@@ -4,7 +4,7 @@
     --rosa-principal: #f2b0ba; 
     
     /* Efecto Hover: Ahora se "ilumina" a un tono más claro en lugar de oscurecerse */
-    --rosa-hover: #f2b2c2/*#ffb8d2*/; 
+    --rosa-hover: #ffb8d2; 
     
     /* Gradiente: Va del principal a uno ligeramente más claro */
     --rosa-gradiente: linear-gradient(135deg, #FFA6C9 0%, #ffbbd5 100%); 
@@ -12,7 +12,7 @@
     /* Tonos progresivamente más claros para fondos y detalles */
     --rosa-medio: #fadbe4;     
     --borde-suave: #f8dce5;      
-    --rosa-claro: #fdf0f4;     
+    --rosa-claro: /*#fdf0f4*/#f2b2c2;     
     
     --blanco: #ffffff;
     
