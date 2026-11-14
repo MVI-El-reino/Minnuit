@@ -12,7 +12,8 @@
     /* Tonos progresivamente más claros para fondos y detalles */
     --rosa-medio: #fadbe4;     
     --borde-suave: #f8dce5;      
-    --rosa-claro: /*#fdf0f4*/#f2b2c2;     
+    --rosa-claro: #fdf0f4;
+    --rosa-claro1: #f2b2c2;
     
     --blanco: #ffffff;
     
@@ -116,7 +117,7 @@ select,
     display: flex;
     justify-content: space-between;
     align-items: stretch;
-    background: var(--rosa-claro);
+    background: var(--rosa-claro1);
     padding: 12px 15px 15px 15px; /* Menos espacio de relleno arriba y abajo */
     border-radius: 12px;
     margin: 15px 0 25px;
