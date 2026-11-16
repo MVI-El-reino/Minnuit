@@ -1191,16 +1191,19 @@ body { padding-bottom: 100px; }
     mask: url("cora.png") no-repeat center / contain;
 }
 
-/* CORAZÓN ORIGINAL (cora.png) CON TRAZO A PLUMA + ACOMODO */
+/* CORAZÓN ORIGINAL (cora.png) SIN PIXELARSE */
 .splash-corazon-original {
     position: absolute;
-    width: 41px;
-    height: 37px;
-    top: 24px;
-    left: 141px;
+    /* Tamaño grande nativo para que el trazo inicial sea 100% nítido */
+    width: 110px;
+    height: 99px;
+    /* Coordenadas ajustadas al centro antes de encogerse */
+    top: -7px;
+    left: 106px;
     z-index: 2;
     overflow: visible;
-    transform: translate(-18px, 35px) scale(2.6);
+    /* Inicia grande en el centro (scale 1) y aterriza en su lugar exacto (scale 0.373 = 41px) */
+    transform: translate(-31px, 22px) scale(1);
     animation: acomodarCorazon 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s forwards;
 }
 
@@ -1226,7 +1229,9 @@ body { padding-bottom: 100px; }
 }
 
 @keyframes acomodarCorazon {
-    to { transform: translate(0, 0) scale(1); }
+    to { 
+        transform: translate(0, 0) scale(0.373); 
+    }
 }
 
 @keyframes escribirMinuit {
