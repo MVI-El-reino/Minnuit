@@ -1159,38 +1159,103 @@ body { padding-bottom: 100px; }
     border: 3px solid #ffffff; /* Borde blanco estilo foto polaroid moderna */
 }
 
-/* =========================================
-   PANTALLA DE CARGA (SPINNER)
-   ========================================= */
-#pantalla-carga {
+/* =========================================================
+   1. ANIMACIÓN DE ENTRADA (SPLASH SCREEN)
+   ========================================================= */
+#splash-screen {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(253, 240, 244, 0.95);
-    z-index: 99999;
-    display: none;
-    flex-direction: column;
+    inset: 0;
+    background-color: #fdf0f4;
+    z-index: 999999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Se desvanece suavemente después de completar la animación (2.6s) */
+    animation: desaparecerSplash 0.6s ease 2.6s forwards;
+}
+
+.splash-contenedor {
+    position: relative;
+    width: 260px;
+    height: 130px;
+    display: flex;
     justify-content: center;
     align-items: center;
 }
-.spinner-minuit {
-    width: 60px;
-    height: 60px;
-    border: 6px solid #fce4ec;
-    border-top: 6px solid var(--rosa-principal);
-    border-radius: 50%;
-    animation: girarMinuit 0.8s linear infinite;
+
+/* El corazón empieza grande en el centro, se dibuja y luego se encoge hacia arriba */
+.splash-corazon {
+    position: absolute;
+    width: 34px;  /* Tamaño final exacto sobre la "i" */
+    height: 30px;
+    /* Posición final exacta sobre las letras (ajusta top/left 1 o 2px si hace falta) */
+    top: 12px;
+    left: 118px;
+    z-index: 2;
+    /* Inicia centrado y 2.6 veces más grande; a los 0.9s viaja a su lugar */
+    transform: translate(-18px, 35px) scale(2.6);
+    animation: acomodarCorazon 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s forwards;
 }
-@keyframes girarMinuit {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+
+.trazo-entrada {
+    stroke-dasharray: 240;
+    stroke-dashoffset: 240;
+    animation: dibujarTrazo 0.85s ease-out forwards;
 }
-.texto-carga {
-    margin-top: 20px;
-    color: var(--rosa-principal);
-    font-weight: 700;
-    font-size: 1.1rem;
-    letter-spacing: 0.5px;
+
+/* Las letras se escriben justo cuando el corazón llega a su posición */
+.splash-letras {
+    width: 250px;
+    height: 115px;
+    background-color: #F2B2C2; /* Pantone 495 U */
+    -webkit-mask: url("miniut.png") no-repeat center / contain;
+    mask: url("miniut.png") no-repeat center / contain;
+    clip-path: inset(0 100% 0 0);
+    animation: escribirMinuit 1s ease-out 1.35s forwards;
+}
+
+@keyframes dibujarTrazo {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes acomodarCorazon {
+    to { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes escribirMinuit {
+    to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes desaparecerSplash {
+    to {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+}
+
+/* =========================================================
+   2. PANTALLA DE CARGA AL GENERAR PDF (CORAZÓN EN BUCLE)
+   ========================================================= */
+.carga-corazon {
+    width: 75px;
+    height: 68px;
+}
+
+.trazo-bucle {
+    stroke-dasharray: 240;
+    stroke-dashoffset: 240;
+    animation: bucleCorazon 1.5s ease-in-out infinite;
+}
+
+@keyframes bucleCorazon {
+    0% {
+        stroke-dashoffset: 240;
+    }
+    50% {
+        stroke-dashoffset: 0;
+    }
+    100% {
+        stroke-dashoffset: -240;
+    }
 }
