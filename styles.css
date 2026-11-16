@@ -1237,6 +1237,19 @@ body { padding-bottom: 100px; }
 /* =========================================================
    2. PANTALLA DE CARGA AL GENERAR PDF (CORAZÓN EN BUCLE)
    ========================================================= */
+#pantalla-carga {
+    position: fixed;
+    inset: 0;
+    background: rgba(253, 240, 244, 0.96);
+    z-index: 999999; /* Por encima de todos los modales */
+    display: none;   /* Oculto hasta que se llame mostrarCarga() */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
 .carga-corazon {
     width: 75px;
     height: 68px;
