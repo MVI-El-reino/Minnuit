@@ -1193,7 +1193,7 @@ body { padding-bottom: 100px; }
     z-index: 2;
     background-color: #F2B2C2; /* Pantone 495 U exacto */
     -webkit-mask: url("cora.png") no-repeat center / contain;
-    mask: url("cora.png") no-repeat center / contain;
+    mask: url("miniut.png") no-repeat center / contain;
     
     /* Se revela de abajo hacia arriba como dibujándose, luego se encoge a su lugar */
     clip-path: inset(100% 0 0 0);
