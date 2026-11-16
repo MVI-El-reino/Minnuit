@@ -1189,8 +1189,8 @@ body { padding-bottom: 100px; }
     width: 34px;  /* Tamaño final exacto sobre la "i" */
     height: 30px;
     /* Posición final exacta sobre las letras (ajusta top/left 1 o 2px si hace falta) */
-    top: 5px;
-    left: 110px;
+    top: 30px;
+    left: 150px;
     z-index: 2;
     /* Inicia centrado y 2.6 veces más grande; a los 0.9s viaja a su lugar */
     transform: translate(-18px, 35px) scale(2.6);
