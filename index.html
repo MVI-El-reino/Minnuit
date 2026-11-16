@@ -58,24 +58,27 @@
 <body onload="inicializarTienda()">
 
     <!-- 1. EN #splash-screen (Animación de entrada: se traza a pluma y se acomoda) -->
-<svg class="splash-corazon-original" viewBox="0 0 100 90">
-    <defs>
-        <mask id="mascara-cora-entrada">
-            <!-- El trazo blanco que va revelando la silueta a pluma -->
-            <path class="pluma-entrada" 
-                  d="M49 27 C42 12, 16 10, 15 30 C14 50, 38 66, 49 81 C61 65, 86 46, 84 26 C82 9, 56 12, 49 27 Z" 
-                  fill="none" 
-                  stroke="white" 
-                  stroke-width="24" 
-                  stroke-linecap="round" 
-                  stroke-linejoin="round" />
-        </mask>
-    </defs>
-    <!-- Tu archivo cora.png original teñido en Pantone 495 U y recortado por el trazo -->
-    <foreignObject width="100" height="90" mask="url(#mascara-cora-entrada)">
-        <div class="relleno-cora-pantone"></div>
-    </foreignObject>
-</svg>
+<div id="splash-screen">
+    <div class="splash-contenedor">
+        <!-- 1. Corazón trazo a pluma -->
+        <svg class="splash-corazon-original" viewBox="0 0 100 90">
+            <defs>
+                <mask id="mascara-cora-entrada">
+                    <path class="pluma-entrada" 
+                          d="M49 27 C42 12, 16 10, 15 30 C14 50, 38 66, 49 81 C61 65, 86 46, 84 26 C82 9, 56 12, 49 27 Z" 
+                          fill="none" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" />
+                </mask>
+            </defs>
+            <foreignObject width="100" height="90" mask="url(#mascara-cora-entrada)">
+                <div class="relleno-cora-pantone"></div>
+            </foreignObject>
+        </svg>
+
+        <!-- 2. Imagen miniut.png que se escribe detrás -->
+        <div class="splash-letras"></div>
+    </div>
+</div>
+    
     <header style="position: relative;">
     <div class="logo-pantone" aria-label="Minuit Letters Design"></div>
 </header>
