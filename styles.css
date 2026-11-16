@@ -1187,8 +1187,8 @@ body { padding-bottom: 100px; }
     position: absolute;
     width: 34px;
     height: 30px;
-    top: 12px;
-    left: 118px;
+    top: 30px;
+    left: 147px;
     z-index: 2;
     background-color: #F2B2C2; /* Pantone 495 U */
     -webkit-mask: url("cora.png") no-repeat center / contain;
