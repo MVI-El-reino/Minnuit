@@ -61,18 +61,22 @@
 <div id="splash-screen">
     <div class="splash-contenedor">
         <!-- 1. Corazón trazo a pluma -->
-        <svg class="splash-corazon-original" viewBox="0 0 100 90">
-            <defs>
-                <mask id="mascara-cora-entrada">
-                    <path class="pluma-entrada" 
-                          d="M49 27 C42 12, 16 10, 15 30 C14 50, 38 66, 49 81 C61 65, 86 46, 84 26 C82 9, 56 12, 49 27 Z" 
-                          fill="none" stroke="white" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" />
-                </mask>
-            </defs>
-            <foreignObject width="100" height="90" mask="url(#mascara-cora-entrada)">
-                <div class="relleno-cora-pantone"></div>
-            </foreignObject>
-        </svg>
+<svg class="splash-corazon-original" viewBox="0 0 100 90">
+    <defs>
+        <mask id="mascara-cora-entrada">
+            <path class="pluma-entrada" 
+                  d="M49 32 C43 13, 14 10, 13 33 C12 56, 38 71, 49 85 C61 70, 88 51, 86 29 C84 8, 56 13, 49 32 Z" 
+                  fill="none" 
+                  stroke="white" 
+                  stroke-width="22" 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" />
+        </mask>
+    </defs>
+    <foreignObject width="100" height="90" mask="url(#mascara-cora-entrada)">
+        <div class="relleno-cora-pantone"></div>
+    </foreignObject>
+</svg>
 
         <!-- 2. Imagen miniut.png que se escribe detrás -->
         <div class="splash-letras"></div>
@@ -741,14 +745,15 @@
     <!-- PANTALLA DE CARGA (SOLO CORAZÓN EN BUCLE) -->
 <div id="pantalla-carga">
     <!-- 2. EN #pantalla-carga (Se dibuja a pluma en bucle hasta abrir WhatsApp) -->
+<!-- 2. EN #pantalla-carga (Pantalla de espera nítida en bucle) -->
 <svg class="carga-corazon-original" viewBox="0 0 100 90">
     <defs>
         <mask id="mascara-cora-carga">
             <path class="pluma-bucle" 
-                  d="M49 27 C42 12, 16 10, 15 30 C14 50, 38 66, 49 81 C61 65, 86 46, 84 26 C82 9, 56 12, 49 27 Z" 
+                  d="M49 32 C43 13, 14 10, 13 33 C12 56, 38 71, 49 85 C61 70, 88 51, 86 29 C84 8, 56 13, 49 32 Z" 
                   fill="none" 
                   stroke="white" 
-                  stroke-width="24" 
+                  stroke-width="22" 
                   stroke-linecap="round" 
                   stroke-linejoin="round" />
         </mask>
