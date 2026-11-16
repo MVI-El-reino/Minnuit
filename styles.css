@@ -1213,6 +1213,15 @@ body { padding-bottom: 100px; }
     animation: trazoPluma 0.85s cubic-bezier(0.45, 0, 0.55, 1) forwards;
 }
 
+.relleno-final-entrada {
+    opacity: 0;
+    animation: completarMascara 0.15s ease 0.72s forwards;
+}
+
+@keyframes completarMascara {
+    to { opacity: 1; }
+}
+
 /* LETRAS MINUIT (miniut.png) QUE SE ESCRIBEN DETRÁS */
 .splash-letras {
     width: 250px;
