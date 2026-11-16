@@ -190,6 +190,12 @@ function inicializarTienda() {
     actualizarConfiguradorBases(); 
     actualizarConfiguradorCupcakes();
     actualizarOpcionesTamanoPastel();
+
+    // Eliminar la pantalla de bienvenida del DOM cuando termine su animación
+    setTimeout(() => {
+        const splash = document.getElementById("splash-screen");
+        if (splash) splash.remove();
+    }, 3300);
 }
 
 // Helper para que el diseño premium lea los cambios de tu código
