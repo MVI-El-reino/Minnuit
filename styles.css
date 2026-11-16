@@ -126,7 +126,7 @@ select,
     display: flex;
     justify-content: space-between;
     align-items: stretch;
-    background: var(--rosa-claro1);
+    background: var(--rosa-claro);
     padding: 12px 15px 15px 15px; /* Menos espacio de relleno arriba y abajo */
     border-radius: 12px;
     margin: 15px 0 25px;
