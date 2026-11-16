@@ -1182,7 +1182,16 @@ body { padding-bottom: 100px; }
     align-items: center;
 }
 
-/* CORAZÓN ORIGINAL (cora.png) EN LA ANIMACIÓN DE ENTRADA */
+/* Relleno Pantone 495 U con la forma exacta de cora.png */
+.relleno-cora-pantone {
+    width: 100%;
+    height: 100%;
+    background-color: #F2B2C2;
+    -webkit-mask: url("cora.png") no-repeat center / contain;
+    mask: url("cora.png") no-repeat center / contain;
+}
+
+/* CORAZÓN ORIGINAL (cora.png) CON TRAZO A PLUMA + ACOMODO */
 .splash-corazon-original {
     position: absolute;
     width: 41px;
@@ -1190,18 +1199,18 @@ body { padding-bottom: 100px; }
     top: 24px;
     left: 141px;
     z-index: 2;
-    background-color: #F2B2C2; /* Pantone 495 U */
-    -webkit-mask: url("cora.png") no-repeat center / contain;
-    mask: url("cora.png") no-repeat center / contain;
-    
-    clip-path: inset(100% 0 0 0);
+    overflow: visible;
     transform: translate(-18px, 35px) scale(2.6);
-    animation: 
-        revelarCorazonOriginal 0.8s ease-out forwards,
-        acomodarCorazon 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.85s forwards;
+    animation: acomodarCorazon 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s forwards;
 }
 
-/* LETRAS MINUIT QUE SE ESCRIBEN DEBAJO */
+.pluma-entrada {
+    stroke-dasharray: 260;
+    stroke-dashoffset: 260;
+    animation: trazoPluma 0.85s cubic-bezier(0.45, 0, 0.55, 1) forwards;
+}
+
+/* LETRAS MINUIT (miniut.png) QUE SE ESCRIBEN DETRÁS */
 .splash-letras {
     width: 250px;
     height: 115px;
@@ -1212,8 +1221,8 @@ body { padding-bottom: 100px; }
     animation: escribirMinuit 1s ease-out 1.35s forwards;
 }
 
-@keyframes revelarCorazonOriginal {
-    to { clip-path: inset(0 0 0 0); }
+@keyframes trazoPluma {
+    to { stroke-dashoffset: 0; }
 }
 
 @keyframes acomodarCorazon {
@@ -1233,14 +1242,14 @@ body { padding-bottom: 100px; }
 }
 
 /* =========================================================
-   2. PANTALLA DE CARGA AL GENERAR PEDIDO (cora.png EN BUCLE)
+   2. PANTALLA DE CARGA AL GENERAR PEDIDO (cora.png A PLUMA EN BUCLE)
    ========================================================= */
 #pantalla-carga {
     position: fixed;
     inset: 0;
     background: rgba(253, 240, 244, 0.96);
     z-index: 999999;
-    display: none; /* Oculto hasta que se presiona Finalizar Pedido */
+    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -1249,16 +1258,19 @@ body { padding-bottom: 100px; }
 }
 
 .carga-corazon-original {
-    width: 75px;
-    height: 68px;
-    background-color: #F2B2C2; /* Pantone 495 U */
-    -webkit-mask: url("cora.png") no-repeat center / contain;
-    mask: url("cora.png") no-repeat center / contain;
-    animation: dibujarBucleOriginal 1.4s ease-in-out infinite;
+    width: 80px;
+    height: 72px;
+    overflow: visible;
 }
 
-@keyframes dibujarBucleOriginal {
-    0%   { clip-path: inset(0 100% 0 0); opacity: 0.4; }
-    50%  { clip-path: inset(0 0 0 0);    opacity: 1; }
-    100% { clip-path: inset(0 0 0 100%); opacity: 0.4; }
+.pluma-bucle {
+    stroke-dasharray: 260;
+    stroke-dashoffset: 260;
+    animation: buclePluma 1.6s ease-in-out infinite;
+}
+
+@keyframes buclePluma {
+    0%   { stroke-dashoffset: 260; }
+    50%  { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -260; }
 }
